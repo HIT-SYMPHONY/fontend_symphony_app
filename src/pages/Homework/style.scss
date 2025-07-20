@@ -1,0 +1,187 @@
+$primary-color: #f48a4c;
+$secondary-color: #ff6911;
+$border-color: #d9d9d9;
+$background-light: #ffefe4;
+$shadow-color: #b5b5b5;
+
+.homework {
+  position: relative;
+  border: 1px solid $border-color;
+  padding: 10px;
+  border-radius: 20px;
+  width: 30%;
+  box-sizing: border-box;
+
+  &__icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &__baitap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .mau {
+        color: $secondary-color;
+      }
+    }
+
+    &__bieutuong {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+
+        .dropdown-btn {
+          background-color: $primary-color;
+          color: white;
+          padding: 4px 16px;
+          border: none;
+          border-radius: 20px;
+          font-size: 12px;
+          cursor: pointer;
+          outline: none;
+          transition: all 0.3s ease;
+        }
+
+        .dropdown-content {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          border-radius: 10px;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 1;
+          font-size: 12px;
+          border: 1px solid $primary-color;
+          background-color: white;
+
+          a {
+            color: gray;
+            display: block;
+            padding: 4px 16px;
+            text-decoration: none;
+
+            &:hover {
+              background-color: $background-light;
+              border-radius: 10px;
+            }
+          }
+        }
+      }
+
+      .mau {
+        color: $secondary-color;
+      }
+    }
+  }
+
+  .homework__baitap {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    max-height: 445px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    .baitap {
+      background-color: $background-light;
+      border-radius: 8px;
+      gap: 20px;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba($shadow-color, 0.1);
+
+      .div {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        gap: 10px;
+
+        span {
+          display: block;
+          font-size: 14px;
+          font-weight: bold;
+          padding: 10px;
+          border-radius: 10px;
+        }
+
+        div {
+          h5 {
+            font-size: 14px;
+            font-weight: bold;
+          }
+
+          .daucuoi {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+
+            p {
+              font-size: 14px;
+              margin: 0;
+              padding: 0;
+            }
+          }
+        }
+      }
+
+      &__content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .vien {
+          width: 5px;
+          height: 100px;
+          border-radius: 10px;
+        }
+
+        div:last-child {
+          flex: 1;
+
+          .daucuoi {
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+          }
+
+          p {
+            padding: 0;
+            margin: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+.color-one {
+  color: #f27b36 !important;
+}
+.color-two {
+  color: #da0b00 !important;
+}
+.color-three {
+  color: #b5b5b5 !important;
+}
+.back-one {
+  background-color: #f27b36 !important;
+  color: #fff;
+}
+.back-two {
+  background-color: #da0b00 !important;
+  color: #fff;
+}
+.back-three {
+  background-color: #b5b5b5 !important;
+  color: #fff;
+}

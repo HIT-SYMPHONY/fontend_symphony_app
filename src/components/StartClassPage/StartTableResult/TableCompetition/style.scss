@@ -1,0 +1,177 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.table-result {
+  border: 2px solid $border-color;
+  padding: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    &__icon {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      &__fill {
+        color: $secondary-color;
+      }
+    }
+    &__toggle {
+      border-radius: 20px;
+      border: 2px solid $border-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      p {
+        padding-left: 10px;
+        padding-right: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .toggle {
+        background-color: $secondary-color;
+        height: 100%;
+        border-radius: 20px;
+        color: #fff;
+      }
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 90%;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    .body {
+      display: flex;
+      flex-direction: column;
+      border: 2px solid $border-color;
+      padding: 10px;
+      box-shadow: 0 4px 8px $shadow-color;
+      border-radius: 10px;
+      box-sizing: border-box;
+      gap: 10px;
+      width: 100%;
+      .body__img {
+        display: flex;
+        border-radius: 10px;
+        box-sizing: border-box;
+        width: 100%;
+        align-items: center;
+        gap: 20px;
+        &__hinhanh {
+          width: 60px;
+          height: 60px;
+          border-radius: 10px;
+          background-color: #d3d1d0;
+        }
+        &__hi {
+          width: 180px;
+          height: 60px;
+          border-radius: 10px;
+          background-color: #d3d1d0;
+        }
+        &__tieumuc {
+          width: 100%;
+          &__space {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            span {
+              padding: 2px;
+              background-color: #ffefe4;
+              color: #f06c25;
+            }
+            .space {
+              display: flex;
+              gap: 20px;
+              padding-right: 20px;
+              &__mau {
+                color: #f06c25;
+                cursor: pointer;
+              }
+            }
+          }
+          p {
+            color: #a2a2a2;
+          }
+        }
+      }
+
+      &__thongtin {
+        width: 100%;
+        &__title {
+          display: flex;
+          justify-content: space-around;
+        }
+
+        &__table {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-height: 200px;
+          overflow-y: auto;
+          &::-webkit-scrollbar {
+            display: none;
+          }
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+
+          .list-table {
+            display: flex;
+            justify-content: space-between;
+            border: 2px solid $border-color;
+            padding: 10px;
+            border-radius: 10px;
+            box-sizing: border-box;
+            align-items: center;
+
+            &__title {
+              display: flex;
+              gap: 20px;
+              align-items: center;
+              &__icon {
+                padding: 10px;
+                color: #fff;
+                background-color: #ff6911;
+                border-radius: 10px;
+              }
+            }
+
+            &__h3 {
+              padding: 10px;
+              color: #fff;
+              background-color: #ff6911;
+              border-radius: 10px;
+            }
+
+            &__icon {
+              color: #ff6911;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media (min-width: 1200px) and (min-height: 780px) {
+  .table-result__body {
+    height: 95%;
+  }
+}

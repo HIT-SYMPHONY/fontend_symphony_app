@@ -1,0 +1,108 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.listmember {
+  border: 2px solid $border-color;
+  padding: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+
+  &__table {
+    border: 2px solid $border-color;
+    padding: 10px;
+    box-shadow: 0 4px 8px $shadow-color;
+    border-radius: 10px;
+    box-sizing: border-box;
+    height: 80%;
+
+    &__begin {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    &__end {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 95%;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      .end {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: $background-light;
+        padding-right: 10px;
+        border-radius: 10px;
+
+        &__id {
+          display: flex;
+          align-items: center;
+          gap: 85px;
+
+          span {
+            width: 35px;
+            height: 35px;
+            background-color: $secondary-color;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            color: #fff;
+          }
+        }
+
+        &__time {
+          display: flex;
+          align-items: center;
+          gap: 80px;
+
+          &__eclip {
+            width: 35px;
+            height: 35px;
+            background-color: #c8c6c6;
+            border-radius: 50%;
+          }
+        }
+      }
+    }
+  }
+
+  &__title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &__icon {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+
+      .icon {
+        width: 50px;
+        height: 50px;
+        background-color: #c8c6c6;
+        border-radius: 50%;
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .listmember__table {
+    height: 85%;
+  }
+  .listmember__table__end {
+    height: 95%;
+  }
+}

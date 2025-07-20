@@ -1,0 +1,102 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.manage {
+  border: 2px solid $border-color;
+  box-shadow: 0 4px 8px $shadow-color;
+  padding: 10px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  &__title {
+    display: flex;
+    gap: 10px;
+    &__icon {
+      color: $secondary-color;
+    }
+  }
+
+  &__search {
+    display: flex;
+    justify-content: center;
+    &__container {
+      display: flex;
+      gap: 10px;
+      border: 2px solid #b5b5b5;
+      padding-left: 10px;
+      padding-right: 10px;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 30px;
+      width: 50%;
+
+      input {
+        border-radius: 30px;
+        padding: 10px;
+        border: none;
+        outline: none;
+        width: 80%;
+      }
+      i {
+        padding: 5px;
+        border-radius: 50%;
+        background-color: $secondary-color;
+        color: aliceblue;
+        cursor: pointer;
+      }
+      i:hover {
+        background-color: #dd5a0f;
+      }
+    }
+  }
+
+  &__table {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    .manage-table {
+      display: flex;
+      gap: 20px;
+      border: 2px solid $border-color;
+      padding: 10px;
+      align-items: center;
+      border-radius: 10px;
+      &__img {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        background-color: #d9d9d9;
+      }
+
+      &__context {
+        width: 90%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &__pair {
+          span {
+            background-color: #ffefe4;
+            color: #ff6911;
+          }
+        }
+        &__span {
+          color: #ff6911;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

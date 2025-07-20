@@ -1,0 +1,129 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.testcontent {
+  display: flex;
+  flex-direction: column;
+  height: 66vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  gap: 5px;
+
+  &__title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    &__h4 {
+      padding: 5px 15px;
+      background-color: #f48a4c;
+      border-radius: 10px;
+      color: white;
+    }
+
+    i {
+      color: $secondary-color;
+    }
+  }
+
+  &__information {
+    display: flex;
+    justify-content: space-around;
+
+    &__context {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      h5 {
+        color: #a2a2a2;
+      }
+    }
+  }
+
+  &__topic {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border: 2px solid $border-color;
+    padding: 10px;
+    border-radius: 15px;
+    &__tap {
+      display: flex;
+      justify-content: space-between;
+      &__icon {
+        cursor: pointer;
+        color: $secondary-color;
+      }
+    }
+    &__context {
+      height: 150px;
+    }
+  }
+
+  &__member {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border: 2px solid $border-color;
+    padding: 10px;
+    border-radius: 10px;
+    &__title {
+      display: flex;
+      justify-content: space-around;
+    }
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      height: 300px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      &__box {
+        display: flex;
+        justify-content: space-between;
+        background-color: #ffefe4;
+        align-items: center;
+        border-radius: 10px;
+        &__name {
+          display: flex;
+          gap: 40px;
+          align-items: center;
+          &__span {
+            padding: 5px 15px;
+            border-radius: 10px;
+            background-color: #f48a4c;
+            color: #fff;
+          }
+        }
+        &__diem {
+          h5 {
+            padding: 5px 10px;
+            border-radius: 10px;
+            background-color: #f48a4c;
+            color: #fff;
+          }
+        }
+        &__time {
+          display: flex;
+          gap: 40px;
+          &__icon {
+            color: $secondary-color;
+            cursor: pointer;
+            padding-right: 10px;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,117 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+
+$secondary-color: #ff6911;
+
+$background-light: #ffefe4;
+
+.exam {
+  border: 2px solid $border-color;
+  padding: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  &__one {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &__tap {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      &__than {
+        background-color: #ff6911;
+        color: #ffefe4;
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .tapthan {
+        color: #ff6911;
+      }
+    }
+    &__time {
+      padding: 10px;
+      background-color: #ff6911;
+      color: #ffefe4 !important;
+      border-radius: 10px;
+      padding-bottom: 5px;
+      padding-top: 5px;
+    }
+  }
+  &__two {
+    border: 2px solid $border-color;
+    height: 50%;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 10px;
+    box-shadow: 0 4px 8px $shadow-color;
+  }
+  &__nop {
+    border: 2px solid $border-color;
+    height: 25%;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 10px;
+    box-shadow: 0 4px 8px $shadow-color;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+
+  &__input-wrapper {
+    position: relative;
+
+    border-radius: 10px;
+
+    background: #fff;
+  }
+
+  &__textarea {
+    width: 100%;
+    resize: none;
+    overflow-y: auto;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    line-height: 1.4;
+    box-sizing: border-box;
+  }
+
+  &__submit {
+    position: absolute;
+    right: 10px;
+    bottom: -20px;
+    background-color: #f26522;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+  }
+}
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .exam__nop {
+    height: 30%;
+  }
+  .exam__submit {
+    bottom: -100px;
+  }
+}

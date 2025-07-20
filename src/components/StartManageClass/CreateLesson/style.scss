@@ -1,0 +1,74 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.createlesson {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid $border-color;
+  padding: 10px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  gap: 5px;
+  height: 66vh;
+  &__start {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    &__icon {
+      color: $secondary-color;
+      cursor: pointer;
+    }
+  }
+
+  &__context {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+    gap: 5px;
+    h4 {
+      color: #a2a2a2;
+    }
+
+    &__input {
+      padding: 10px;
+      border-radius: 15px;
+      border: 2px solid #dadada;
+    }
+
+    &__textarea {
+      padding: 10px;
+      border-radius: 15px;
+      border: 2px solid #dadada;
+      height: 25vh;
+    }
+  }
+
+  &__end {
+    display: flex;
+    justify-content: end;
+    padding: 0px 10px;
+    &__submit {
+      padding: 5px 20px;
+      border: 2px solid #ff6911;
+      border-radius: 20px;
+      background-color: $secondary-color;
+      color: #fff;
+      cursor: pointer;
+    }
+    &__submit:hover {
+      background-color: #fff;
+      color: $secondary-color;
+    }
+  }
+}
+@media (min-width: 1200px) and (min-height: 780px) {
+  .createlesson {
+    height: 72vh;
+  }
+  .createlesson__context__textarea {
+    height: 42vh;
+  }
+}

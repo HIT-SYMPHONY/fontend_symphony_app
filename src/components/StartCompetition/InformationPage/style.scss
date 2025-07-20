@@ -1,0 +1,235 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.competition-infor {
+  border: 2px solid $border-color;
+  padding: 10px;
+  box-shadow: 0 4px 8px $shadow-color;
+  border-radius: 10px;
+  box-sizing: border-box;
+  height: 90vh;
+  display: flex;
+
+  .competition-infor__among {
+    width: 2px;
+    background-color: #ccc;
+    position: relative;
+  }
+
+  &__among::before,
+  &__among::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 50%;
+  }
+
+  &__among::before {
+    top: 0;
+  }
+
+  &__among::after {
+    bottom: 0;
+  }
+
+  &__left {
+    width: 70%;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    &__title {
+      display: flex;
+      gap: 10px;
+      &__icon {
+        color: $secondary-color;
+      }
+    }
+    &__board {
+      width: 99%;
+      height: 30%;
+      padding: 10px;
+      background-color: #ccc;
+      border-radius: 20px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: end;
+      align-items: end;
+      .board {
+        color: $secondary-color;
+        font-size: 24px;
+      }
+    }
+    &__bang {
+      box-sizing: border-box;
+      height: 60%;
+      width: 99%;
+      border-radius: 20px;
+      border: 2px solid $border-color;
+      padding: 10px;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    &__button {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      .btn {
+        padding: 10px 15px;
+        background-color: #fff;
+        color: #7d7c7c;
+        border: 2px solid #7d7c7c;
+        // font-size: 14px;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+
+      .btn.active {
+        color: $secondary-color !important;
+        border: 2px solid $secondary-color !important;
+      }
+
+      .divider {
+        width: 2px;
+        height: 30px;
+        background-color: #7d7c7c;
+        margin: 0 8px;
+      }
+    }
+  }
+
+  &__right {
+    padding: 10px;
+    padding-right: 0;
+    width: 28%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    &__class {
+      display: flex;
+      flex-direction: column;
+      &__board {
+        background-color: #d9d9d9;
+        height: 150px;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        padding-bottom: 4px;
+        .class-board {
+          background-color: #fff;
+          display: flex;
+          padding: 5px;
+          border-radius: 20px;
+          padding-left: 25%;
+          position: relative;
+          box-shadow: 0 4px 8px $shadow-color;
+          &__icon {
+            position: absolute;
+            z-index: 2;
+            top: -10px;
+            left: 15px;
+            color: #ff6911;
+            background-color: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+}
+.you {
+  color: #7d7c7c;
+}
+.test {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
+  align-items: center;
+  color: #000000;
+  &__img {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    &__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #7d7c7c;
+    }
+  }
+}
+.test-table {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+  &__box {
+    border: 2px solid $border-color;
+    padding: 10px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &__one {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      &__icon {
+        padding: 10px;
+        background-color: #ff6911;
+        border-radius: 10px;
+        color: #fff;
+      }
+      &__span1 {
+        padding-left: 5px;
+        padding-right: 5px;
+        color: #ff6911;
+        background-color: #ffefe4;
+      }
+      &__span2 {
+        padding-left: 5px;
+        padding-right: 5px;
+        color: #a2a2a2;
+        background-color: #ccc;
+      }
+    }
+
+    &__two {
+      display: flex;
+      align-items: center;
+      padding-right: 20px;
+      gap: 30px;
+      cursor: pointer;
+      &__span1 {
+        padding: 10px;
+        background-color: #ff6911;
+        border-radius: 10px;
+        color: #fff;
+      }
+      &__p {
+        color: #ff6911;
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .competition__right__text {
+    height: 65%;
+  }
+}

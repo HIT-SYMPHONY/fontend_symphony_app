@@ -1,0 +1,68 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.managelesson {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid $border-color;
+  padding: 10px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  gap: 5px;
+
+  &__title {
+    display: flex;
+    justify-content: space-around;
+  }
+  &__table {
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+    gap: 5px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    &__box {
+      display: flex;
+      justify-content: space-between;
+      padding-right: 10px;
+      padding-left: 0;
+      background-color: #ffefe4;
+      border-radius: 5px;
+      align-items: center;
+      &__start {
+        display: flex;
+        align-items: center;
+        gap: 100px;
+        &__h5 {
+          background-color: $secondary-color;
+          padding: 10px 15px;
+          border-radius: 5px;
+          color: #fff;
+        }
+      }
+
+      i {
+        color: #ff6911;
+        cursor: pointer;
+      }
+    }
+
+    &__item {
+      display: flex;
+      justify-content: space-around;
+      cursor: pointer;
+    }
+  }
+}
+@media (min-width: 1200px) and (min-height: 780px) {
+  .managelesson__table {
+    height: 500px;
+  }
+}

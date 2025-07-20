@@ -1,0 +1,124 @@
+$primary-color: #f48a4c;
+$secondary-color: #ff6911;
+$border-color: #d9d9d9;
+$background-light: #ffefe4;
+$shadow-color: #b5b5b5;
+
+.schedule {
+  position: relative;
+  border: 1px solid $border-color;
+  padding: 10px;
+  border-radius: 20px;
+  width: 30%;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &__icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    &__thang {
+      display: flex;
+      align-items: center;
+      &__Icon {
+        color: $primary-color;
+      }
+      h3 {
+        margin-left: 10px;
+        font-size: 18px;
+      }
+    }
+
+    span {
+      font-size: 14px;
+      padding: 10px;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      border-radius: 20px;
+      background-color: #f48a4c;
+      color: #fff;
+    }
+  }
+
+  &__date {
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    .date-item {
+      text-align: center;
+      padding: 5px;
+      display: flex;
+      flex-direction: column;
+
+      // gap: 5px;
+      p {
+        margin: 0;
+        padding: 0;
+      }
+
+      &.selected {
+        background-color: #f27b36 !important;
+        border-radius: 10px;
+        color: #fff !important;
+      }
+    }
+  }
+  &__number {
+    color: #888787;
+    padding: 5px;
+  }
+
+  .schedule__list {
+    max-height: 340px;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    .schedule__item {
+      margin-bottom: 10px;
+      padding: 5px;
+      background-color: #ffefe4;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      .div {
+        height: 80px;
+        width: 4px;
+        background-color: #f27b36;
+        border-radius: 5px;
+      }
+
+      div {
+        span {
+          font-weight: bold;
+          color: #ff6911;
+        }
+
+        h5 {
+          margin: 0;
+          padding: 0;
+        }
+
+        p {
+          padding: 0;
+          margin: 0;
+          font-size: 14px;
+          color: #888787;
+        }
+      }
+    }
+  }
+}
