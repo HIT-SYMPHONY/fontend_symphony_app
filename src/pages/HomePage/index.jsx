@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { GlobalContext } from '../../dataContext'
-import icon from './../../assets/img/Ellipse.png'
-import { Outlet } from 'react-router-dom'
-import logo from './../../assets/img/logo.png'
-import Schedule from '../SchedulePage'
-import Homework from '../Homework'
+import toast from 'react-hot-toast'
+import useAuth from '../../hooks/useAuth'
+import useFetch from '../../hooks/useFetch'
+import { ApiConstant } from '../../constants/api.constant'
 import Logout from '../../components/Logout'
 import Main from '../../components/StartHomePage/MainPage'
-import DataInitialState from '../../data/dataSV'
+import Schedule from '../SchedulePage'
+import Homework from '../Homework'
+import icon from '../../assets/img/Ellipse.png'
+import logo from '../../assets/img/logo.png'
 import './style.scss'
 
-const HomeTap = ({ showSchedule, showHomework, showMain }) => {
+const HomeTap = ({ showSchedule, showHomework, showMain, announcements, recentClasses }) => {
   return (
     <div
       className={
@@ -21,10 +23,10 @@ const HomeTap = ({ showSchedule, showHomework, showMain }) => {
       }>
       {(showSchedule || showHomework) && !showMain ? (
         <div className='homepage__main__thongbao__div'>
-          <Main title={true} />
+          <Main title={true} announcements={announcements} recentClasses={recentClasses} />
         </div>
       ) : (
-        <Main title={false} />
+        <Main title={false} announcements={announcements} recentClasses={recentClasses} />
       )}
       {showSchedule && !showMain && <Schedule />}
       {showHomework && !showMain && <Homework />}
@@ -33,172 +35,96 @@ const HomeTap = ({ showSchedule, showHomework, showMain }) => {
 }
 
 const HomePage = () => {
-  const [frame, setFrame] = useState(false)
+  const navigate = useNavigate()
+  const { user } = useAuth()
+
+  const [showLogoutPopup, setShowLogoutPopup] = useState(false)
   const [showMain, setShowMain] = useState(true)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(true)
 
-  const {
-    updateGlobalState,
-    path,
-    aspect,
-    responseData,
-    userData,
-    setUserData,
-    setToken,
-    setAspect,
-  } = useContext(GlobalContext)
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!responseData) {
-        setLoading(false)
-        setError('Không có dữ liệu đăng nhập. Vui lòng đăng nhập lại.')
-        return
-      }
-      if (userData) {
-        setLoading(false)
-        return
-      }
-
-      try {
-        const data = await DataInitialState(responseData, setUserData, setToken, setAspect)
-        setLoading(false)
-      } catch (err) {
-        setError(err.message)
-        setLoading(false)
-      }
-    }
-    fetchUserData()
-  }, [responseData, userData, setUserData, setToken, setAspect])
-
-  const k = 0 // Index của path, cần điều chỉnh nếu k thay đổi động
+  const { data: recentClasses, loading: classesLoading } = useFetch(ApiConstant.classrooms.base)
+  const { data: announcements, loading: announcementsLoading } = useFetch(
+    ApiConstant.notifications.base,
+  )
 
   const handleLichHoc = () => {
-    if (showHomework) {
-      setShowHomework(false)
-    }
+    if (showHomework) setShowHomework(false)
     setShowSchedule(!showSchedule)
   }
 
   const handleBaiTap = () => {
-    if (showSchedule) {
-      setShowSchedule(false)
-    }
+    if (showSchedule) setShowSchedule(false)
     setShowHomework(!showHomework)
   }
 
-  if (loading) {
-    return <div>Đang tải...</div>
-  }
-
-  if (error) {
-    return (
-      <div>
-        Lỗi: {error}
-        <br />
-        <button onClick={() => updateGlobalState(6)}>Đăng nhập lại</button>
-      </div>
-    )
-  }
-
-  if (!userData) {
-    return (
-      <div>
-        Không tìm thấy dữ liệu người dùng! Vui lòng đăng nhập lại.
-        <br />
-        <button onClick={() => updateGlobalState(6)}>Đăng nhập lại</button>
-      </div>
-    )
+  if (!user) {
+    return <div>Loading user information...</div>
   }
 
   return (
     <div className='homepage'>
       <div className='homepage__choose'>
         <div className='homepage__choose__img'>
-          <img src={icon} alt='Profile' />
+          <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {userData.firstName}!</h3>
-        <div
-          className={path[k].home ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => updateGlobalState(1)}>
+        <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
+
+        <NavLink to='/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
-        </div>
+        </NavLink>
+
         <div
-          className={
-            path[k].classroom ? 'homepage__choose__click origin' : 'homepage__choose__click'
-          }
-          onClick={() => updateGlobalState(2)}>
+          className='homepage__choose__click'
+          onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
         </div>
-        {path[k].show && (
+
+        {isClassroomMenuOpen && (
           <div>
-            <div
-              className={
-                path[k].myclass ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
-              }
-              onClick={() => updateGlobalState(2)}>
+            <NavLink to='/my-classes' className='homepage__choose__clickone child'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
-            </div>
-            <div
-              className={
-                path[k].myresult ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
-              }
-              onClick={() => updateGlobalState(3)}>
+            </NavLink>
+            <NavLink to='/my-results' className='homepage__choose__clickone child'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
-            </div>
+            </NavLink>
           </div>
         )}
-        <div
-          className={
-            path[k].competition ? 'homepage__choose__click origin' : 'homepage__choose__click'
-          }
-          onClick={() => updateGlobalState(4)}>
+
+        <NavLink to='/competitions' className='homepage__choose__click'>
           <Icon
             icon='streamline-ultimate:ranking-stars-ribbon-bold'
             className='homepage__choose__click__Icon'
           />
           <span>Cuộc thi</span>
-        </div>
-        {aspect === 'LEADER' && (
-          <div
-            className={
-              path[k].manage ? 'homepage__choose__click origin' : 'homepage__choose__click'
-            }
-            onClick={() => updateGlobalState(7)}>
-            <Icon
-              icon='mdi:book-account'
-              className={
-                path[k].manage
-                  ? 'homepage__choose__click__replace'
-                  : 'homepage__choose__click__Icon'
-              }
-            />
+        </NavLink>
+
+        {user.authorities?.[0]?.authority === 'LEADER' && (
+          <NavLink to='/manage/classes' className='homepage__choose__click'>
+            <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
             <span>Quản lý</span>
-          </div>
+          </NavLink>
         )}
-        <div
-          className={path[k].account ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => updateGlobalState(5)}>
+
+        <NavLink to='/profile' className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
-        </div>
-        <div
-          className={path[k].logout ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => setFrame(true)}>
+        </NavLink>
+
+        <div className='homepage__choose__click' onClick={() => setShowLogoutPopup(true)}>
           <Icon icon='mage:shut-down-fill' className='homepage__choose__click__Icon' />
           <span>Đăng xuất</span>
         </div>
       </div>
+
       <div className='homepage__main'>
         <div className='homepage__main__search'>
           <div className='search'>
@@ -240,6 +166,7 @@ const HomePage = () => {
                 width='26'
                 height='26'
                 className='search__then__Icon'
+                onClick={() => navigate('/chat')}
               />
               <Icon
                 icon='mingcute:notification-newdot-line'
@@ -249,10 +176,18 @@ const HomePage = () => {
               />
             </div>
           </div>
-          <HomeTap showSchedule={showSchedule} showHomework={showHomework} showMain={showMain} />
+
+          <HomeTap
+            showSchedule={showSchedule}
+            showHomework={showHomework}
+            showMain={showMain}
+            announcements={announcements}
+            recentClasses={recentClasses?.items}
+          />
         </div>
       </div>
-      {frame ? <Logout onSetFrame={setFrame} /> : ''}
+
+      {showLogoutPopup && <Logout onSetFrame={setShowLogoutPopup} />}
     </div>
   )
 }

@@ -1,66 +1,33 @@
-import React, { useState, useContext } from 'react'
-import './style.scss'
-import loginImg from './../../../assets/img/login.jpg'
-import { GlobalContext } from '../../../dataContext'
-import logo from './../../../assets/img/logo.png'
-import { Button, Form, Input, message } from 'antd'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { Button, Form, Input } from 'antd'
+import toast from 'react-hot-toast'
 
-const Login = () => {
-  const { handleAspectChange, setToken, setResponseData, updateGlobalState } =
-    useContext(GlobalContext)
+import { login as loginApi } from '../../../apis/auth.api'
+import useAuth from '../../../hooks/useAuth'
+// --- Assets and Styles ---
+import loginImg from '../../../assets/img/login.jpg'
+import logo from '../../../assets/img/logo.png'
+import './style.scss'
+
+const LoginPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
-
+  const { saveUser } = useAuth()
   const onFinish = async (values) => {
     setLoading(true)
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/v1/auth/login',
-        {
-          studentCode: values.username,
-          password: values.password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      console.log('API response:', response.data)
-
-      if (response.data.status === 'SUCCESS') {
-        setResponseData(response.data)
-        localStorage.setItem('accessToken', response.data.data.accessToken)
-        localStorage.setItem('refreshToken', response.data.data.refreshToken)
-        setToken(response.data.data.accessToken)
-        handleAspectChange(response.data.data.authorities[0]?.authority || 'USER')
-        message.success('Đăng nhập thành công!')
-        alert('Đăng nhập thành công!')
-        navigate('/home')
-      } else {
-        const errorMessage =
-          typeof response.data.message === 'object'
-            ? JSON.stringify(response.data.message)
-            : response.data.message
-        message.error(
-          errorMessage || 'Đăng nhập thất bại. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-        )
-        alert('Đăng nhập thất bại. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!')
-      }
+      const response = await loginApi({
+        studentCode: values.username,
+        password: values.password,
+      })
+      const authPayload = response.data
+      saveUser(authPayload)
+      toast.success('Đăng nhập thành công!')
+      navigate('/home')
     } catch (error) {
-      console.error('Đăng nhập thất bại:', error.response?.data)
-      const errorMessage = error.response?.data?.message
-      message.error(
-        typeof errorMessage === 'object'
-          ? JSON.stringify(errorMessage)
-          : errorMessage ||
-              'Đăng nhập thất bại: Yêu cầu không hợp lệ. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-      )
-      alert(
-        'Đăng nhập thất bại: Yêu cầu không hợp lệ. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-      )
+      const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -68,7 +35,7 @@ const Login = () => {
 
   const onFinishFailed = (errorInfo) => {
     console.log('Form validation failed:', errorInfo)
-    message.error('Vui lòng kiểm tra lại thông tin nhập!')
+    toast.error('Vui lòng điền đầy đủ thông tin!')
   }
 
   return (
@@ -111,11 +78,11 @@ const Login = () => {
 
           <Form.Item className='login__tap__form__item'>
             <Button type='primary' htmlType='submit' className='button-color' loading={loading}>
-              Xác nhận
+              Đăng nhập
             </Button>
           </Form.Item>
         </Form>
-        <span className='white' onClick={() => navigate('/FixPassword')}>
+        <span className='white' onClick={() => navigate('/forgot-password')}>
           Quên mật khẩu?
         </span>
       </div>
@@ -124,4 +91,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage

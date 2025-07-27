@@ -19,6 +19,10 @@ import MainClass from './pages/ClassPage/MyClass'
 import ListMember from './pages/ClassPage/MyResult'
 import HomePage from './pages/HomePage'
 import HomeAccount from './pages/AccountPage'
+import AuthListener from './components/AuthListener/AuthListener'
+import LoginPage from './components/StartLoginPage/LoginPage'
+import ProtectedRoute from './components/ProtecedRoute/ProtectedRoute'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
@@ -45,17 +49,60 @@ function App() {
 
         <Route path="/chatroom" element={<ChatRoom />} />
       </Routes> */}
+      <Toaster
+        position='top-right'
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+      <AuthListener />
+
       <Routes>
-        <Route path='/home' element={<HomePage />} />
-        <Route path='/myclass' element={<MainClass />} />
-        <Route path='/myresult' element={<ListMember />} />
-        <Route path='/account' element={<HomeAccount />} />
-        <Route path='/competition' element={<PublicPage />}>
+        <Route path='/' element={<LoginPage />} />
+        <Route path='/login' element={<LoginPage />} />
+        <Route
+          path='/home'
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/myclass'
+          element={
+            <ProtectedRoute>
+              <MainClass />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/myresult'
+          element={
+            <ProtectedRoute>
+              <ListMember />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/account'
+          element={
+            <ProtectedRoute>
+              <HomeAccount />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/competition'
+          element={
+            <ProtectedRoute>
+              <PublicPage />
+            </ProtectedRoute>
+          }>
           <Route path='' element={<MainCompetition />} />
           <Route path='information' element={<InformationCompetition />} />
           <Route path='information/contest' element={<Assignment />} />
         </Route>
-        <Route path='/' element={<Login />} />
       </Routes>
     </div>
   )
