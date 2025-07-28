@@ -2,23 +2,27 @@ import { useState } from 'react'
 import { Route, Routes, Link } from 'react-router-dom'
 import './App.css'
 import './scss/style.scss'
+// link của admin
+import MainOfAdmin from './components/Admin/HomeOfAdmin/MainOfAdmin'
 import Login from './components/StartLoginPage/LoginPage'
-import Confirm from './components/StartLoginPage/FixPassword'
-import PublicPage from './components/StartCompetition/PublicPage'
-import InformationClass from './components/StartClassPage/StartMyClass/InformationClass'
-import MainCompetition from './components/StartCompetition/MainPage'
-import InformationCompetition from './components/StartCompetition/InformationPage'
-import Assignment from './components/StartCompetition/Assignment'
-import Complete from './components/StartCompetition/Complete'
-import { HomeInformation } from './components/StartClassPage/StartMyClass/InformationClass'
-import Exam from './components/StartClassPage/StartMyClass/Exam'
-import Lesson from './components/StartClassPage/StartMyClass/Lession'
-import ChatRoom from './components/ChatRoom'
-import ManagePage from './pages/ManagePage'
-import MainClass from './pages/ClassPage/MyClass'
-import ListMember from './pages/ClassPage/MyResult'
+import CheckOfClassAdmin from './components/Admin/ClassOfAdmin/CheckOfClass'
+import CreateOfMain from './components/Admin/HomeOfAdmin/CreateOfMain'
+import InforOfAdmin from './components/Admin/HomeOfAdmin/InforOfAdmin'
+import MainOfClassAdmin from './components/Admin/ClassOfAdmin/MainOfClass'
+import CreateOfClassAdmin from './components/Admin/ClassOfAdmin/CreateOfClass'
+import MemberOfClassAdmin from './components/Admin/ClassOfAdmin/MemberOfAdmin'
+import MainOfCompet from './components/Admin/CompetOfAdmin/MainOfCompet'
+import CreateOfCompetAdmin from './components/Admin/CompetOfAdmin/CreateOfCompet'
+import MemberOfCompetAdmin from './components/Admin/CompetOfAdmin/MemberOfCompet'
+import AdminPage from './pages/AdminPage'
+import IntroOfCompetAdmin from './components/Admin/CompetOfAdmin/IntroOfCompet'
+import RolusOfCompetAdmin from './components/Admin/CompetOfAdmin/RolusOfAdmin'
+import ListOfGroup from './components/Admin/CompetOfAdmin/ListOfGroup'
+import CreateOfMess from './components/Admin/CompetOfAdmin/CreateOfMess'
+import DecentOfAdmin from './components/Admin/DecentOfAdmin'
+import AccountOfAdmin from './components/Admin/AccoutOfAdmin'
+// link của user và leader
 import HomePage from './pages/HomePage'
-import HomeAccount from './pages/AccountPage'
 
 function App() {
   return (
@@ -46,16 +50,25 @@ function App() {
         <Route path="/chatroom" element={<ChatRoom />} />
       </Routes> */}
       <Routes>
-        <Route path='/home' element={<HomePage />} />
-        <Route path='/myclass' element={<MainClass />} />
-        <Route path='/myresult' element={<ListMember />} />
-        <Route path='/account' element={<HomeAccount />} />
-        <Route path='/competition' element={<PublicPage />}>
-          <Route path='' element={<MainCompetition />} />
-          <Route path='information' element={<InformationCompetition />} />
-          <Route path='information/contest' element={<Assignment />} />
-        </Route>
         <Route path='/' element={<Login />} />
+        <Route path='admin' element={<AdminPage />}>
+          <Route path='home' element={<MainOfAdmin />} />
+          <Route path='home/create' element={<CreateOfMain />} />
+          <Route path='home/information' element={<InforOfAdmin />} />
+          <Route path='manage' element={<MainOfClassAdmin />} />
+          <Route path='manage/create' element={<CreateOfClassAdmin />} />
+          <Route path='manage/information' element={<CheckOfClassAdmin />} />
+          <Route path='manage/manageofmember' element={<MemberOfClassAdmin />} />
+          <Route path='competition' element={<MainOfCompet />} />
+          <Route path='competition/create' element={<CreateOfCompetAdmin />} />
+          <Route path='competition/information' element={<IntroOfCompetAdmin />} />
+          <Route path='competition/rules' element={<RolusOfCompetAdmin />} />
+          <Route path='competition/memberofcompetition' element={<MemberOfCompetAdmin />} />
+          <Route path='competition/notification' element={<ListOfGroup />} />
+          <Route path='competition/notification/create' element={<CreateOfMess />} />
+          <Route path='decent' element={<DecentOfAdmin />} />
+          <Route path='account' element={<AccountOfAdmin />} />
+        </Route>
       </Routes>
     </div>
   )

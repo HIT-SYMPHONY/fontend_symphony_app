@@ -161,3 +161,21 @@ $class-ago-width: 210px;
 .child {
   color: #f27b36 !important;
 }
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .homepage__main .fle {
+    height: 90vh;
+  }
+  .flex-one .class-ago {
+    max-height: 480px;
+  }
+  .schedule .schedule__list {
+    max-height: 520px;
+  }
+  .homework .homework__baitap {
+    max-height: 640px;
+  }
+  .homepage__main__thongbao {
+    height: 90vh;
+  }
+}

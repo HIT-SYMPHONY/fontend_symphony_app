@@ -4,7 +4,7 @@ import { GlobalContext } from '../../dataContext'
 import icon from './../../assets/img/Ellipse.png'
 import { Outlet } from 'react-router-dom'
 import MainManage from '../../components/StartManageClass/MainManage'
-import ListMember from '../../components/StartManageClass/ListMember'
+import ListMember from '../../components/StartManageClass/AllMember'
 import logo from './../../assets/img/logo.png'
 import Logout from '../../components/Logout'
 import InformationManage from '../../components/StartManageClass/Information'
@@ -192,7 +192,8 @@ const ManagePage = () => {
           </div>
           {/* here */}
           {/* <MainManage /> */}
-          <InformationManage />
+          {/* <InformationManage /> */}
+          <Outlet />
         </div>
       </div>
       {frame ? <Logout onSetFrame={setFrame} /> : ''}

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 // Khởi tạo GlobalContext
 export const GlobalContext = createContext()
 
-// Mảng path để quản lý trạng thái giao diện
 const path = [
   {
     home: true,
@@ -141,6 +140,8 @@ export const GlobalProvider = ({ children }) => {
     navigate(routes[index].path)
   }
 
+  const [showMain, setShowMain] = useState(false)
+  const [showNoti, setShowNoti] = useState(false)
   return (
     <GlobalContext.Provider
       value={{
@@ -154,6 +155,10 @@ export const GlobalProvider = ({ children }) => {
         setResponseData,
         userData,
         setUserData,
+        showMain,
+        setShowMain,
+        showNoti,
+        setShowNoti,
       }}>
       {children}
     </GlobalContext.Provider>

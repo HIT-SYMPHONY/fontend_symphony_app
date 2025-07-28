@@ -33,6 +33,59 @@ const HomeTap = ({ showSchedule, showHomework, showMain }) => {
 }
 
 const HomePage = () => {
+  const [showLink, setShowLink] = useState({
+    home: false,
+    myclass: false,
+    myresult: false,
+    competition: false,
+    manageClass: false,
+    manageCompetition: false,
+    account: false,
+    logout: false,
+  })
+  const handleColor = (index) => {
+    let newLink = {
+      home: false,
+      myclass: false,
+      myresult: false,
+      competition: false,
+      manageClass: false,
+      manageCompetition: false,
+      account: false,
+      logout: false,
+    }
+
+    switch (index) {
+      case 1:
+        newLink.home = true
+        break
+      case 2:
+        newLink.myclass = true
+        break
+      case 3:
+        newLink.myresult = true
+        break
+      case 4:
+        newLink.competition = true
+        break
+      case 5:
+        newLink.manageClass = true
+        break
+      case 6:
+        newLink.manageCompetition = true
+        break
+      case 7:
+        newLink.account = true
+        break
+      case 8:
+        newLink.logout = true
+        break
+      default:
+        break
+    }
+
+    setShowLink(newLink)
+  }
   const [frame, setFrame] = useState(false)
   const [showMain, setShowMain] = useState(true)
   const [showSchedule, setShowSchedule] = useState(false)
@@ -74,8 +127,6 @@ const HomePage = () => {
     fetchUserData()
   }, [responseData, userData, setUserData, setToken, setAspect])
 
-  const k = 0 // Index của path, cần điều chỉnh nếu k thay đổi động
-
   const handleLichHoc = () => {
     if (showHomework) {
       setShowHomework(false)
@@ -94,33 +145,13 @@ const HomePage = () => {
     return <div>Đang tải...</div>
   }
 
-  if (error) {
-    return (
-      <div>
-        Lỗi: {error}
-        <br />
-        <button onClick={() => updateGlobalState(6)}>Đăng nhập lại</button>
-      </div>
-    )
-  }
-
-  if (!userData) {
-    return (
-      <div>
-        Không tìm thấy dữ liệu người dùng! Vui lòng đăng nhập lại.
-        <br />
-        <button onClick={() => updateGlobalState(6)}>Đăng nhập lại</button>
-      </div>
-    )
-  }
-
   return (
     <div className='homepage'>
       <div className='homepage__choose'>
         <div className='homepage__choose__img'>
           <img src={icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {userData.firstName}!</h3>
+        <h3 className='homepage__choose__h3'>Chào Tên!</h3>
         <div
           className={path[k].home ? 'homepage__choose__click origin' : 'homepage__choose__click'}
           onClick={() => updateGlobalState(1)}>
@@ -169,23 +200,17 @@ const HomePage = () => {
           />
           <span>Cuộc thi</span>
         </div>
-        {aspect === 'LEADER' && (
-          <div
+        <div
+          className={path[k].manage ? 'homepage__choose__click origin' : 'homepage__choose__click'}
+          onClick={() => updateGlobalState(7)}>
+          <Icon
+            icon='mdi:book-account'
             className={
-              path[k].manage ? 'homepage__choose__click origin' : 'homepage__choose__click'
+              path[k].manage ? 'homepage__choose__click__replace' : 'homepage__choose__click__Icon'
             }
-            onClick={() => updateGlobalState(7)}>
-            <Icon
-              icon='mdi:book-account'
-              className={
-                path[k].manage
-                  ? 'homepage__choose__click__replace'
-                  : 'homepage__choose__click__Icon'
-              }
-            />
-            <span>Quản lý</span>
-          </div>
-        )}
+          />
+          <span>Quản lý</span>
+        </div>
         <div
           className={path[k].account ? 'homepage__choose__click origin' : 'homepage__choose__click'}
           onClick={() => updateGlobalState(5)}>
