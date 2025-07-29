@@ -21,36 +21,16 @@ import ListOfGroup from './components/Admin/CompetOfAdmin/ListOfGroup'
 import CreateOfMess from './components/Admin/CompetOfAdmin/CreateOfMess'
 import DecentOfAdmin from './components/Admin/DecentOfAdmin'
 import AccountOfAdmin from './components/Admin/AccoutOfAdmin'
+import Confirm from './components/StartLoginPage/FixPassword'
 // link của user và leader
 import HomePage from './pages/HomePage'
 
 function App() {
   return (
     <div className='app'>
-      {/* <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/competition" element={<PublicPage />}>
-          <Route path="" element={<MainCompetition />} />
-          <Route path="information" element={<InformationCompetition />} />
-          <Route path="information/contest" element={<Assignment />} />
-        </Route>
-        <Route path="/account" element={<HomeAccount />} />
-        <Route path="/myclass" element={<MainClass />} />
-        <Route path="/myresult" element={<ListMember />} />
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/information" element={<InformationClass />}>
-          <Route path="" element={<HomeInformation />} />
-          <Route path="exam" element={<Exam />} />
-          <Route path="lesson" element={<Lesson />} />
-        </Route>
-
-        <Route path="/manage" element={<managePage />}></Route>
-
-        <Route path="/chatroom" element={<ChatRoom />} />
-      </Routes> */}
       <Routes>
         <Route path='/' element={<Login />} />
+        <Route path='/FixPassword' element={<Confirm />} />
         <Route path='admin' element={<AdminPage />}>
           <Route path='home' element={<MainOfAdmin />} />
           <Route path='home/create' element={<CreateOfMain />} />

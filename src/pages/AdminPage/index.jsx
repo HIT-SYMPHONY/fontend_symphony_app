@@ -1,36 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { Icon } from '@iconify/react'
 import { GlobalContext } from '../../dataContext'
-import { useNavigate } from 'react-router-dom'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import icon from './../../assets/img/Ellipse.png'
-import { Outlet } from 'react-router-dom'
 import logo from './../../assets/img/logo.png'
-import Schedule from '../SchedulePage'
-import Homework from '../Homework'
 import Logout from '../../components/Logout'
-import Main from '../../components/StartHomePage/MainPage'
-import DataInitialState from '../../data/dataSV'
-import MainOfAdmin from '../../components/Admin/HomeOfAdmin/MainOfAdmin'
-import CreateOfMain from '../../components/Admin/HomeOfAdmin/CreateOfMain'
-import InforOfAdmin from '../../components/Admin/HomeOfAdmin/InforOfAdmin'
-import MainOfClassAdmin from '../../components/Admin/ClassOfAdmin/MainOfClass'
-import CreateOfClassAdmin from '../../components/Admin/ClassOfAdmin/CreateOfClass'
-import CheckOfClassAdmin from '../../components/Admin/ClassOfAdmin/CheckOfClass'
-import MainOfCompet from '../../components/Admin/CompetOfAdmin/MainOfCompet'
-import CreateOfCompetAdmin from '../../components/Admin/CompetOfAdmin/CreateOfCompet'
-import IntroOfCompetAdmin from '../../components/Admin/CompetOfAdmin/IntroOfCompet'
-import RolusOfCompetAdmin from '../../components/Admin/CompetOfAdmin/RolusOfAdmin'
-import MemberOfCompetAdmin from '../../components/Admin/ClassOfAdmin/MemberOfAdmin'
 import ReplaceOfAdmin from '../../components/Admin/NotiOfAdmin/ReplaceOfNoti'
-import CreateOfHomeAdmin from '../../components/Admin/HomeOfAdmin/CreateOfMain'
 import CreateOfNoti from '../../components/Admin/NotiOfAdmin/CreateOfNoti'
-
 import './style.scss'
 
 const AdminPage = () => {
   const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
-  const navigate = useNavigate()
   const [frame, setFrame] = useState(false)
+  const [showManage, setShowManage] = useState(false)
+  const location = useLocation()
+  const navigate = useNavigate()
 
   // Khởi tạo trạng thái từ localStorage hoặc giá trị mặc định
   const [showThen, setShowThen] = useState(() => {
@@ -38,14 +22,49 @@ const AdminPage = () => {
     return saved ? JSON.parse(saved) : { one: false, two: false }
   })
 
-  const [showManage, setShowManage] = useState(false)
-
   const [showLink, setShowLink] = useState(() => {
     const saved = localStorage.getItem('showLink')
     return saved
       ? JSON.parse(saved)
       : { home: false, manage: false, decent: false, account: false, logout: false }
   })
+
+  // Đồng bộ trạng thái với URL khi trang tải
+  useEffect(() => {
+    const path = location.pathname
+    const newLink = {
+      home: false,
+      manage: false,
+      decent: false,
+      account: false,
+      logout: false,
+    }
+    const newThen = { one: false, two: false }
+
+    if (path === '/admin' || path.startsWith('/admin/home')) {
+      newLink.home = true
+      setShowManage(false)
+    } else if (path.startsWith('/admin/manage')) {
+      newLink.manage = true
+      newThen.one = true
+      setShowManage(true)
+    } else if (path.startsWith('/admin/competition')) {
+      newLink.manage = true
+      newThen.two = true
+      setShowManage(true)
+    } else if (path.startsWith('/admin/decent')) {
+      newLink.decent = true
+      setShowManage(false)
+    } else if (path.startsWith('/admin/account')) {
+      newLink.account = true
+      setShowManage(false)
+    }
+
+    setShowLink(newLink)
+    setShowThen(newThen)
+    localStorage.setItem('showLink', JSON.stringify(newLink))
+    localStorage.setItem('showThen', JSON.stringify(newThen))
+  }, [location.pathname])
 
   // Lưu showThen vào localStorage khi nó thay đổi
   useEffect(() => {
@@ -57,77 +76,62 @@ const AdminPage = () => {
     localStorage.setItem('showLink', JSON.stringify(showLink))
   }, [showLink])
 
-  const handleThen = (index) => {
-    const then = {
-      one: false,
-      two: false,
-    }
-    switch (index) {
-      case 1:
-        navigate('/admin/manage')
-        handleColor(6)
-        then.one = true
-        break
-      case 2:
-        navigate('/admin/competition')
-        handleColor(6)
-        then.two = true
-        break
-      default:
-        break
-    }
-    setShowThen(then)
-  }
-
-  const handleColor = (index) => {
-    let newLink = {
+  // Hàm xử lý trạng thái khi nhấp vào liên kết
+  const handleLinkClick = (section) => {
+    const newLink = {
       home: false,
       manage: false,
       decent: false,
       account: false,
       logout: false,
     }
+    const newThen = { one: false, two: false }
 
-    switch (index) {
-      case 1:
-        handleThen(0)
+    switch (section) {
+      case 'home':
         newLink.home = true
+        setShowManage(false)
         navigate('/admin/home')
         break
-      case 2:
-        setShowManage(!showManage)
-        handleThen(1)
+      case 'manage':
+        newLink.manage = true
+        newThen.one = true // Highlight "Lớp học"
+        setShowManage(true)
+        navigate('/admin/manage') // Điều hướng về /admin/manage
+        break
+      case 'class':
+        newLink.manage = true
+        newThen.one = true
+        setShowManage(true)
         navigate('/admin/manage')
-        newLink.manage = true
         break
-      case 3:
-        navigate('/admin/decent')
-        handleThen(0)
+      case 'competition':
+        newLink.manage = true
+        newThen.two = true
+        setShowManage(true)
+        navigate('/admin/competition')
+        break
+      case 'decent':
         newLink.decent = true
+        setShowManage(false)
+        navigate('/admin/decent')
         break
-      case 4:
-        navigate('/admin/account')
-        handleThen(0)
+      case 'account':
         newLink.account = true
+        setShowManage(false)
+        navigate('/admin/account')
         break
-      case 5:
-        handleThen(0)
+      case 'logout':
         newLink.logout = true
-        break
-      case 6:
-        newLink.manage = true
+        setFrame(true)
+        setShowManage(false)
         break
       default:
-        handleThen(0)
         break
     }
 
     setShowLink(newLink)
-  }
-
-  const handleLogout = (index) => {
-    handleColor(5)
-    setFrame(true)
+    setShowThen(newThen)
   }
 
   return (
@@ -137,69 +141,78 @@ const AdminPage = () => {
           <img src={icon} alt='Profile' />
         </div>
         <h3 className='homepage__choose__h3'>Chào Tên!</h3>
-        <div
+        <Link
+          to='/admin/home'
           className={showLink.home ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => handleColor(1)}>
+          onClick={() => handleLinkClick('home')}>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
-        </div>
+        </Link>
         <div
           className={showLink.manage ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => handleColor(2)}>
+          onClick={() => handleLinkClick('manage')}>
           <Icon
             icon='mdi:book-account'
             width='22'
             height='22'
-            className='homepage__choose__click__Icon'
+            className={showLink.manage ? 'whiteP' : 'homepage__choose__click__Icon'}
           />
           <span>Quản lý</span>
         </div>
-        {showManage ? (
+        {showManage && (
           <div>
-            <div
+            <Link
+              to='/admin/manage'
               className={
                 showThen.one ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
               }
-              onClick={() => handleThen(1)}>
+              onClick={() => handleLinkClick('class')}>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp học</span>
-            </div>
-            <div
+            </Link>
+            <Link
+              to='/admin/competition'
               className={
                 showThen.two ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
               }
-              onClick={() => handleThen(2)}>
+              onClick={() => handleLinkClick('competition')}>
               <Icon
                 icon='streamline-ultimate:ranking-stars-ribbon-bold'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Cuộc thi</span>
-            </div>
+            </Link>
           </div>
-        ) : (
-          ''
         )}
-        <div
+        <Link
+          to='/admin/decent'
           className={showLink.decent ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => handleColor(3)}>
-          <Icon icon='fluent:people-star-24-filled' className='homepage__choose__click__Icon' />
+          onClick={() => handleLinkClick('decent')}>
+          <Icon
+            icon='fluent:people-star-24-filled'
+            className={showLink.decent ? 'whiteP' : 'homepage__choose__click__Icon'}
+          />
           <span>Phân quyền</span>
-        </div>
-        <div
+        </Link>
+        <Link
+          to='/admin/account'
           className={
             showLink.account ? 'homepage__choose__click origin' : 'homepage__choose__click'
           }
-          onClick={() => handleColor(4)}>
+          onClick={() => handleLinkClick('account')}>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
-        </div>
+        </Link>
         <div
           className={showLink.logout ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => handleLogout(5)}>
-          <Icon icon='mage:shut-down-fill' className='homepage__choose__click__Icon' />
+          onClick={() => handleLinkClick('logout')}>
+          <Icon
+            icon='mage:shut-down-fill'
+            className={showLink.logout ? 'whiteP' : 'homepage__choose__click__Icon'}
+          />
           <span>Đăng xuất</span>
         </div>
       </div>

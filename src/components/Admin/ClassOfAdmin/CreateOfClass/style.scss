@@ -14,7 +14,12 @@ $background-light: #ffefe4;
   display: flex;
   flex-direction: column;
   gap: 20px;
-
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   &__header {
     display: flex;
     justify-content: space-between;
@@ -204,6 +209,23 @@ $background-light: #ffefe4;
               border: 2px solid #ccc;
               border-radius: 5px;
             }
+          }
+
+          &-upload {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+          }
+          img {
+            width: 210px;
+            height: 210px;
+            border-radius: 5px;
           }
         }
       }

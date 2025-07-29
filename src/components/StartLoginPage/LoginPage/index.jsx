@@ -1,74 +1,31 @@
-import React, { useState, useContext } from 'react'
+import React from 'react'
 import './style.scss'
 import loginImg from './../../../assets/img/login.jpg'
-import { GlobalContext } from '../../../dataContext'
 import logo from './../../../assets/img/logo.png'
-import { Button, Form, Input, message } from 'antd'
+import { Button, Form, Input } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import HttpService from '../../../services/http-service'
+import storageService from '../../../services/storage.service'
+import { LocalStorage } from '../../../contexts/localStorage.constant'
+import toast from 'react-hot-toast'
 
 const Login = () => {
-  const { handleAspectChange, setToken, setResponseData, updateGlobalState } =
-    useContext(GlobalContext)
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
 
-  const onFinish = async (values) => {
-    setLoading(true)
+  // ✅ Xử lý đăng nhập
+  const handleSubmit = async (values) => {
+    const { username: studentCode, password } = values
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/v1/auth/login',
-        {
-          studentCode: values.username,
-          password: values.password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      console.log('API response:', response.data)
-
-      if (response.data.status === 'SUCCESS') {
-        setResponseData(response.data)
-        localStorage.setItem('accessToken', response.data.data.accessToken)
-        localStorage.setItem('refreshToken', response.data.data.refreshToken)
-        setToken(response.data.data.accessToken)
-        handleAspectChange(response.data.data.authorities[0]?.authority || 'USER')
-        message.success('Đăng nhập thành công!')
-        alert('Đăng nhập thành công!')
-        navigate('/home')
+      const res = await HttpService.login(studentCode, password)
+      if (res.success) {
+        toast.success('Đăng nhập thành công!')
+        navigate('/dashboard')
       } else {
-        const errorMessage =
-          typeof response.data.message === 'object'
-            ? JSON.stringify(response.data.message)
-            : response.data.message
-        message.error(
-          errorMessage || 'Đăng nhập thất bại. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-        )
-        alert('Đăng nhập thất bại. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!')
+        toast.error(res.message)
       }
-    } catch (error) {
-      console.error('Đăng nhập thất bại:', error.response?.data)
-      const errorMessage = error.response?.data?.message
-      message.error(
-        typeof errorMessage === 'object'
-          ? JSON.stringify(errorMessage)
-          : errorMessage ||
-              'Đăng nhập thất bại: Yêu cầu không hợp lệ. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-      )
-      alert(
-        'Đăng nhập thất bại: Yêu cầu không hợp lệ. Vui lòng kiểm tra mã sinh viên hoặc mật khẩu!',
-      )
-    } finally {
-      setLoading(false)
+    } catch (err) {
+      toast.error('Lỗi kết nối đến máy chủ!')
     }
-  }
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Form validation failed:', errorInfo)
-    message.error('Vui lòng kiểm tra lại thông tin nhập!')
   }
 
   return (
@@ -76,13 +33,8 @@ const Login = () => {
       <div className='login__tap'>
         <img src={logo} alt='Logo' />
         <h1>ĐĂNG NHẬP</h1>
-        <Form
-          name='basic'
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete='off'
-          className='login__tap__form'>
+
+        <Form name='basic' autoComplete='off' className='login__tap__form' onFinish={handleSubmit}>
           <Form.Item
             name='username'
             rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
@@ -90,8 +42,6 @@ const Login = () => {
             <Input
               prefix={<i className='fa-solid fa-circle-user' aria-hidden='true'></i>}
               placeholder='Mã sinh viên'
-              variant='outlined'
-              aria-label='Mã Sinh Viên'
               className='form__input'
             />
           </Form.Item>
@@ -103,18 +53,17 @@ const Login = () => {
             <Input.Password
               prefix={<i className='fa-solid fa-lock' aria-hidden='true'></i>}
               placeholder='Mật khẩu'
-              variant='outlined'
-              aria-label='Mật Khẩu'
               className='form__input'
             />
           </Form.Item>
 
           <Form.Item className='login__tap__form__item'>
-            <Button type='primary' htmlType='submit' className='button-color' loading={loading}>
+            <Button type='primary' htmlType='submit' className='button-color'>
               Xác nhận
             </Button>
           </Form.Item>
         </Form>
+
         <span className='white' onClick={() => navigate('/FixPassword')}>
           Quên mật khẩu?
         </span>

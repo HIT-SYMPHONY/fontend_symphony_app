@@ -149,6 +149,11 @@ $background-light: #ffefe4;
           height: 50px;
           border-radius: 10px;
           background-color: #ccc;
+          img {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+          }
         }
         &__box {
           display: flex;

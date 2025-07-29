@@ -86,7 +86,11 @@ const path = [
 
 // Khởi tạo GlobalProvider
 export const GlobalProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem('accessToken') || null)
+  const submit =
+    'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNTc2ZDJmZS04OTI4LTQ4N2UtOTkwNC0wNDI5M2UzYzlkNzMiLCJzY29wZSI6IkFETUlOIiwiaXNzIjoiaGl0c3ltcGhvbnkuY29tIiwiZXhwIjoxNzUzODA4MzU0LCJpYXQiOjE3NTM4MDQ3NTQsImp0aSI6IjA4YjIyYTUwLWIxNjctNGUyMi04NDM1LWEyMTlmMmM5MTFlNiIsInVzZXJuYW1lIjoiMjAyMzYwMDY2NiJ9.IAtNToh4w8KddsYnhrgs1E1BJituxAfJjTS7afPqa5q2xxFBAOIVV3Iq7ExkeI7giq4lVvUy9ESumUYxzTBXaw'
+
+  const [token, setToken] = useState(submit)
+  //localStorage.getItem('accessToken') || null
   const [aspect, setAspect] = useState(localStorage.getItem('aspect') || 'USER')
   const [responseData, setResponseData] = useState(
     JSON.parse(localStorage.getItem('responseData')) || null,
