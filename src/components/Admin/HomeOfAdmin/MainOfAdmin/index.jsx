@@ -1,42 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
-import { Outlet } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { getAllUsers } from '../../../../apis/user.api'
+const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 import './style.scss'
 
-const classOptions = ['HIT 15', 'Lớp 10', 'Lớp 11', 'Lớp 12']
-const member = [
-  { id: 1, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 2, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 3, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 4, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 5, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 6, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 1, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 2, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 3, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 4, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 5, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 6, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 1, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 2, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 3, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 4, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 5, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 6, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 1, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 2, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 3, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 4, name: 'Nguyễn Văn A', role: 'LEADER', msv: '2023609901', time: '30/06/2025' },
-  { id: 5, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-  { id: 6, name: 'Nguyễn Văn A', role: 'USER', msv: '2023609901', time: '30/06/2025' },
-]
 const MainOfAdmin = () => {
   const navigate = useNavigate()
-  const [selectedClass, setSelectedClass] = useState('HIT 15')
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedClass, setSelectedClass] = useState('ALL')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef(null)
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true)
+        const response = await getAllUsers()
+        setUsers(response.data || [])
+      } catch (error) {
+        if (error.response?.data?.message) {
+          toast.error(error.response.data.message)
+        } else {
+          toast.error('Có lỗi xảy ra khi tải danh sách thành viên.')
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUsers()
+  }, [])
+
+  const filteredUsers = useMemo(() => {
+    let filtered = [...users]
+    if (selectedClass !== 'ALL') {
+      filtered = filtered.filter((user) => user.role === selectedClass)
+    }
+    if (searchQuery) {
+      const lowercasedQuery = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (user) =>
+          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
+          user.studentCode?.includes(lowercasedQuery),
+      )
+    }
+    return filtered
+  }, [users, selectedClass, searchQuery])
   const handleSelect = (item) => {
     setSelectedClass(item)
     setIsDropdownOpen(false)
@@ -48,11 +60,8 @@ const MainOfAdmin = () => {
         setIsDropdownOpen(false)
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   return (
@@ -61,7 +70,6 @@ const MainOfAdmin = () => {
         <i
           className='fa-solid fa-arrow-left main-admin__title__i'
           onClick={() => navigate('/admin')}></i>
-
         <div
           className='main-admin__title__choose'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -72,14 +80,15 @@ const MainOfAdmin = () => {
             height='20'
             className='main-admin__title__choose__icon'
           />
-          <div className='main-admin__title__choose__label'>{selectedClass}</div>
+          <div className='main-admin__title__choose__label'>
+            {selectedClass === 'ALL' ? 'Tất cả' : selectedClass}
+          </div>
           <Icon
             icon='mdi:chevron-down'
             width='20'
             height='20'
             className='main-admin__title__choose__arrow'
           />
-
           {isDropdownOpen && (
             <div className='main-admin__title__choose__dropdown'>
               {classOptions.map((item, index) => (
@@ -87,24 +96,30 @@ const MainOfAdmin = () => {
                   key={index}
                   className='main-admin__title__choose__dropdown__item'
                   onClick={() => handleSelect(item)}>
-                  {item}
+                  {item === 'ALL' ? 'Tất cả' : item}
                 </div>
               ))}
             </div>
           )}
         </div>
         <div className='main-admin__search'>
-          <input type='text' placeholder='Tìm kiếm...' />
+          <input
+            type='text'
+            placeholder='Tìm kiếm...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <i className='fa-solid fa-magnifying-glass'></i>
         </div>
-
-        <button className='main-admin__title__create' onClick={() => navigate('create')}>
+        <button
+          className='main-admin__title__create'
+          onClick={() => navigate('/admin/home/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>
       </div>
       <h2>Danh sách thành viên </h2>
-      <h3>Số lượng thành viên: {member.length}</h3>
+      <h3>Số lượng thành viên: {loading ? '...' : filteredUsers.length}</h3>
       <div className='main-admin__context'>
         <table className='main-admin__context__table'>
           <thead className='main-admin__context__table__thead'>
@@ -118,25 +133,26 @@ const MainOfAdmin = () => {
             </tr>
           </thead>
         </table>
-
-        {/* Đây là phần có scroll */}
         <div className='main-admin__context__table__tbody-wrapper'>
-          <table className='main-admin__context__table'>
-            <tbody className='main-admin__context__table__tbody'>
-              {member.map((item, index) => (
-                <tr key={index} onClick={() => navigate('information')}>
-                  <td className='tbody'>
-                    <h4>{index + 1}</h4>
-                  </td>
-                  <td>{item.name}</td>
-                  <td>{item.role}</td>
-                  <td>{item.msv}</td>
-                  <td>{item.time}</td>
-                  <td className='tbody-td'></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
+          {!loading && (
+            <table className='main-admin__context__table'>
+              <tbody className='main-admin__context__table__tbody'>
+                {filteredUsers.map((user, index) => (
+                  <tr key={user.id} onClick={() => navigate(`/admin/home/information/${user.id}`)}>
+                    <td className='tbody'>
+                      <h4>{index + 1}</h4>
+                    </td>
+                    <td>{user.fullName}</td>
+                    <td>{user.role}</td>
+                    <td>{user.studentCode}</td>
+                    <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
+                    <td className='tbody-td'></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

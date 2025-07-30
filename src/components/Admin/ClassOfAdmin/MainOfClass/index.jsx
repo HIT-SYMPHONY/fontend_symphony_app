@@ -1,32 +1,70 @@
-import React, { useState, useRef, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { getAllClassrooms } from '../../../../apis/admin.api'
-import { GlobalContext } from '../../../../dataContext'
+import toast from 'react-hot-toast'
+import { getAllClassrooms } from '../../../../apis/classroom.api'
+import { translateStatus } from '../../../../utils/formatters'
 import './style.scss'
 
 const MainOfClassAdmin = () => {
   const navigate = useNavigate()
-  const { token } = useContext(GlobalContext)
-
+  const [classrooms, setClassrooms] = useState([])
+  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState('Tất cả')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [selectedClass, setSelectedClass] = useState('Tất cả lớp')
-  const [classOptions, setClassOptions] = useState(['Tất cả lớp'])
-  const [memberClass, setMemberClass] = useState([])
-  const [filteredClass, setFilteredClass] = useState([]) // For filtering
-  const [error, setError] = useState(null)
   const dropdownRef = useRef(null)
 
-  const handleSelect = (item) => {
-    setSelectedClass(item)
-    setIsDropdownOpen(false)
+  const statusOptions = ['Tất cả', 'UPCOMING', 'ONGOING', 'COMPLETED']
 
-    // Lọc lớp học khi chọn dropdown
-    if (item === 'Tất cả lớp') {
-      setFilteredClass(memberClass)
-    } else {
-      setFilteredClass(memberClass.filter((cls) => cls.className === item))
+  const fetchClasses = useCallback(async (page = 1) => {
+    try {
+      setLoading(true)
+      const params = { pageNum: page, pageSize: 10 }
+      const response = await getAllClassrooms(params)
+      const content = response.data
+
+      if (content && content.items) {
+        setClassrooms(content.items)
+      }
+      if (content && content.meta) {
+        setPagination((prev) => ({
+          ...prev,
+          totalElements: content.meta.totalElements,
+          pageNum: content.meta.pageNum,
+        }))
+      }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Có lỗi xảy ra khi tải danh sách lớp học.')
+      }
+    } finally {
+      setLoading(false)
     }
+  }, [])
+
+  useEffect(() => {
+    fetchClasses(pagination.pageNum)
+  }, [fetchClasses, pagination.pageNum])
+
+  const filteredClassrooms = useMemo(() => {
+    let filtered = [...classrooms]
+    if (selectedStatus !== 'Tất cả') {
+      filtered = filtered.filter((cls) => cls.status === selectedStatus)
+    }
+    if (searchQuery) {
+      const lowercasedQuery = searchQuery.toLowerCase()
+      filtered = filtered.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
+    }
+    return filtered
+  }, [classrooms, selectedStatus, searchQuery])
+
+  const handleSelect = (item) => {
+    setSelectedStatus(item)
+    setIsDropdownOpen(false)
   }
 
   useEffect(() => {
@@ -35,70 +73,16 @@ const MainOfClassAdmin = () => {
         setIsDropdownOpen(false)
       }
     }
-
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  useEffect(() => {
-    if (!token || token.trim() === '') {
-      setError('Token không hợp lệ hoặc không tồn tại. Vui lòng đăng nhập lại.')
-      navigate('/login')
-      return
-    }
-
-    const fetchClasses = async () => {
-      try {
-        const response = await getAllClassrooms(token)
-        if (response.success) {
-          const formattedClasses = response.data.items.map((classroom) => ({
-            id: classroom.id,
-            className: classroom.name,
-            style: classroom.status === 'UPCOMING' ? 1 : 2,
-            state: classroom.status === 'UPCOMING' ? 'Đang diễn ra' : 'Đã kết thúc',
-            view: 'Xem chi tiết',
-            image: classroom.image,
-          }))
-
-          setMemberClass(formattedClasses)
-          setFilteredClass(formattedClasses)
-
-          const newClassOptions = [
-            'Tất cả lớp',
-            ...new Set(response.data.items.map((classroom) => classroom.name)),
-          ]
-          setClassOptions(newClassOptions)
-        } else {
-          if (response.error.includes('xác thực')) {
-            setError('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.')
-            navigate('/login')
-          } else {
-            setError('Không thể tải danh sách lớp: ' + response.error)
-          }
-        }
-      } catch (error) {
-        console.error('Unexpected error:', error)
-        setError('Lỗi không mong muốn khi tải danh sách lớp')
-      }
-    }
-
-    fetchClasses()
-  }, [token, navigate])
-
   return (
     <div className='main-class-admin'>
-      {error && (
-        <div className='main-class-admin__error' style={{ color: 'red', marginBottom: '10px' }}>
-          {error}
-        </div>
-      )}
-
       <div className='main-class-admin__header'>
         <i
           className='main-class-admin__back-icon fa-solid fa-arrow-left'
           onClick={() => navigate('/admin')}></i>
-
-        {/* Dropdown chọn lớp */}
         <div
           className='main-class-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -109,7 +93,9 @@ const MainOfClassAdmin = () => {
             height='20'
             className='main-class-admin__filter-icon'
           />
-          <div className='main-class-admin__filter-label'>{selectedClass}</div>
+          <div className='main-class-admin__filter-label'>
+            {selectedStatus === 'Tất cả' ? 'Tất cả' : translateStatus(selectedStatus)}
+          </div>
           <Icon
             icon='mdi:chevron-down'
             width='20'
@@ -118,64 +104,66 @@ const MainOfClassAdmin = () => {
           />
           {isDropdownOpen && (
             <div className='main-class-admin__dropdown'>
-              {classOptions.map((item, index) => (
+              {statusOptions.map((item, index) => (
                 <div
                   key={index}
                   className='main-class-admin__dropdown-item'
                   onClick={() => handleSelect(item)}>
-                  {item}
+                  {item === 'Tất cả' ? 'Tất cả' : translateStatus(item)}
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        {/* Thanh tìm kiếm (chưa xử lý logic tìm) */}
         <div className='main-class-admin__search'>
           <input
             type='text'
             placeholder='Tìm kiếm...'
             className='main-class-admin__search-input'
-            onChange={(e) => {
-              const search = e.target.value.toLowerCase()
-              const filtered = memberClass.filter((item) =>
-                item.className.toLowerCase().includes(search),
-              )
-              setFilteredClass(filtered)
-            }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <i className='main-class-admin__search-icon fa-solid fa-magnifying-glass'></i>
         </div>
-
-        <button className='main-class-admin__create-button' onClick={() => navigate('create')}>
+        <button
+          className='main-class-admin__create-button'
+          onClick={() => navigate('/admin/manage/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>
       </div>
-
       <div className='main-class-admin__content'>
-        <h3>Danh sách lớp học</h3>
+        <h3>Danh sách lớp học ({loading ? '...' : pagination.totalElements})</h3>
         <div className='main-class-admin__content-body'>
-          {filteredClass.map((item) => (
-            <div className='main-class-admin__content-body-item' key={item.id}>
-              <div className='main-class-admin__content-body-item__img'>
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.className}
-                    className='main-class-admin__content-body-item__img-content'
-                  />
-                )}
-              </div>
-              <div className='main-class-admin__content-body-item__box'>
-                <div className='main-class-admin__content-body-item__box-start'>
-                  <h4>{item.className}</h4>
-                  <span className={item.style === 1 ? 'span1' : 'span2'}>{item.state}</span>
+          {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
+          {!loading &&
+            filteredClassrooms.map((item) => (
+              <div className='main-class-admin__content-body-item' key={item.id}>
+                <div className='main-class-admin__content-body-item__img'>
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} />
+                  ) : (
+                    <div className='placeholder-image'></div>
+                  )}
                 </div>
-                <span onClick={() => navigate(`information/${item.id}`)}>{item.view}</span>
+                <div className='main-class-admin__content-body-item__box'>
+                  <div className='main-class-admin__content-body-item__box-start'>
+                    <h4>{item.name}</h4>
+                    <span className={item.status === 'COMPLETED' ? 'span2' : 'span1'}>
+                      {translateStatus(item.status)}
+                    </span>
+                  </div>
+                  <span onClick={() => navigate(`/admin/manage/information/${item.id}`)}>
+                    Xem chi tiết
+                  </span>
+                </div>
               </div>
+            ))}
+          {!loading && filteredClassrooms.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+              Không có lớp học nào.
             </div>
-          ))}
+          )}
         </div>
       </div>
       <Outlet />

@@ -1,65 +1,89 @@
 import { useState } from 'react'
-import { Route, Routes, Link } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import './scss/style.scss'
-// link của admin
+
+import AuthListener from './components/AuthListener/AuthListener'
+import ProtectedRoute from './components/ProtecedRoute/ProtectedRoute'
+import LoginPage from './components/StartLoginPage/LoginPage'
+import Confirm from './components/StartLoginPage/FixPassword'
+import { Toaster } from 'react-hot-toast'
+
+import HomePage from './pages/HomePage'
+import HomeAccount from './pages/AccountPage'
+
+import AdminPage from './pages/AdminPage'
 import MainOfAdmin from './components/Admin/HomeOfAdmin/MainOfAdmin'
-import Login from './components/StartLoginPage/LoginPage'
-import CheckOfClassAdmin from './components/Admin/ClassOfAdmin/CheckOfClass'
 import CreateOfMain from './components/Admin/HomeOfAdmin/CreateOfMain'
 import InforOfAdmin from './components/Admin/HomeOfAdmin/InforOfAdmin'
 import MainOfClassAdmin from './components/Admin/ClassOfAdmin/MainOfClass'
 import CreateOfClassAdmin from './components/Admin/ClassOfAdmin/CreateOfClass'
+import CheckOfClassAdmin from './components/Admin/ClassOfAdmin/CheckOfClass'
 import MemberOfClassAdmin from './components/Admin/ClassOfAdmin/MemberOfAdmin'
 import MainOfCompet from './components/Admin/CompetOfAdmin/MainOfCompet'
 import CreateOfCompetAdmin from './components/Admin/CompetOfAdmin/CreateOfCompet'
-import MemberOfCompetAdmin from './components/Admin/CompetOfAdmin/MemberOfCompet'
-import AdminPage from './pages/AdminPage'
 import IntroOfCompetAdmin from './components/Admin/CompetOfAdmin/IntroOfCompet'
 import RolusOfCompetAdmin from './components/Admin/CompetOfAdmin/RolusOfAdmin'
+import MemberOfCompetAdmin from './components/Admin/CompetOfAdmin/MemberOfCompet'
 import ListOfGroup from './components/Admin/CompetOfAdmin/ListOfGroup'
 import CreateOfMess from './components/Admin/CompetOfAdmin/CreateOfMess'
 import DecentOfAdmin from './components/Admin/DecentOfAdmin'
 import AccountOfAdmin from './components/Admin/AccoutOfAdmin'
-import Confirm from './components/StartLoginPage/FixPassword'
-// link của user và leader
-import HomePage from './pages/HomePage'
-import HomeAccount from './pages/AccountPage'
-import AuthListener from './components/AuthListener/AuthListener'
-import LoginPage from './components/StartLoginPage/LoginPage'
-import ProtectedRoute from './components/ProtecedRoute/ProtectedRoute'
-import { Toaster } from 'react-hot-toast'
 
 function App() {
   return (
     <div className='app'>
-      <Toaster
-        position='top-right'
-        toastOptions={{
-          duration: 3000,
-        }}
-      />
+      <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
       <AuthListener />
 
       <Routes>
-        <Route path='/' element={<Login />} />
+        <Route path='/' element={<LoginPage />} />
+        <Route path='/login' element={<LoginPage />} />
         <Route path='/FixPassword' element={<Confirm />} />
-        <Route path='admin' element={<AdminPage />}>
+
+        <Route
+          path='/home'
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/account'
+          element={
+            <ProtectedRoute>
+              <HomeAccount />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/admin'
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN', 'LEADER']}>
+              <AdminPage />
+            </ProtectedRoute>
+          }>
+          <Route index element={<MainOfAdmin />} />
           <Route path='home' element={<MainOfAdmin />} />
           <Route path='home/create' element={<CreateOfMain />} />
-          <Route path='home/information' element={<InforOfAdmin />} />
+          <Route path='home/information/:userId' element={<InforOfAdmin />} />
           <Route path='manage' element={<MainOfClassAdmin />} />
           <Route path='manage/create' element={<CreateOfClassAdmin />} />
-          <Route path='manage/information' element={<CheckOfClassAdmin />} />
-          <Route path='manage/manageofmember' element={<MemberOfClassAdmin />} />
+          <Route path='manage/information/:classId' element={<CheckOfClassAdmin />} />
+          <Route path='manage/members/:classId' element={<MemberOfClassAdmin />} />
           <Route path='competition' element={<MainOfCompet />} />
           <Route path='competition/create' element={<CreateOfCompetAdmin />} />
-          <Route path='competition/information' element={<IntroOfCompetAdmin />} />
-          <Route path='competition/rules' element={<RolusOfCompetAdmin />} />
-          <Route path='competition/memberofcompetition' element={<MemberOfCompetAdmin />} />
-          <Route path='competition/notification' element={<ListOfGroup />} />
-          <Route path='competition/notification/create' element={<CreateOfMess />} />
+          <Route path='competition/:competitionId'>
+            <Route path='information' element={<IntroOfCompetAdmin />} />
+            <Route path='rules' element={<RolusOfCompetAdmin />} />
+            <Route path='members' element={<MemberOfCompetAdmin />} />
+            <Route path='notifications' element={<ListOfGroup />} />
+            <Route path='notifications/create' element={<CreateOfMess />} />
+          </Route>
+
           <Route path='decent' element={<DecentOfAdmin />} />
+
           <Route path='account' element={<AccountOfAdmin />} />
         </Route>
       </Routes>

@@ -1,4 +1,4 @@
-import { apiDefault } from '.'
+import { apiDefault } from './axios'
 import { ApiConstant } from '../constants/api.constant'
 
 const authApi = () => ({

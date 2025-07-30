@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Form, Input } from 'antd'
 import toast from 'react-hot-toast'
 
 import { login as loginApi } from '../../../apis/auth.api'
 import useAuth from '../../../hooks/useAuth'
-// --- Assets and Styles ---
 import loginImg from '../../../assets/img/login.jpg'
 import logo from '../../../assets/img/logo.png'
 import './style.scss'
@@ -14,6 +13,7 @@ const LoginPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const { saveUser } = useAuth()
+
   const onFinish = async (values) => {
     setLoading(true)
     try {
@@ -21,13 +21,23 @@ const LoginPage = () => {
         studentCode: values.username,
         password: values.password,
       })
+
       const authPayload = response.data
       saveUser(authPayload)
       toast.success('Đăng nhập thành công!')
-      navigate('/home')
+
+      const userRole = authPayload.authorities?.[0]?.authority
+      if (userRole === 'ADMIN' || userRole === 'LEADER') {
+        navigate('/admin/home')
+      } else {
+        navigate('/home')
+      }
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
-      toast.error(errorMessage)
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Không thể kết nối đến máy chủ. Vui lòng thử lại.')
+      }
     } finally {
       setLoading(false)
     }
@@ -43,8 +53,13 @@ const LoginPage = () => {
       <div className='login__tap'>
         <img src={logo} alt='Logo' />
         <h1>ĐĂNG NHẬP</h1>
-
-        <Form name='basic' autoComplete='off' className='login__tap__form' onFinish={handleSubmit}>
+        <Form
+          name='basic'
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete='off'
+          className='login__tap__form'>
           <Form.Item
             name='username'
             rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
@@ -52,6 +67,8 @@ const LoginPage = () => {
             <Input
               prefix={<i className='fa-solid fa-circle-user' aria-hidden='true'></i>}
               placeholder='Mã sinh viên'
+              variant='outlined'
+              aria-label='Mã Sinh Viên'
               className='form__input'
             />
           </Form.Item>
@@ -63,6 +80,8 @@ const LoginPage = () => {
             <Input.Password
               prefix={<i className='fa-solid fa-lock' aria-hidden='true'></i>}
               placeholder='Mật khẩu'
+              variant='outlined'
+              aria-label='Mật Khẩu'
               className='form__input'
             />
           </Form.Item>
