@@ -1,31 +1,51 @@
-import React from 'react'
-import './style.scss'
-import loginImg from './../../../assets/img/login.jpg'
-import logo from './../../../assets/img/logo.png'
-import { Button, Form, Input } from 'antd'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import HttpService from '../../../services/http-service'
-import storageService from '../../../services/storage.service'
-import { LocalStorage } from '../../../contexts/localStorage.constant'
+import { Button, Form, Input } from 'antd'
 import toast from 'react-hot-toast'
 
-const Login = () => {
-  const navigate = useNavigate()
+import { login as loginApi } from '../../../apis/auth.api'
+import useAuth from '../../../hooks/useAuth'
+import loginImg from '../../../assets/img/login.jpg'
+import logo from '../../../assets/img/logo.png'
+import './style.scss'
 
-  // ✅ Xử lý đăng nhập
-  const handleSubmit = async (values) => {
-    const { username: studentCode, password } = values
+const LoginPage = () => {
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const { saveUser } = useAuth()
+
+  const onFinish = async (values) => {
+    setLoading(true)
     try {
-      const res = await HttpService.login(studentCode, password)
-      if (res.success) {
-        toast.success('Đăng nhập thành công!')
-        navigate('/dashboard')
+      const response = await loginApi({
+        studentCode: values.username,
+        password: values.password,
+      })
+
+      const authPayload = response.data
+      saveUser(authPayload)
+      toast.success('Đăng nhập thành công!')
+
+      const userRole = authPayload.authorities?.[0]?.authority
+      if (userRole === 'ADMIN' || userRole === 'LEADER') {
+        navigate('/admin/home')
       } else {
-        toast.error(res.message)
+        navigate('/home')
       }
-    } catch (err) {
-      toast.error('Lỗi kết nối đến máy chủ!')
+    } catch (error) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Không thể kết nối đến máy chủ. Vui lòng thử lại.')
+      }
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const onFinishFailed = (errorInfo) => {
+    console.log('Form validation failed:', errorInfo)
+    toast.error('Vui lòng điền đầy đủ thông tin!')
   }
 
   return (
@@ -33,8 +53,13 @@ const Login = () => {
       <div className='login__tap'>
         <img src={logo} alt='Logo' />
         <h1>ĐĂNG NHẬP</h1>
-
-        <Form name='basic' autoComplete='off' className='login__tap__form' onFinish={handleSubmit}>
+        <Form
+          name='basic'
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete='off'
+          className='login__tap__form'>
           <Form.Item
             name='username'
             rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
@@ -42,6 +67,8 @@ const Login = () => {
             <Input
               prefix={<i className='fa-solid fa-circle-user' aria-hidden='true'></i>}
               placeholder='Mã sinh viên'
+              variant='outlined'
+              aria-label='Mã Sinh Viên'
               className='form__input'
             />
           </Form.Item>
@@ -53,18 +80,19 @@ const Login = () => {
             <Input.Password
               prefix={<i className='fa-solid fa-lock' aria-hidden='true'></i>}
               placeholder='Mật khẩu'
+              variant='outlined'
+              aria-label='Mật Khẩu'
               className='form__input'
             />
           </Form.Item>
 
           <Form.Item className='login__tap__form__item'>
-            <Button type='primary' htmlType='submit' className='button-color'>
-              Xác nhận
+            <Button type='primary' htmlType='submit' className='button-color' loading={loading}>
+              Đăng nhập
             </Button>
           </Form.Item>
         </Form>
-
-        <span className='white' onClick={() => navigate('/FixPassword')}>
+        <span className='white' onClick={() => navigate('/forgot-password')}>
           Quên mật khẩu?
         </span>
       </div>
@@ -73,4 +101,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage

@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@iconify-icons/material-symbols": "^1.2.58",
     "@iconify/react": "^6.0.0",
+    "@reduxjs/toolkit": "^2.8.2",
     "antd": "^5.26.0",
     "axios": "^1.10.0",
     "formik": "^2.4.6",
@@ -20,6 +21,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.1",
     "react-hot-toast": "^2.5.2",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
     "sass": "^1.86.0",
     "yup": "^1.6.1"
