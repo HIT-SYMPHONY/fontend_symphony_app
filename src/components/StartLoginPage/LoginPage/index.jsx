@@ -43,13 +43,8 @@ const LoginPage = () => {
       <div className='login__tap'>
         <img src={logo} alt='Logo' />
         <h1>ĐĂNG NHẬP</h1>
-        <Form
-          name='basic'
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete='off'
-          className='login__tap__form'>
+
+        <Form name='basic' autoComplete='off' className='login__tap__form' onFinish={handleSubmit}>
           <Form.Item
             name='username'
             rules={[{ required: true, message: 'Vui lòng nhập mã sinh viên!' }]}
@@ -57,8 +52,6 @@ const LoginPage = () => {
             <Input
               prefix={<i className='fa-solid fa-circle-user' aria-hidden='true'></i>}
               placeholder='Mã sinh viên'
-              variant='outlined'
-              aria-label='Mã Sinh Viên'
               className='form__input'
             />
           </Form.Item>
@@ -70,8 +63,6 @@ const LoginPage = () => {
             <Input.Password
               prefix={<i className='fa-solid fa-lock' aria-hidden='true'></i>}
               placeholder='Mật khẩu'
-              variant='outlined'
-              aria-label='Mật Khẩu'
               className='form__input'
             />
           </Form.Item>
