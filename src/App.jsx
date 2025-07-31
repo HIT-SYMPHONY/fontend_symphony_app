@@ -6,7 +6,7 @@ import './scss/style.scss'
 import AuthListener from './components/AuthListener/AuthListener'
 import ProtectedRoute from './components/ProtecedRoute/ProtectedRoute'
 import LoginPage from './components/StartLoginPage/LoginPage'
-import Confirm from './components/StartLoginPage/FixPassword'
+import Confirm from './components/StartLoginPage/Confirm'
 import { Toaster } from 'react-hot-toast'
 
 import HomePage from './pages/HomePage'
@@ -39,7 +39,7 @@ function App() {
       <Routes>
         <Route path='/' element={<LoginPage />} />
         <Route path='/login' element={<LoginPage />} />
-        <Route path='/FixPassword' element={<Confirm />} />
+        <Route path='/forgot-password' element={<Confirm />} />
 
         <Route
           path='/home'
