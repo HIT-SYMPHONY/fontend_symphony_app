@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react'
 import { Icon } from '@iconify/react'
-import { GlobalContext } from '../../../dataContext'
+// import { GlobalContext } from '../../../dataContext'
 import './style.scss'
 
 const AccountOfAdmin = () => {
-  const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
+  // const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
   const [isEditingPersonal, setIsEditingPersonal] = useState(false)
   const [isEditingPassword, setIsEditingPassword] = useState(false)
   const [personalInfo, setPersonalInfo] = useState({

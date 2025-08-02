@@ -34,6 +34,7 @@ export const ApiConstant = {
   competitions: {
     base: '/competitions',
     getById: '/competitions/',
+    addMultipleMembers: '/competition-users/add-multiple',
   },
   commentPosts: {
     base: '/comment-posts',

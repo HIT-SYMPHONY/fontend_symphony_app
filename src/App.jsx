@@ -64,26 +64,33 @@ function App() {
               <AdminPage />
             </ProtectedRoute>
           }>
+          {/* Dashboard */}
           <Route index element={<MainOfAdmin />} />
           <Route path='home' element={<MainOfAdmin />} />
           <Route path='home/create' element={<CreateOfMain />} />
           <Route path='home/information/:userId' element={<InforOfAdmin />} />
-          <Route path='manage' element={<MainOfClassAdmin />} />
-          <Route path='manage/create' element={<CreateOfClassAdmin />} />
-          <Route path='manage/information/:classId' element={<CheckOfClassAdmin />} />
-          <Route path='manage/members/:classId' element={<MemberOfClassAdmin />} />
-          <Route path='competition' element={<MainOfCompet />} />
-          <Route path='competition/create' element={<CreateOfCompetAdmin />} />
-          <Route path='competition/:competitionId'>
-            <Route path='information' element={<IntroOfCompetAdmin />} />
+
+          {/* Class Management */}
+          <Route path='class' element={<MainOfClassAdmin />} />
+          <Route path='class/create' element={<CreateOfClassAdmin />} />
+          <Route path='class/:classId' element={<CheckOfClassAdmin />} />
+          <Route path='class/:classId/members' element={<MemberOfClassAdmin />} />
+
+          {/* Competition (số ít - để khớp với URL bạn báo lỗi) */}
+          <Route path='competitions' element={<MainOfCompet />} />
+          <Route path='competitions/create' element={<CreateOfCompetAdmin />} />
+
+          {/* Competition (số nhiều - phân trang sâu hơn như rules, members...) */}
+          <Route path='competitions/:competitionId'>
+            <Route path='' element={<IntroOfCompetAdmin />} />
             <Route path='rules' element={<RolusOfCompetAdmin />} />
             <Route path='members' element={<MemberOfCompetAdmin />} />
             <Route path='notifications' element={<ListOfGroup />} />
             <Route path='notifications/create' element={<CreateOfMess />} />
           </Route>
 
+          {/* Other admin routes */}
           <Route path='decent' element={<DecentOfAdmin />} />
-
           <Route path='account' element={<AccountOfAdmin />} />
         </Route>
       </Routes>

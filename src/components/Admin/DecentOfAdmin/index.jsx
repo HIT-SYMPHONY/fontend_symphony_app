@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useContext } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
-import { GlobalContext } from '../../../dataContext'
+// import { GlobalContext } from '../../../dataContext'
 import './style.scss'
 
 const member = [
@@ -18,7 +18,7 @@ const member = [
 ]
 
 const DecentOfAdmin = () => {
-  const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
+  // const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
   const navigate = useNavigate()
   const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
   const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
@@ -281,11 +281,11 @@ const DecentOfAdmin = () => {
             Chọn tất cả
           </span>
           <button onClick={handleRemoveMembers}>Xóa</button>
-          <button onClick={() => setShowNoti(true)}>Tạo chat room</button>
+          <button>Tạo chat room</button>
         </div>
       </div>
     </div>
   )
 }
-
+// onClick={() => setShowNoti(true)}
 export default DecentOfAdmin

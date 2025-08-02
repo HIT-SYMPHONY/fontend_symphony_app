@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllCompetitions } from '../../../../apis/competition.api'
-import { translateStatus, formatDate } from '../../../../utils/formatters' // 👈 Import helpers
+import { translateStatus, formatDate } from '../../../../utils/formatters'
 import './style.scss'
 
 const MainOfCompet = () => {
@@ -63,7 +63,7 @@ const MainOfCompet = () => {
         </div>
         <button
           className='mainofcompet__create-button'
-          onClick={() => navigate('/admin/competition/create')}>
+          onClick={() => navigate('/admin/competitions/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>
@@ -77,19 +77,16 @@ const MainOfCompet = () => {
             <div
               className='mainofcompet__table-box'
               key={item.id}
-              onClick={() => navigate(`/admin/competition/${item.id}/information`)}>
+              onClick={() => navigate(`/admin/competitions/${item.id}`)}>
               <div className='mainofcompet__table-box__img'>
-                {item.image && <img src={item.image} alt={item.name} />}
+                {item.image && <img src={item.image} alt={item.name} width='100%' height='100%' />}
               </div>
               <div className='mainofcompet__table-box__item'>
                 <div className='mainofcompet__table-box__item-start'>
                   <h4>{item.name}</h4>
-                  {/* 👇 Use the helper function here */}
+
                   <span>{translateStatus(item.status)}</span>
-                  <p>
-                    {/* 👇 And here */}
-                    Ngày bắt đầu: {formatDate(item.startTime)}
-                  </p>
+                  <p>Ngày bắt đầu: {formatDate(item.startTime)}</p>
                 </div>
                 <i className='fa-solid fa-circle-info mainofcompet__table-box__item-end'></i>
               </div>
