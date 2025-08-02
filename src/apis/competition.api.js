@@ -9,6 +9,9 @@ const competitionApi = () => ({
 
   createCompetition: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.competitions.base, formDataPayload),
+  updateCompetition: async (competitionId, formDataPayload) =>
+    apiDefaultUpload.patch(`${ApiConstant.competitions.base}/${competitionId}`, formDataPayload),
 })
 
-export const { getAllCompetitions, getCompetitionById, createCompetition } = competitionApi()
+export const { getAllCompetitions, getCompetitionById, createCompetition, updateCompetition } =
+  competitionApi()

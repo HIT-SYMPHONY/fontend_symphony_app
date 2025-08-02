@@ -83,6 +83,10 @@ $class-ago-width: 210px;
     }
     &__click:hover {
       background-color: #ffefe4;
+      svg,
+      i {
+        color: #f06c25;
+      }
     }
     &__clickone {
       cursor: pointer;
@@ -103,14 +107,95 @@ $class-ago-width: 210px;
     }
     &__clickone:hover {
       background-color: #ffefe4;
+      svg,
+      i {
+        color: #f06c25;
+      }
     }
   }
   &__main {
-    // ... rest of the file ...
     width: 85%;
+    &__search {
+      padding-right: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      .search {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        &__icon {
+          display: flex;
+          align-items: center;
+          &__box {
+            background-color: #dcdbdb;
+            padding: 5px;
+            border-radius: 30px;
+            min-width: 400px;
+            display: flex;
+            justify-content: space-between;
+            input {
+              border: none;
+              width: 90%;
+              background-color: #dcdbdb;
+              outline: none;
+              padding-left: 10px;
+            }
+            input:focus {
+              outline: none;
+              background-color: #dcdbdb;
+            }
+            i {
+              padding: 5px;
+              border-radius: 50%;
+              background-color: $button-color;
+              color: #fff;
+            }
+          }
+        }
+        div {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        &__then {
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          &__Icon {
+            color: $button-color;
+          }
+          &__button {
+            border: none;
+            padding: 10px;
+            width: 100px;
+            background-color: $button-color;
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    .fle {
+      display: flex;
+    }
+    &__thongbao {
+      border: 2px solid #eeecec;
+      padding: 10px;
+      margin: 4px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      justify-content: space-between;
+      box-sizing: border-box;
+      height: 525px;
+      &__div {
+        box-sizing: border-box;
+        width: 70%;
+      }
+    }
   }
 }
-
 .child {
   background-color: transparent !important;
   color: #f27b36 !important;

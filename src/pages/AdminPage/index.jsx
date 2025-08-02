@@ -13,8 +13,8 @@ const AdminPage = () => {
   const navigate = useNavigate()
   const [showLogoutPopup, setShowLogoutPopup] = useState(false)
   const isManageSectionActive =
-    location.pathname.startsWith('/admin/manage') ||
-    location.pathname.startsWith('/admin/competition')
+    location.pathname.startsWith('/admin/classes') ||
+    location.pathname.startsWith('/admin/competitions')
   const [isManageMenuOpen, setIsManageMenuOpen] = useState(isManageSectionActive)
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const AdminPage = () => {
     if (isManageSectionActive) {
       setIsManageMenuOpen((prevState) => !prevState)
     } else {
-      navigate('/admin/manage')
+      navigate('/admin/classes')
     }
   }
 
@@ -57,14 +57,14 @@ const AdminPage = () => {
 
         {isManageMenuOpen && (
           <div className='admin-sidebar-submenu'>
-            <NavLink to='/admin/manage' className='homepage__choose__clickone' end>
+            <NavLink to='/admin/classes' className='homepage__choose__clickone' end>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp học</span>
             </NavLink>
-            <NavLink to='/admin/competition' className='homepage__choose__clickone' end>
+            <NavLink to='/admin/competitions' className='homepage__choose__clickone' end>
               <Icon
                 icon='streamline-ultimate:ranking-stars-ribbon-bold'
                 className='homepage__choose__clickone__Icon'

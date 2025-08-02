@@ -33,39 +33,6 @@ $background-light: #ffefe4;
     cursor: pointer;
   }
 
-  &__filter {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid #ccc;
-    border-radius: 999px;
-    background-color: #fff;
-    padding: 5px 10px;
-    min-width: 180px;
-    cursor: pointer;
-    user-select: none;
-
-    &-icon {
-      color: #f26522;
-      margin-right: 8px;
-      z-index: 1;
-    }
-
-    &-label {
-      flex: 1;
-      text-align: center;
-      font-weight: 600;
-      color: #000;
-      z-index: 1;
-    }
-
-    &-arrow {
-      color: #f26522;
-      margin-left: 8px;
-      z-index: 1;
-    }
-  }
-
   &__dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -96,30 +63,6 @@ $background-light: #ffefe4;
     }
   }
 
-  &__search {
-    position: relative;
-    display: flex;
-    align-items: center;
-
-    &-input {
-      padding: 10px 10px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      outline: none;
-      min-width: 450px;
-    }
-
-    &-icon {
-      position: absolute;
-      right: 10px;
-      padding: 5px;
-      color: #fff;
-      background-color: #ff6911;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-  }
-
   &__create-button {
     padding: 5px 10px;
     background-color: $background-light;
@@ -142,8 +85,13 @@ $background-light: #ffefe4;
       i {
         background-color: #f26522;
         color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         padding: 10px;
         border-radius: 50%;
+        width: 16px;
+        aspect-ratio: 1;
       }
     }
 
@@ -156,12 +104,12 @@ $background-light: #ffefe4;
         display: flex;
         flex-direction: column;
 
-        gap: 5px;
+        gap: 10px;
         width: 45%;
 
         &-time {
           display: flex;
-          justify-content: space-around;
+          gap: 4rem;
           div {
             display: flex;
             flex-direction: column;
@@ -176,6 +124,7 @@ $background-light: #ffefe4;
 
         span {
           color: #989898;
+          font-weight: 700;
         }
 
         input {
@@ -185,7 +134,7 @@ $background-light: #ffefe4;
         }
         &-upload {
           width: 100%;
-          height: 80px;
+          min-height: 150px;
           background-color: #bcbaba;
           color: #5d5c5c;
           display: flex;
@@ -211,22 +160,34 @@ $background-light: #ffefe4;
           border: 2px solid $border-color;
           padding: 10px;
           box-sizing: border-box;
+          resize: vertical;
+          font-family: 'Baloo 2', sans-serif !important;
         }
       }
       &__right {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
         width: 45%;
 
         span {
           color: #989898;
         }
 
-        input {
+        input,
+        select {
           padding: 5px 15px;
           border: 2px solid $border-color;
           border-radius: 20px;
+        }
+        select {
+          option {
+            border-bottom: 1px solid black;
+            transition: all 0.2s;
+            &:hover {
+              color: #f28c38;
+            }
+          }
         }
 
         &-textarea {
@@ -236,7 +197,23 @@ $background-light: #ffefe4;
           border: 2px solid $border-color;
           padding: 10px;
           box-sizing: border-box;
+          resize: vertical;
         }
+      }
+    }
+    &-content {
+      padding: 10px;
+      label {
+        color: #989898;
+      }
+      #content {
+        width: 100%;
+        min-height: 120px;
+        border-radius: 5px;
+        border: 2px solid #dfdddd;
+        padding: 10px;
+        box-sizing: border-box;
+        resize: vertical;
       }
     }
 
