@@ -11,6 +11,7 @@ const userApi = () => ({
   },
   createUser: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
+  getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
 })
 
-export const { getAllUsers, getUserById, updateUser, createUser } = userApi()
+export const { getAllUsers, getUserById, updateUser, createUser, getLeaderList } = userApi()

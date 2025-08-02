@@ -1,5 +1,5 @@
 body {
-  font-family: "Baloo 2", sans-serif !important;
+  font-family: 'Baloo 2', sans-serif !important;
 }
 * {
   padding: 0;
@@ -9,4 +9,8 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
+}
+img {
+  max-width: 100%;
+  display: block;
 }

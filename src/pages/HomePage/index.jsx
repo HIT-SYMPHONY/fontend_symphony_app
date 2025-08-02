@@ -72,7 +72,7 @@ const HomePage = () => {
         <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
 
         <NavLink to='/home' className='homepage__choose__click'>
-          <i className='fa-solid fa-house'></i>
+          <Icon icon='material-symbols:home' width='22' height='22'></Icon>
           <span>Trang chủ</span>
         </NavLink>
 

@@ -68,22 +68,24 @@ function App() {
           <Route path='home' element={<MainOfAdmin />} />
           <Route path='home/create' element={<CreateOfMain />} />
           <Route path='home/information/:userId' element={<InforOfAdmin />} />
-          <Route path='manage' element={<MainOfClassAdmin />} />
-          <Route path='manage/create' element={<CreateOfClassAdmin />} />
-          <Route path='manage/information/:classId' element={<CheckOfClassAdmin />} />
-          <Route path='manage/members/:classId' element={<MemberOfClassAdmin />} />
-          <Route path='competition' element={<MainOfCompet />} />
-          <Route path='competition/create' element={<CreateOfCompetAdmin />} />
-          <Route path='competition/:competitionId'>
-            <Route path='information' element={<IntroOfCompetAdmin />} />
-            <Route path='rules' element={<RolusOfCompetAdmin />} />
-            <Route path='members' element={<MemberOfCompetAdmin />} />
-            <Route path='notifications' element={<ListOfGroup />} />
-            <Route path='notifications/create' element={<CreateOfMess />} />
+          <Route path='classes'>
+            <Route index element={<MainOfClassAdmin />} />
+            <Route path='create' element={<CreateOfClassAdmin />} />
+            <Route path=':classId' element={<CheckOfClassAdmin />} />
           </Route>
-
+          <Route path='members/:classId' element={<MemberOfClassAdmin />} />
+          <Route path='competitions'>
+            <Route index element={<MainOfCompet />} />
+            <Route path='create' element={<CreateOfCompetAdmin />} />
+            <Route path=':competitionId'>
+              <Route index element={<IntroOfCompetAdmin />} />
+              <Route path='rules' element={<RolusOfCompetAdmin />} />
+              <Route path='members' element={<MemberOfCompetAdmin />} />
+              <Route path='notifications' element={<ListOfGroup />} />
+              <Route path='notifications/create' element={<CreateOfMess />} />
+            </Route>
+          </Route>
           <Route path='decent' element={<DecentOfAdmin />} />
-
           <Route path='account' element={<AccountOfAdmin />} />
         </Route>
       </Routes>
