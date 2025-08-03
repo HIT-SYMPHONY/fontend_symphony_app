@@ -148,51 +148,7 @@ $background-light: #ffefe4;
         color: #f26522;
       }
     }
-    &-context {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 80%;
 
-      &__title {
-        display: flex;
-        justify-content: space-between;
-      }
-      &__list {
-        display: flex;
-        flex-direction: column;
-        height: 90%;
-        gap: 5px;
-        overflow-y: auto;
-        &::-webkit-scrollbar {
-          display: none;
-        }
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        &-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border: 1px solid #f48a4c;
-          border-radius: 5px;
-          padding-right: 10px;
-          &-box {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            &-h5 {
-              padding: 5px 15px;
-              border-radius: 5px;
-              background-color: #f48a4c;
-              color: #fff;
-            }
-            input {
-              cursor: pointer;
-            }
-          }
-        }
-      }
-    }
     &-button {
       display: flex;
       gap: 20px;
@@ -239,55 +195,86 @@ $background-light: #ffefe4;
       gap: 10px;
       align-items: center;
     }
-    &-context {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      height: 80%;
+  }
+}
 
-      &__title {
-        display: flex;
-        justify-content: space-between;
-        &-icon {
-          color: #f26522;
-        }
-        i {
-          color: #f26522;
-        }
+.decent-admin__left-context {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &__table {
+    width: 100%;
+    border-collapse: separate;
+    text-align: left;
+
+    thead th {
+      font-weight: 700;
+      font-size: 1.25rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    thead th:first-child {
+      padding-left: 8px;
+    }
+    border-spacing: 0 10px;
+  }
+
+  &__tbody-wrapper {
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  &__tbody {
+    font-weight: 600;
+    font-size: 1.125rem;
+    tr {
+      cursor: default;
+      td:first-child {
+        border-left: 1px solid #f48a4c;
+        border-radius: 12px 0 0 12px;
       }
-      &__list {
+      td:last-child {
+        border-right: 1px solid #f48a4c;
+        border-radius: 0 12px 12px 0;
+      }
+      td {
+        border-bottom: 1px solid #f48a4c;
+        border-top: 1px solid #f48a4c;
+      }
+      input[type="checkbox"] {
         display: flex;
-        flex-direction: column;
-        height: 90%;
-        gap: 5px;
-        overflow-y: auto;
-        &::-webkit-scrollbar {
-          display: none;
-        }
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        &-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border: 1px solid #f48a4c;
-          border-radius: 5px;
-          padding-right: 10px;
-          &-box {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            &-h5 {
-              padding: 5px 15px;
-              border-radius: 5px;
-              background-color: #f48a4c;
-              color: #fff;
-            }
-            input {
-              cursor: pointer;
-            }
-          }
-        }
+        align-items: center;
+        align-items: center;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .user-info-cell {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-index {
+      font-size: 1.5rem;
+
+      color: #fff;
+      h4 {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 12px;
+        background-color: #f48a4c;
+        color: #fff;
       }
     }
   }

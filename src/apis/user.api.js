@@ -13,7 +13,15 @@ const userApi = () => ({
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
   getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
+  updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
 })
 
-export const { getAllUsers, getUserById, updateUser, createUser, getLeaderList, getCurrentUser } =
-  userApi()
+export const {
+  getAllUsers,
+  getUserById,
+  updateUser,
+  createUser,
+  getLeaderList,
+  getCurrentUser,
+  updateUserRoles,
+} = userApi()
