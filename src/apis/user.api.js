@@ -4,14 +4,16 @@ import { ApiConstant } from '../constants/api.constant'
 const userApi = () => ({
   getAllUsers: async () => api.get(ApiConstant.users.base),
   getUserById: async (userId) => {
-    return api.get(`${ApiConstant.users.getById}${userId}`)
+    return api.get(`${ApiConstant.users.baseId}${userId}`)
   },
   updateUser: async (userId, formDataPayload) => {
-    return apiDefaultUpload.patch(`${ApiConstant.users.update}${userId}`, formDataPayload)
+    return apiDefaultUpload.patch(`${ApiConstant.users.baseId}${userId}`, formDataPayload)
   },
   createUser: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
   getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
+  getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
 })
 
-export const { getAllUsers, getUserById, updateUser, createUser, getLeaderList } = userApi()
+export const { getAllUsers, getUserById, updateUser, createUser, getLeaderList, getCurrentUser } =
+  userApi()

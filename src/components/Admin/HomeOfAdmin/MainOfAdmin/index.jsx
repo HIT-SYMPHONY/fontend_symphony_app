@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
 const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 import './style.scss'
+import placeHolderImage from '../../../../assets/img/Ellipse.png'
 
 const MainOfAdmin = () => {
   const navigate = useNavigate()
@@ -121,24 +122,28 @@ const MainOfAdmin = () => {
       <h2>Danh sách thành viên </h2>
       <h3>Số lượng thành viên: {loading ? '...' : filteredUsers.length}</h3>
       <div className='main-admin__context'>
-        <table className='main-admin__context__table'>
-          <thead className='main-admin__context__table__thead'>
-            <tr className='main-admin__context__table__thead__tr'>
-              <th>STT</th>
-              <th>Tên</th>
-              <th>Phân quyền</th>
-              <th>Mã sinh viên</th>
-              <th>Thời gian</th>
-              <th>Icon</th>
-            </tr>
-          </thead>
-        </table>
         <div className='main-admin__context__table__tbody-wrapper'>
-          {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
-          {!loading && (
-            <table className='main-admin__context__table'>
-              <tbody className='main-admin__context__table__tbody'>
-                {filteredUsers.map((user, index) => (
+          <table className='main-admin__context__table'>
+            <thead className='main-admin__context__table__thead'>
+              <tr className='main-admin__context__table__thead__tr'>
+                <th>STT</th>
+                <th>Tên</th>
+                <th>Phân quyền</th>
+                <th>Mã sinh viên</th>
+                <th>Ngày tham gia</th>
+                <th>Ảnh</th>
+              </tr>
+            </thead>
+            <tbody className='main-admin__context__table__tbody'>
+              {loading && (
+                <tr>
+                  <td colSpan='6' style={{ textAlign: 'center', padding: '2rem' }}>
+                    Đang tải...
+                  </td>
+                </tr>
+              )}
+              {!loading &&
+                filteredUsers.map((user, index) => (
                   <tr key={user.id} onClick={() => navigate(`/admin/home/information/${user.id}`)}>
                     <td className='tbody'>
                       <h4>{index + 1}</h4>
@@ -147,12 +152,13 @@ const MainOfAdmin = () => {
                     <td>{user.role}</td>
                     <td>{user.studentCode}</td>
                     <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
-                    <td className='tbody-td'></td>
+                    <td className='tbody-td'>
+                      <img src={user.imageUrl || placeHolderImage} alt='Profile' />
+                    </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
