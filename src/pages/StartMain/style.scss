@@ -8,57 +8,75 @@ $class-ago-width: 210px;
   padding-left: 10px;
   padding-right: 10px;
   position: relative;
+
   &__choose {
     width: 15%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding-top: 10px;
+    padding-top: 20px;
+
     &__img {
       display: flex;
       justify-content: center;
       img {
         width: 100px;
         height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     }
+
     &__h3 {
       text-align: center;
       padding-bottom: 10px;
       padding-top: 10px;
     }
-    .origin {
-      background-color: $button-color !important;
 
-      color: #fff !important;
-      i {
-        color: #fff !important;
-      }
-      border-radius: 20px;
+    a {
+      text-decoration: none;
+      color: inherit;
     }
+
+    .homepage__choose__click,
+    .homepage__choose__clickone {
+      &.active {
+        background-color: $button-color;
+        color: #fff;
+        border-radius: 20px;
+        i,
+        .iconify {
+          color: #fff;
+        }
+      }
+    }
+
     &__click {
       cursor: pointer;
+      margin: 5px 0;
+      padding: 10px;
       padding-left: 20px;
       display: flex;
-      padding: 5px;
       align-items: center;
+      border-radius: 20px;
+      transition: background-color 0.2s ease-in-out;
+
       i {
         color: #979797;
         padding-right: 10px;
       }
+
       &__Icon {
         color: #979797;
         padding-right: 10px;
         font-size: 20px;
       }
-    }
-    &__click:hover {
-      background-color: #ffefe4;
-      svg,
-      i {
-        color: #f06c25;
+
+      &:hover {
+        background-color: #ffefe4;
       }
     }
+
     &__clickone {
       cursor: pointer;
       margin: 0;
@@ -68,18 +86,29 @@ $class-ago-width: 210px;
       display: flex;
       align-items: center;
       gap: 5px;
+      border-radius: 20px;
+      transition: background-color 0.2s ease-in-out;
+
       &__Icon {
         padding-right: 10px;
       }
-    }
-    &__clickone:hover {
-      background-color: #ffefe4;
-      svg,
-      i {
-        color: #f06c25;
+
+      &:hover {
+        background-color: #ffefe4;
+      }
+
+      &.active {
+        background-color: transparent;
+        color: $button-color;
+
+        i,
+        .iconify {
+          color: $button-color;
+        }
       }
     }
   }
+
   &__main {
     width: 85%;
     &__search {
@@ -107,6 +136,7 @@ $class-ago-width: 210px;
               outline: none;
               padding-left: 10px;
             }
+
             input:focus {
               outline: none;
               background-color: #dcdbdb;
@@ -155,7 +185,8 @@ $class-ago-width: 210px;
       border-radius: 10px;
       justify-content: space-between;
       box-sizing: border-box;
-      height: 525px;
+      height: 90vh;
+
       &__div {
         box-sizing: border-box;
         width: 70%;
@@ -163,21 +194,14 @@ $class-ago-width: 210px;
     }
   }
 }
-.child {
-  color: #f27b36 !important;
-  i,
-  .iconify {
-    color: #f27b36 !important;
+@media (min-width: 1200px) and (min-height: 780px) {
+  .flex-one .class-ago {
+    max-height: 500px;
   }
-}
-
-.whiteP {
-  color: #fff;
-  padding-right: 10px;
-  width: 20px;
-  height: 20px;
-}
-.error-message {
-  color: #ff4d4f !important;
-  display: block;
+  .schedule .schedule__list {
+    max-height: 540px;
+  }
+  .homework .homework__baitap {
+    max-height: 630px;
+  }
 }

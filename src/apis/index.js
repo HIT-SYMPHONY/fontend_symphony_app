@@ -5,7 +5,7 @@ import { store } from '../store/configureStore'
 import { save as saveAuthAction, clear as logoutAction } from '../store/auth.store'
 import { LocalStorage } from '../constants/localStorage.constant'
 import { refreshToken as refreshTokenApi } from './auth.api'
-import { api, apiDefault, apiDefaultUpload } from './axios' 
+import { api, apiDefault, apiDefaultUpload, apiUpload } from './axios'
 const privateRequestInterceptor = (config) => {
   const authData = JSON.parse(localStorage.getItem(LocalStorage.auth))
   const accessToken = authData?.accessToken
@@ -53,4 +53,8 @@ api.interceptors.response.use((response) => response.data, privateResponseInterc
 apiDefaultUpload.interceptors.request.use(privateRequestInterceptor, Promise.reject)
 apiDefaultUpload.interceptors.response.use((response) => response.data, privateResponseInterceptor)
 
-export { api, apiDefault, apiDefaultUpload }
+//axios cho các request cần truyền token và upload file
+apiUpload.interceptors.request.use(privateRequestInterceptor, Promise.reject)
+apiUpload.interceptors.response.use((response) => response.data, privateResponseInterceptor)
+
+export { api, apiDefault, apiDefaultUpload, apiUpload }

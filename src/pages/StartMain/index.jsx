@@ -13,28 +13,7 @@ import icon from '../../assets/img/Ellipse.png'
 import logo from '../../assets/img/logo.png'
 // import './style.scss'
 
-const HomeTap = ({ showSchedule, showHomework, showMain, announcements, recentClasses }) => {
-  return (
-    <div
-      className={
-        (showSchedule || showHomework) && !showMain
-          ? 'homepage__main__thongbao fle'
-          : 'homepage__main__thongbao'
-      }>
-      {(showSchedule || showHomework) && !showMain ? (
-        <div className='homepage__main__thongbao__div'>
-          <Main title={true} announcements={announcements} recentClasses={recentClasses} />
-        </div>
-      ) : (
-        <Main title={false} announcements={announcements} recentClasses={recentClasses} />
-      )}
-      {showSchedule && !showMain && <Schedule />}
-      {showHomework && !showMain && <Homework />}
-    </div>
-  )
-}
-
-const HomePage = () => {
+const StartMain = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
 
@@ -71,36 +50,35 @@ const HomePage = () => {
         </div>
         <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
 
-        <NavLink to='/client/home' className='homepage__choose__click origin'>
+        <NavLink to='/client/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </NavLink>
 
-        <NavLink
-          to='/client/classes'
+        <div
           className='homepage__choose__click'
           onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
-        </NavLink>
+        </div>
 
         {isClassroomMenuOpen && (
           <div>
-            <NavLink to='/client/my-classes' className='homepage__choose__clickone'>
+            <NavLink to='/my-classes' className='homepage__choose__clickone child'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
             </NavLink>
-            <NavLink to='/client/my-results' className='homepage__choose__clickone'>
+            <NavLink to='/my-results' className='homepage__choose__clickone child'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
             </NavLink>
           </div>
         )}
 
-        <NavLink to='/client/competitions' className='homepage__choose__click'>
+        <NavLink to='/competitions' className='homepage__choose__click'>
           <Icon
             icon='streamline-ultimate:ranking-stars-ribbon-bold'
             className='homepage__choose__click__Icon'
@@ -109,13 +87,13 @@ const HomePage = () => {
         </NavLink>
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
-          <NavLink to='/client/manage' className='homepage__choose__click'>
+          <NavLink to='/manage/classes' className='homepage__choose__click'>
             <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
             <span>Quản lý</span>
           </NavLink>
         )}
 
-        <NavLink to='/account' className='homepage__choose__click'>
+        <NavLink to='/profile' className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </NavLink>
@@ -154,12 +132,7 @@ const HomePage = () => {
                     className='search__then__Icon'
                     onClick={() => setShowMain(!showMain)}
                   />
-                  <button className='search__then__button' onClick={handleLichHoc}>
-                    Lịch học
-                  </button>
-                  <button className='search__then__button' onClick={handleBaiTap}>
-                    Bài tập
-                  </button>
+                  {/* here */}
                 </div>
               )}
               <Icon
@@ -177,14 +150,7 @@ const HomePage = () => {
               />
             </div>
           </div>
-
-          <HomeTap
-            showSchedule={showSchedule}
-            showHomework={showHomework}
-            showMain={showMain}
-            announcements={announcements}
-            recentClasses={recentClasses?.items}
-          />
+          {/* here */}
         </div>
       </div>
 
@@ -193,4 +159,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default StartMain

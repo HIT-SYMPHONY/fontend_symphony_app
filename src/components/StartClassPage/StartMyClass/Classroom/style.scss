@@ -8,13 +8,8 @@ $secondary-color: #ff6911;
 
 $background-light: #ffefe4;
 .flextap-one {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
-  box-sizing: border-box;
-  height: 90vh;
-  display: flex;
+  width: 100%;
+  height: 100%;
   .plustap {
     display: flex;
     justify-content: space-between;
@@ -70,7 +65,7 @@ $background-light: #ffefe4;
     max-height: 460px;
 
     position: relative;
-    font-family: "Baloo 2", sans-serif;
+    font-family: 'Baloo 2', sans-serif;
     box-sizing: border-box;
     max-width: 100%;
 
@@ -134,9 +129,9 @@ $background-light: #ffefe4;
     }
   }
 }
-.add {
-  width: 100%;
-}
-.add-b {
-  width: 70%;
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .flextap-one .class-tap {
+    max-height: 650px;
+  }
 }

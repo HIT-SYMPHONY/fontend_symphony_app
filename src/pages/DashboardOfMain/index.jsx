@@ -7,47 +7,23 @@ import useFetch from '../../hooks/useFetch'
 import { ApiConstant } from '../../constants/api.constant'
 import Logout from '../../components/Logout'
 import Main from '../../components/StartHomePage/MainPage'
+import AllClassroom from '../../components/StartClassPage/StartMyClass/AllClassroom'
 import Schedule from '../SchedulePage'
 import Homework from '../Homework'
 import icon from '../../assets/img/Ellipse.png'
+import { Outlet } from 'react-router-dom'
 import logo from '../../assets/img/logo.png'
-// import './style.scss'
+import './style.scss'
 
-const HomeTap = ({ showSchedule, showHomework, showMain, announcements, recentClasses }) => {
-  return (
-    <div
-      className={
-        (showSchedule || showHomework) && !showMain
-          ? 'homepage__main__thongbao fle'
-          : 'homepage__main__thongbao'
-      }>
-      {(showSchedule || showHomework) && !showMain ? (
-        <div className='homepage__main__thongbao__div'>
-          <Main title={true} announcements={announcements} recentClasses={recentClasses} />
-        </div>
-      ) : (
-        <Main title={false} announcements={announcements} recentClasses={recentClasses} />
-      )}
-      {showSchedule && !showMain && <Schedule />}
-      {showHomework && !showMain && <Homework />}
-    </div>
-  )
-}
-
-const HomePage = () => {
+const DashboardOfMain = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false)
-  const [showMain, setShowMain] = useState(true)
+  const [showMain, setShowMain] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
   const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(true)
-
-  const { data: recentClasses, loading: classesLoading } = useFetch(ApiConstant.classrooms.base)
-  const { data: announcements, loading: announcementsLoading } = useFetch(
-    ApiConstant.notifications.base,
-  )
 
   const handleLichHoc = () => {
     if (showHomework) setShowHomework(false)
@@ -77,7 +53,7 @@ const HomePage = () => {
         </NavLink>
 
         <NavLink
-          to='/client/classes'
+          to='/client/profile'
           className='homepage__choose__click'
           onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
           <i className='fa-solid fa-book'></i>
@@ -86,14 +62,14 @@ const HomePage = () => {
 
         {isClassroomMenuOpen && (
           <div>
-            <NavLink to='/client/my-classes' className='homepage__choose__clickone'>
+            <NavLink to='/client/profile/my-classes' className='homepage__choose__clickone'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
             </NavLink>
-            <NavLink to='/client/my-results' className='homepage__choose__clickone'>
+            <NavLink to='/client/profile/my-results' className='homepage__choose__clickone'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
             </NavLink>
@@ -109,13 +85,28 @@ const HomePage = () => {
         </NavLink>
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
-          <NavLink to='/client/manage' className='homepage__choose__click'>
-            <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
-            <span>Quản lý</span>
-          </NavLink>
+          <>
+            <NavLink to='/client/manage' className='homepage__choose__click'>
+              <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
+              <span>Quản lý</span>
+            </NavLink>
+            <div>
+              <NavLink to='/client/my-classes' className='homepage__choose__clickone'>
+                <Icon
+                  icon='fluent:book-star-24-regular'
+                  className='homepage__choose__clickone__Icon'
+                />
+                <span>Lớp của tôi</span>
+              </NavLink>
+              <NavLink to='/client/my-results' className='homepage__choose__clickone'>
+                <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
+                <span>Bảng kết quả</span>
+              </NavLink>
+            </div>
+          </>
         )}
 
-        <NavLink to='/account' className='homepage__choose__click'>
+        <NavLink to='/client/account' className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </NavLink>
@@ -138,14 +129,6 @@ const HomePage = () => {
             </div>
             <div className='search__then'>
               {showMain ? (
-                <Icon
-                  icon='line-md:menu-unfold-left'
-                  width='26'
-                  height='26'
-                  className='search__then__Icon'
-                  onClick={() => setShowMain(!showMain)}
-                />
-              ) : (
                 <div>
                   <Icon
                     icon='line-md:menu-unfold-right'
@@ -161,6 +144,14 @@ const HomePage = () => {
                     Bài tập
                   </button>
                 </div>
+              ) : (
+                <Icon
+                  icon='line-md:menu-unfold-left'
+                  width='26'
+                  height='26'
+                  className='search__then__Icon'
+                  onClick={() => setShowMain(!showMain)}
+                />
               )}
               <Icon
                 icon='hugeicons:message-notification-01'
@@ -178,13 +169,12 @@ const HomePage = () => {
             </div>
           </div>
 
-          <HomeTap
-            showSchedule={showSchedule}
-            showHomework={showHomework}
-            showMain={showMain}
-            announcements={announcements}
-            recentClasses={recentClasses?.items}
-          />
+          {/* here */}
+          <div className='context-main'>
+            <Outlet />
+            {showSchedule && showMain && <Schedule />}
+            {showHomework && showMain && <Homework />}
+          </div>
         </div>
       </div>
 
@@ -193,4 +183,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default DashboardOfMain

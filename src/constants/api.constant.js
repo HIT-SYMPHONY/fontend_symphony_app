@@ -18,7 +18,7 @@ export const ApiConstant = {
   classrooms: {
     base: '/classrooms',
     getById: '/classrooms/',
-    members: '/classrooms/',
+    members: '/classrooms/{id}/members',
   },
   lessons: {
     base: '/lesson',
@@ -37,6 +37,10 @@ export const ApiConstant = {
   competitions: {
     base: '/competitions',
     getById: '/competitions/',
+    addMultipleMembers: '/competition-users/add-multiple',
+    removeMultipleMembers: '/competition-users/remove-multiple',
+    getMembers: '/competition-users/',
+    getNonMembers: '/competition-users/',
   },
   commentPosts: {
     base: '/comment-posts',

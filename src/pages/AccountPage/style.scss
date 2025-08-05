@@ -5,12 +5,7 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .account {
-  border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
   gap: 10px;

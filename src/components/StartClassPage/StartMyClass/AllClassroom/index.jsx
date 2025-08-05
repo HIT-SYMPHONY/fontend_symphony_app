@@ -5,7 +5,7 @@ import { lop } from '../../../../data/app'
 
 import './style.scss'
 
-const Classroom = () => {
+const AllClassroom = () => {
   const navigate = useNavigate()
   return (
     <div className='flextap-one'>
@@ -19,9 +19,6 @@ const Classroom = () => {
               className='plustap__plus__Icon'
             />
             <h3>Lớp học gần đây</h3>
-          </div>
-          <div className='plustap__infor'>
-            <span className='plustap__infor__span'>▲ Lớp đang học</span>
           </div>
         </div>
         {/* "class-tap thay2" */}
@@ -60,4 +57,4 @@ const Classroom = () => {
   )
 }
 
-export default Classroom
+export default AllClassroom
