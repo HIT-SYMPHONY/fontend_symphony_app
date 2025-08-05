@@ -5,12 +5,7 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .complete {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
 
   &__left {
@@ -54,7 +49,7 @@ $background-light: #ffefe4;
       border: 2px solid $border-color;
       border-radius: 10px;
       box-sizing: border-box;
-      height: 50%;
+      height: 250px;
     }
     &__feedback {
       margin-top: 10px;
@@ -72,6 +67,7 @@ $background-light: #ffefe4;
           overflow: auto;
           width: 95%;
           border: none;
+          padding: 10px;
         }
         .respon-color {
           color: #a2a2a2;

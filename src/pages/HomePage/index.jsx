@@ -11,7 +11,7 @@ import Schedule from '../SchedulePage'
 import Homework from '../Homework'
 import icon from '../../assets/img/Ellipse.png'
 import logo from '../../assets/img/logo.png'
-import './style.scss'
+// import './style.scss'
 
 const HomeTap = ({ showSchedule, showHomework, showMain, announcements, recentClasses }) => {
   return (
@@ -71,35 +71,36 @@ const HomePage = () => {
         </div>
         <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
 
-        <NavLink to='/home' className='homepage__choose__click'>
+        <NavLink to='/client/home' className='homepage__choose__click origin'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </NavLink>
 
-        <div
+        <NavLink
+          to='/client/classes'
           className='homepage__choose__click'
           onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
-        </div>
+        </NavLink>
 
         {isClassroomMenuOpen && (
           <div>
-            <NavLink to='/my-classes' className='homepage__choose__clickone child'>
+            <NavLink to='/client/my-classes' className='homepage__choose__clickone'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
             </NavLink>
-            <NavLink to='/my-results' className='homepage__choose__clickone child'>
+            <NavLink to='/client/my-results' className='homepage__choose__clickone'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
             </NavLink>
           </div>
         )}
 
-        <NavLink to='/competitions' className='homepage__choose__click'>
+        <NavLink to='/client/competitions' className='homepage__choose__click'>
           <Icon
             icon='streamline-ultimate:ranking-stars-ribbon-bold'
             className='homepage__choose__click__Icon'
@@ -108,13 +109,13 @@ const HomePage = () => {
         </NavLink>
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
-          <NavLink to='/manage/classes' className='homepage__choose__click'>
+          <NavLink to='/client/manage' className='homepage__choose__click'>
             <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
             <span>Quản lý</span>
           </NavLink>
         )}
 
-        <NavLink to='/profile' className='homepage__choose__click'>
+        <NavLink to='/account' className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </NavLink>

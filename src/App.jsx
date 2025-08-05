@@ -1,101 +1,24 @@
 import { useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import './scss/style.scss'
+// import './scss/style.scss'
+import InformationClass from './components/StartClassPage/StartMyClass/InformationClass'
 
-import AuthListener from './components/AuthListener/AuthListener'
-import ProtectedRoute from './components/ProtecedRoute/ProtectedRoute'
+// src/AppRoutes.jsx
 import LoginPage from './components/StartLoginPage/LoginPage'
 import Confirm from './components/StartLoginPage/FixPassword'
-import { Toaster } from 'react-hot-toast'
+import AdminRoutes from './routes/AdminRoutes'
+import ClientRoutes from './routes/ClientRoutes'
 
-import HomePage from './pages/HomePage'
-import HomeAccount from './pages/AccountPage'
+const AppRoutes = () => (
+  <Routes>
+    <Route path='/' element={<LoginPage />} />
+    <Route path='/login' element={<LoginPage />} />
+    <Route path='/FixPassword' element={<InformationClass />} />
 
-import AdminPage from './pages/AdminPage'
-import MainOfAdmin from './components/Admin/HomeOfAdmin/MainOfAdmin'
-import CreateOfMain from './components/Admin/HomeOfAdmin/CreateOfMain'
-import InforOfAdmin from './components/Admin/HomeOfAdmin/InforOfAdmin'
-import MainOfClassAdmin from './components/Admin/ClassOfAdmin/MainOfClass'
-import CreateOfClassAdmin from './components/Admin/ClassOfAdmin/CreateOfClass'
-import CheckOfClassAdmin from './components/Admin/ClassOfAdmin/CheckOfClass'
-import MemberOfClassAdmin from './components/Admin/ClassOfAdmin/MemberOfAdmin'
-import MainOfCompet from './components/Admin/CompetOfAdmin/MainOfCompet'
-import CreateOfCompetAdmin from './components/Admin/CompetOfAdmin/CreateOfCompet'
-import IntroOfCompetAdmin from './components/Admin/CompetOfAdmin/IntroOfCompet'
-import RolusOfCompetAdmin from './components/Admin/CompetOfAdmin/RolusOfAdmin'
-import MemberOfCompetAdmin from './components/Admin/CompetOfAdmin/MemberOfCompet'
-import ListOfGroup from './components/Admin/CompetOfAdmin/ListOfGroup'
-import CreateOfMess from './components/Admin/CompetOfAdmin/CreateOfMess'
-import DecentOfAdmin from './components/Admin/DecentOfAdmin'
-import AccountOfAdmin from './components/Admin/AccoutOfAdmin'
+    {ClientRoutes}
+    {AdminRoutes}
+  </Routes>
+)
 
-function App() {
-  return (
-    <div className='app'>
-      <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
-      <AuthListener />
-
-      <Routes>
-        <Route path='/' element={<LoginPage />} />
-        <Route path='/login' element={<LoginPage />} />
-        <Route path='/FixPassword' element={<Confirm />} />
-
-        <Route
-          path='/home'
-          element={
-            <ProtectedRoute>
-              <HomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/account'
-          element={
-            <ProtectedRoute>
-              <HomeAccount />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path='/admin'
-          element={
-            <ProtectedRoute allowedRoles={['ADMIN', 'LEADER']}>
-              <AdminPage />
-            </ProtectedRoute>
-          }>
-          {/* Dashboard */}
-          <Route index element={<MainOfAdmin />} />
-          <Route path='home' element={<MainOfAdmin />} />
-          <Route path='home/create' element={<CreateOfMain />} />
-          <Route path='home/information/:userId' element={<InforOfAdmin />} />
-
-          {/* Class Management */}
-          <Route path='class' element={<MainOfClassAdmin />} />
-          <Route path='class/create' element={<CreateOfClassAdmin />} />
-          <Route path='class/:classId' element={<CheckOfClassAdmin />} />
-          <Route path='class/:classId/members' element={<MemberOfClassAdmin />} />
-
-          {/* Competition (số ít - để khớp với URL bạn báo lỗi) */}
-          <Route path='competitions' element={<MainOfCompet />} />
-          <Route path='competitions/create' element={<CreateOfCompetAdmin />} />
-
-          {/* Competition (số nhiều - phân trang sâu hơn như rules, members...) */}
-          <Route path='competitions/:competitionId'>
-            <Route path='' element={<IntroOfCompetAdmin />} />
-            <Route path='rules' element={<RolusOfCompetAdmin />} />
-            <Route path='members' element={<MemberOfCompetAdmin />} />
-            <Route path='notifications' element={<ListOfGroup />} />
-            <Route path='notifications/create' element={<CreateOfMess />} />
-          </Route>
-
-          {/* Other admin routes */}
-          <Route path='decent' element={<DecentOfAdmin />} />
-          <Route path='account' element={<AccountOfAdmin />} />
-        </Route>
-      </Routes>
-    </div>
-  )
-}
-
-export default App
+export default AppRoutes

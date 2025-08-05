@@ -11,15 +11,8 @@ const MainClass = () => {
   const [showMain, setShowMain] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
+  const [showThen, setShowThen] = useState(false)
 
-  const context = useContext(GlobalContext)
-  const k = 1
-  if (!context) {
-    console.error('GlobalContext is undefined. Ensure HomePage is wrapped in GlobalProvider.')
-    return <div>Lỗi: Không tìm thấy GlobalContext!</div>
-  }
-
-  const { updateGlobalState, path, aspect } = context
   const handleLichHoc = () => {
     if (showHomework) {
       setShowHomework(false)
@@ -41,82 +34,47 @@ const MainClass = () => {
           <img src={icon} alt='Profile' />
         </div>
         <h3 className='homepage__choose__h3'>Chào (tên)! </h3>
-        <div
-          className={path[k].home ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => updateGlobalState(1)}>
+        <div className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </div>
-        <div
-          className={
-            path[k].classroom ? 'homepage__choose__click origin' : 'homepage__choose__click'
-          }
-          onClick={() => {
-            updateGlobalState(2)
-          }}>
+        <div className='homepage__choose__click origin' onClick={() => setShowThen(!showThen)}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
         </div>
-        {path[k].show && (
+        {showThen && (
           <div>
-            <div
-              className={
-                path[k].myclass ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
-              }
-              onClick={() => updateGlobalState(2)}>
+            <div className='homepage__choose__clickone child'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
             </div>
-            <div
-              className={
-                path[k].myresult ? 'homepage__choose__clickone child' : 'homepage__choose__clickone'
-              }
-              onClick={() => updateGlobalState(3)}>
+            <div className='homepage__choose__clickone'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
             </div>
           </div>
         )}
-        <div
-          className={
-            path[k].competition ? 'homepage__choose__click origin' : 'homepage__choose__click'
-          }
-          onClick={() => updateGlobalState(4)}>
+        <div className='homepage__choose__click'>
           <Icon
             icon='streamline-ultimate:ranking-stars-ribbon-bold'
             className='homepage__choose__click__Icon'
           />
           <span>Cuộc thi</span>
         </div>
-        {aspect == 'LEADER' && (
-          <div
-            className={
-              path[k].manage ? 'homepage__choose__click origin' : 'homepage__choose__click'
-            }
-            onClick={() => updateGlobalState(7)}>
-            <Icon
-              icon='mdi:book-account'
-              className={
-                path[k].manage
-                  ? 'homepage__choose__click__replace'
-                  : 'homepage__choose__click__Icon'
-              }
-            />
+        {false && (
+          <div className='homepage__choose__click'>
+            <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
             <span>Quản lý</span>
           </div>
         )}
-        <div
-          className={path[k].account ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => updateGlobalState(5)}>
+        <div className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </div>
-        <div
-          className={path[k].logout ? 'homepage__choose__click origin' : 'homepage__choose__click'}
-          onClick={() => setFrame(true)}>
+        <div className='homepage__choose__click'>
           <Icon icon='mage:shut-down-fill' className='homepage__choose__click__Icon' />
           <span>Đăng xuất</span>
         </div>

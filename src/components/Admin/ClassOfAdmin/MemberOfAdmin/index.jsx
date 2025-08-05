@@ -264,246 +264,44 @@
 
 // export default MemberOfClassAdmin
 
-// import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
-// import { Icon } from '@iconify/react'
-// import { useNavigate, useParams } from 'react-router-dom'
-// import toast from 'react-hot-toast'
-// import { getAllUsers } from '../../../../apis/user.api'
-// import { addMembersToClassroom, getMembersInClassroom } from '../../../../apis/classroom.api'
-// import './style.scss'
-
-// const MemberOfClassAdmin = () => {
-//   const { classId } = useParams()
-//   const navigate = useNavigate()
-
-//   const [allUsers, setAllUsers] = useState([])
-//   const [classMembers, setClassMembers] = useState([])
-//   const [loading, setLoading] = useState(true)
-
-//   const [searchQuery, setSearchQuery] = useState('')
-//   const [selectedMemberIds, setSelectedMemberIds] = useState([])
-
-//   const fetchAllData = useCallback(async () => {
-//     try {
-//       setLoading(true)
-//       const [usersResponse, membersResponse] = await Promise.all([
-//         getAllUsers(),
-//         getMembersInClassroom(classId),
-//       ])
-//       setAllUsers(usersResponse.data || [])
-//       setClassMembers(membersResponse.data?.items || [])
-//     } catch (error) {
-//       toast.error('Không thể tải dữ liệu thành viên.')
-//     } finally {
-//       setLoading(false)
-//     }
-//   }, [classId])
-
-//   useEffect(() => {
-//     fetchAllData()
-//   }, [fetchAllData])
-
-//   const availableUsers = useMemo(() => {
-//     const classMemberIds = new Set(classMembers.map((m) => m.id))
-//     let available = allUsers.filter((user) => !classMemberIds.has(user.id))
-
-//     if (searchQuery) {
-//       const lowercasedQuery = searchQuery.toLowerCase()
-//       available = available.filter(
-//         (user) =>
-//           // 👇 FIX: Added optional chaining (?) to prevent crash if fullName is null
-//           user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-//           user.studentCode?.includes(lowercasedQuery),
-//       )
-//     }
-//     return available
-//   }, [allUsers, classMembers, searchQuery])
-
-//   const handleSelectionChange = (userId) => {
-//     setSelectedMemberIds((prev) =>
-//       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
-//     )
-//   }
-
-//   const handleSelectAll = () => {
-//     setSelectedMemberIds(availableUsers.map((item) => item.id))
-//   }
-
-//   const handleAddMembers = async () => {
-//     if (!classId || selectedMemberIds.length === 0) {
-//       toast.error('Vui lòng chọn thành viên để thêm vào lớp.')
-//       return
-//     }
-//     const actionToast = toast.loading('Đang thêm thành viên...')
-//     try {
-//       const payload = { memberIds: selectedMemberIds }
-//       await addMembersToClassroom(classId, payload)
-//       toast.success('Thêm thành viên thành công!', { id: actionToast })
-//       setSelectedMemberIds([])
-//       await fetchAllData()
-//     } catch (error) {
-//       const message = error.response?.data?.message || 'Lỗi khi thêm thành viên.'
-//       toast.error(message, { id: actionToast })
-//     }
-//   }
-
-//   const handleRemoveMembers = () => {
-//     toast.info('Chức năng xóa đang được phát triển.')
-//   }
-
-//   return (
-//     <div className='member-compet-admin'>
-//       <div className='member-compet-admin__left'>
-//         <div className='member-compet-admin__left-title'>
-//           <Icon
-//             icon='mdi:book-account'
-//             width='24'
-//             height='24'
-//             className='member-compet-admin__left-title-icon'
-//           />
-//           <h3>Quản lý lớp học</h3>
-//           <i className='fa-solid fa-angles-right'></i>
-//           <h3>Thêm thành viên</h3>
-//         </div>
-//         <div className='member-compet-admin__header'>
-//           <i
-//             className='member-compet-admin__back-icon fa-solid fa-arrow-left'
-//             onClick={() => navigate(`/admin/manage/information/${classId}`)}></i>
-//           <div className='member-compet-admin__search'>
-//             <input
-//               type='text'
-//               placeholder='Tìm kiếm...'
-//               className='member-compet-admin__search-input'
-//               value={searchQuery}
-//               onChange={(e) => setSearchQuery(e.target.value)}
-//             />
-//             <i className='member-compet-admin__search-icon fa-solid fa-magnifying-glass'></i>
-//           </div>
-//         </div>
-//         <div className='member-compet-admin__left-context'>
-//           <div className='member-compet-admin__left-context__title'>
-//             <h5>Tên thành viên</h5>
-//             <h5>Mã sinh viên</h5>
-//             <h5>Khóa học</h5>
-//           </div>
-//           <div className='member-compet-admin__left-context__list'>
-//             {loading ? (
-//               <p>Đang tải...</p>
-//             ) : (
-//               availableUsers.map((item, index) => (
-//                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
-//                   <div className='member-compet-admin__left-context__list-item-box'>
-//                     <h5 className='member-compet-admin__left-context__list-item-box-h5'>
-//                       {index + 1}
-//                     </h5>
-//                     <h5>{item.fullName}</h5>
-//                   </div>
-//                   <h5>{item.studentCode}</h5>
-//                   <div className='member-compet-admin__left-context__list-item-box'>
-//                     <h5>{item.intake}</h5>
-//                     <input
-//                       type='checkbox' // Changed to checkbox for multi-select
-//                       checked={selectedMemberIds.includes(item.id)}
-//                       onChange={() => handleSelectionChange(item.id)}
-//                     />
-//                   </div>
-//                 </div>
-//               ))
-//             )}
-//           </div>
-//         </div>
-//         <div className='member-compet-admin__left-button'>
-//           <span onClick={handleSelectAll}>Chọn tất cả</span>
-//           <button onClick={handleAddMembers}>Thêm</button>
-//         </div>
-//       </div>
-
-//       <div className='member-compet-admin__among'></div>
-
-//       <div className='member-compet-admin__right'>
-//         <div className='member-compet-admin__left-title'>
-//           <Icon
-//             icon='fluent:people-24-filled'
-//             width='24'
-//             className='member-compet-admin__left-title-icon'
-//           />
-//           <h3>Danh sách thành viên lớp</h3>
-//         </div>
-//         <div className='member-compet-admin__header'>
-//           {/* Right panel search and filter can be added here */}
-//         </div>
-//         <div className='member-compet-admin__left-context'>
-//           <div className='member-compet-admin__left-context__title'>
-//             <h5>Tên thành viên</h5>
-//             <h5>Mã sinh viên</h5>
-//           </div>
-//           <div className='member-compet-admin__left-context__list'>
-//             {loading ? (
-//               <p>Đang tải...</p>
-//             ) : (
-//               classMembers.map((item, index) => (
-//                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
-//                   <div className='member-compet-admin__left-context__list-item-box'>
-//                     <h5 className='member-compet-admin__left-context__list-item-box-h5'>
-//                       {index + 1}
-//                     </h5>
-//                     <h5>{item.fullName}</h5>
-//                   </div>
-//                   <h5>{item.studentCode}</h5>
-//                   <input
-//                     type='checkbox' // Changed to checkbox for multi-select
-//                     checked={selectedMemberIds.includes(item.id)}
-//                     onChange={() => handleSelectionChange(item.id)}
-//                   />
-//                 </div>
-//               ))
-//             )}
-//           </div>
-//         </div>
-//         <div className='member-compet-admin__left-button'>
-//           <span onClick={() => setSelectedMemberIds(classMembers.map((m) => m.id))}>
-//             Chọn tất cả
-//           </span>
-//           <button onClick={handleRemoveMembers}>Xóa</button>
-//           <button>Tạo chat room</button>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
 // export default MemberOfClassAdmin
 
-// import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+// import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 // import { Icon } from '@iconify/react'
 // import { useNavigate, useParams } from 'react-router-dom'
 // import toast from 'react-hot-toast'
 // import { getAllUsers } from '../../../../apis/user.api'
 // import {
-//   addMembersToClassroom,
 //   getMembersInClassroom,
+//   addMembersToClassroom,
 //   removeMembersFromClassroom,
 // } from '../../../../apis/classroom.api'
 // import './style.scss'
 
 // const MemberOfClassAdmin = () => {
-//   const { classId } = useParams()
 //   const navigate = useNavigate()
+//   const { classId } = useParams()
 
 //   const [allUsers, setAllUsers] = useState([])
 //   const [classMembers, setClassMembers] = useState([])
 //   const [loading, setLoading] = useState(true)
+//   const [selectedUserIds, setSelectedUserIds] = useState([])
 
+//   // --- State for LEFT panel controls ---
+//   const [searchQueryLeft, setSearchQueryLeft] = useState('')
+//   const [selectedRoleLeft, setSelectedRoleLeft] = useState('Tất cả lớp')
 //   const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
-//   const [searchQuery, setSearchQuery] = useState('')
-//   const [selectedMemberIds, setSelectedMemberIds] = useState([])
 //   const dropdownRefLeft = useRef(null)
 
-//   const classOptions = ['Tất cả', 'USER', 'LEADER', 'ADMIN'] // As per your original code
+//   // --- State for RIGHT panel controls ---
+//   const [searchQueryRight, setSearchQueryRight] = useState('')
 
-//   const fetchAllData = useCallback(async () => {
+//   const roleOptions = ['USER', 'LEADER', 'ADMIN']
+
+//   // --- Data Fetching ---
+//   const fetchData = useCallback(async () => {
+//     setLoading(true)
 //     try {
-//       setLoading(true)
 //       const [usersResponse, membersResponse] = await Promise.all([
 //         getAllUsers(),
 //         getMembersInClassroom(classId),
@@ -511,29 +309,86 @@
 //       setAllUsers(usersResponse.data || [])
 //       setClassMembers(membersResponse.data?.items || [])
 //     } catch (error) {
-//       toast.error('Không thể tải dữ liệu thành viên.')
+//       toast.error(error.response?.data?.message || 'Lỗi khi tải dữ liệu thành viên.')
 //     } finally {
 //       setLoading(false)
 //     }
 //   }, [classId])
 
 //   useEffect(() => {
-//     fetchAllData()
-//   }, [fetchAllData])
+//     fetchData()
+//   }, [fetchData])
 
+//   // --- Filtering Logic ---
 //   const availableUsers = useMemo(() => {
-//     const classMemberIds = new Set(classMembers.map((m) => m.id))
-//     let available = allUsers.filter((user) => !classMemberIds.has(user.id))
-//     if (searchQuery) {
-//       const lowercasedQuery = searchQuery.toLowerCase()
-//       available = available.filter(
-//         (user) =>
-//           user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-//           user.studentCode?.includes(lowercasedQuery),
+//     const memberIds = new Set(classMembers.map((m) => m.id))
+//     let users = allUsers.filter((user) => !memberIds.has(user.id))
+
+//     if (selectedRoleLeft !== 'Tất cả lớp') {
+//       users = users.filter((user) => user.role === selectedRoleLeft)
+//     }
+//     if (searchQueryLeft) {
+//       const query = searchQueryLeft.toLowerCase()
+//       users = users.filter(
+//         (user) => user.fullName?.toLowerCase().includes(query) || user.studentCode?.includes(query),
 //       )
 //     }
-//     return available
-//   }, [allUsers, classMembers, searchQuery])
+//     return users
+//   }, [allUsers, classMembers, selectedRoleLeft, searchQueryLeft])
+
+//   const filteredClassMembers = useMemo(() => {
+//     let members = [...classMembers]
+//     if (searchQueryRight) {
+//       const query = searchQueryRight.toLowerCase()
+//       members = members.filter(
+//         (user) => user.fullName?.toLowerCase().includes(query) || user.studentCode?.includes(query),
+//       )
+//     }
+//     return members
+//   }, [classMembers, searchQueryRight])
+
+//   // --- Event Handlers ---
+//   const handleAddMembers = async () => {
+//     if (selectedUserIds.length === 0) return toast.error('Vui lòng chọn thành viên để thêm.')
+//     const toastId = toast.loading('Đang thêm thành viên...')
+//     try {
+//       await addMembersToClassroom(classId, { memberIds: selectedUserIds })
+//       await fetchData()
+//       setSelectedUserIds([])
+//       toast.success('Thêm thành viên thành công!', { id: toastId })
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || 'Lỗi khi thêm thành viên.', { id: toastId })
+//     }
+//   }
+
+//   const handleRemoveMembers = async () => {
+//     if (selectedUserIds.length === 0) return toast.error('Vui lòng chọn thành viên để xóa.')
+//     const toastId = toast.loading('Đang xóa thành viên...')
+//     try {
+//       await removeMembersFromClassroom(classId, { memberIds: selectedUserIds })
+//       await fetchData()
+//       setSelectedUserIds([])
+//       toast.success('Xóa thành viên thành công!', { id: toastId })
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || 'Lỗi khi xóa thành viên.', { id: toastId })
+//     }
+//   }
+
+//   // This function correctly toggles selection, matching your requirement.
+//   const handleSelectionChange = (userId) => {
+//     setSelectedUserIds((prev) =>
+//       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
+//     )
+//   }
+
+//   const handleSelectAll = (list) => {
+//     setSelectedUserIds(list.map((item) => item.id))
+//   }
+
+//   const handleSelectRole = (item) => {
+//     setSelectedRoleLeft(item)
+//     setIsDropdownOpenLeft(false)
+//   }
 
 //   useEffect(() => {
 //     const handleClickOutside = (event) => {
@@ -545,54 +400,9 @@
 //     return () => document.removeEventListener('mousedown', handleClickOutside)
 //   }, [])
 
-//   const handleSelectionChange = (userId) => {
-//     setSelectedMemberIds((prev) =>
-//       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
-//     )
-//   }
-
-//   const handleSelectAll = () => {
-//     setSelectedMemberIds(availableUsers.map((item) => item.id))
-//   }
-
-//   const handleAddMembers = async () => {
-//     if (!classId || selectedMemberIds.length === 0) {
-//       toast.error('Vui lòng chọn thành viên để thêm vào lớp.')
-//       return
-//     }
-//     const actionToast = toast.loading('Đang thêm thành viên...')
-//     try {
-//       const payload = { memberIds: selectedMemberIds }
-//       await addMembersToClassroom(classId, payload)
-//       toast.success('Thêm thành viên thành công!', { id: actionToast })
-//       setSelectedMemberIds([])
-//       await fetchAllData()
-//     } catch (error) {
-//       const message = error.response?.data?.message || 'Lỗi khi thêm thành viên.'
-//       toast.error(message, { id: actionToast })
-//     }
-//   }
-
-//   const handleRemoveMembers = async () => {
-//     if (!classId || selectedMemberIds.length === 0) {
-//       toast.error('Vui lòng chọn thành viên để xóa khỏi lớp.')
-//       return
-//     }
-//     const actionToast = toast.loading('Đang xóa thành viên...')
-//     try {
-//       const payload = { memberIds: selectedMemberIds }
-//       await removeMembersFromClassroom(classId, payload)
-//       toast.success('Xóa thành viên thành công!', { id: actionToast })
-//       setSelectedMemberIds([])
-//       await fetchAllData()
-//     } catch (error) {
-//       const message = error.response?.data?.message || 'Lỗi khi xóa thành viên.'
-//       toast.error(message, { id: actionToast })
-//     }
-//   }
-
 //   return (
 //     <div className='member-compet-admin'>
+//       {/* ======================= LEFT PANEL ======================= */}
 //       <div className='member-compet-admin__left'>
 //         <div className='member-compet-admin__left-title'>
 //           <Icon
@@ -601,21 +411,49 @@
 //             height='24'
 //             className='member-compet-admin__left-title-icon'
 //           />
-//           <h3>Quản lý lớp học</h3>
-//           <i className='fa-solid fa-angles-right'></i>
-//           <h3>Thêm thành viên</h3>
+//           <h3>Quản lý thành viên lớp</h3>
 //         </div>
 //         <div className='member-compet-admin__header'>
 //           <i
 //             className='member-compet-admin__back-icon fa-solid fa-arrow-left'
 //             onClick={() => navigate(`/admin/manage/information/${classId}`)}></i>
+//           <div
+//             className='member-compet-admin__filter'
+//             onClick={() => setIsDropdownOpenLeft(!isDropdownOpenLeft)}
+//             ref={dropdownRefLeft}>
+//             <Icon
+//               icon='stash:filter-solid'
+//               width='20'
+//               height='20'
+//               className='member-compet-admin__filter-icon'
+//             />
+//             <div className='member-compet-admin__filter-label'>{selectedRoleLeft}</div>
+//             <Icon
+//               icon='mdi:chevron-down'
+//               width='20'
+//               height='20'
+//               className='member-compet-admin__filter-arrow'
+//             />
+//             {isDropdownOpenLeft && (
+//               <div className='member-compet-admin__dropdown'>
+//                 {['Tất cả lớp', ...roleOptions].map((item, index) => (
+//                   <div
+//                     key={index}
+//                     className='member-compet-admin__dropdown-item'
+//                     onClick={() => handleSelectRole(item)}>
+//                     {item}
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </div>
 //           <div className='member-compet-admin__search'>
 //             <input
 //               type='text'
 //               placeholder='Tìm kiếm...'
 //               className='member-compet-admin__search-input'
-//               value={searchQuery}
-//               onChange={(e) => setSearchQuery(e.target.value)}
+//               value={searchQueryLeft}
+//               onChange={(e) => setSearchQueryLeft(e.target.value)}
 //             />
 //             <i className='member-compet-admin__search-icon fa-solid fa-magnifying-glass'></i>
 //           </div>
@@ -624,7 +462,7 @@
 //           <div className='member-compet-admin__left-context__title'>
 //             <h5>Tên thành viên</h5>
 //             <h5>Mã sinh viên</h5>
-//             <h5>Khóa học</h5>
+//             <h5>Khóa</h5>
 //           </div>
 //           <div className='member-compet-admin__left-context__list'>
 //             {loading ? (
@@ -642,8 +480,8 @@
 //                   <div className='member-compet-admin__left-context__list-item-box'>
 //                     <h5>{item.intake}</h5>
 //                     <input
-//                       type='radio' // Keeping as radio per your original JSX
-//                       checked={selectedMemberIds.includes(item.id)}
+//                       type='radio'
+//                       checked={selectedUserIds.includes(item.id)}
 //                       onChange={() => handleSelectionChange(item.id)}
 //                     />
 //                   </div>
@@ -652,14 +490,32 @@
 //             )}
 //           </div>
 //         </div>
+//         {/* Preserving the original bottom bar structure and functionality */}
 //         <div className='member-compet-admin__left-button'>
-//           <span onClick={handleSelectAll}>Chọn tất cả</span>
+//           <span
+//             onClick={() => handleSelectAll(availableUsers)}
+//             className='member-compet-admin__left-button-span'>
+//             Chọn tất cả
+//           </span>
 //           <button onClick={handleAddMembers}>Thêm</button>
+//           {roleOptions.map((role) => (
+//             <span
+//               key={role}
+//               onClick={() => setSelectedRoleLeft(role)}
+//               className={
+//                 selectedRoleLeft === role
+//                   ? 'member-compet-admin__left-button-span active'
+//                   : 'member-compet-admin__left-button-span'
+//               }>
+//               {role}
+//             </span>
+//           ))}
 //         </div>
 //       </div>
 
 //       <div className='member-compet-admin__among'></div>
 
+//       {/* ======================= RIGHT PANEL ======================= */}
 //       <div className='member-compet-admin__right'>
 //         <div className='member-compet-admin__left-title'>
 //           <Icon
@@ -670,7 +526,16 @@
 //           <h3>Danh sách thành viên lớp</h3>
 //         </div>
 //         <div className='member-compet-admin__header'>
-//           {/* Right panel search and filter can be added here if needed */}
+//           <div className='member-compet-admin__search'>
+//             <input
+//               type='text'
+//               placeholder='Tìm kiếm...'
+//               className='member-compet-admin__search-input'
+//               value={searchQueryRight}
+//               onChange={(e) => setSearchQueryRight(e.target.value)}
+//             />
+//             <i className='member-compet-admin__search-icon fa-solid fa-magnifying-glass'></i>
+//           </div>
 //         </div>
 //         <div className='member-compet-admin__left-context'>
 //           <div className='member-compet-admin__left-context__title'>
@@ -681,7 +546,7 @@
 //             {loading ? (
 //               <p>Đang tải...</p>
 //             ) : (
-//               classMembers.map((item, index) => (
+//               filteredClassMembers.map((item, index) => (
 //                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
 //                   <div className='member-compet-admin__left-context__list-item-box'>
 //                     <h5 className='member-compet-admin__left-context__list-item-box-h5'>
@@ -692,7 +557,7 @@
 //                   <h5>{item.studentCode}</h5>
 //                   <input
 //                     type='radio'
-//                     checked={selectedMemberIds.includes(item.id)}
+//                     checked={selectedUserIds.includes(item.id)}
 //                     onChange={() => handleSelectionChange(item.id)}
 //                   />
 //                 </div>
@@ -701,9 +566,7 @@
 //           </div>
 //         </div>
 //         <div className='member-compet-admin__left-button'>
-//           <span onClick={() => setSelectedMemberIds(classMembers.map((m) => m.id))}>
-//             Chọn tất cả
-//           </span>
+//           <span onClick={() => handleSelectAll(filteredClassMembers)}>Chọn tất cả</span>
 //           <button onClick={handleRemoveMembers}>Xóa</button>
 //           <button>Tạo chat room</button>
 //         </div>
@@ -714,32 +577,45 @@
 
 // export default MemberOfClassAdmin
 
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
 import {
-  addMembersToClassroom,
   getMembersInClassroom,
+  addMembersToClassroom,
   removeMembersFromClassroom,
 } from '../../../../apis/classroom.api'
 import './style.scss'
 
 const MemberOfClassAdmin = () => {
-  const { classId } = useParams()
   const navigate = useNavigate()
+  const { classId } = useParams()
 
   const [allUsers, setAllUsers] = useState([])
   const [classMembers, setClassMembers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedUserIds, setSelectedUserIds] = useState([])
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedMemberIds, setSelectedMemberIds] = useState([])
+  // --- State for LEFT panel controls ---
+  const [searchQueryLeft, setSearchQueryLeft] = useState('')
+  const [selectedIntakeLeft, setSelectedIntakeLeft] = useState('Tất cả lớp')
+  const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
+  const dropdownRefLeft = useRef(null)
+  const intakeOptions = ['Tất cả lớp', 'K16', 'K17', 'K18', 'K19', 'K20']
 
-  const fetchAllData = useCallback(async () => {
+  // --- State for RIGHT panel controls ---
+  const [searchQueryRight, setSearchQueryRight] = useState('')
+
+  // --- State for the NEW role filter in the bottom bar ---
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState('Tất cả')
+  const roleFilterOptions = ['Tất cả', 'USER', 'LEADER', 'ADMIN']
+
+  // --- Data Fetching ---
+  const fetchData = useCallback(async () => {
+    setLoading(true)
     try {
-      setLoading(true)
       const [usersResponse, membersResponse] = await Promise.all([
         getAllUsers(),
         getMembersInClassroom(classId),
@@ -747,80 +623,98 @@ const MemberOfClassAdmin = () => {
       setAllUsers(usersResponse.data || [])
       setClassMembers(membersResponse.data?.items || [])
     } catch (error) {
-      toast.error('Không thể tải dữ liệu thành viên.')
+      toast.error(error.response?.data?.message || 'Lỗi khi tải dữ liệu thành viên.')
     } finally {
       setLoading(false)
     }
   }, [classId])
 
   useEffect(() => {
-    fetchAllData()
-  }, [fetchAllData])
+    fetchData()
+  }, [fetchData])
 
+  // --- Filtering Logic ---
   const availableUsers = useMemo(() => {
-    const classMemberIds = new Set(classMembers.map((m) => m.id))
-    let available = allUsers.filter((user) => !classMemberIds.has(user.id))
+    const memberIds = new Set(classMembers.map((m) => m.id))
+    let users = allUsers.filter((user) => !memberIds.has(user.id))
 
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase()
-      available = available.filter(
-        (user) =>
-          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-          user.studentCode?.includes(lowercasedQuery),
+    if (selectedIntakeLeft !== 'Tất cả lớp') {
+      users = users.filter((user) => user.intake === selectedIntakeLeft)
+    }
+    if (selectedRoleFilter !== 'Tất cả') {
+      users = users.filter((user) => user.role === selectedRoleFilter)
+    }
+    if (searchQueryLeft) {
+      const query = searchQueryLeft.toLowerCase()
+      users = users.filter(
+        (user) => user.fullName?.toLowerCase().includes(query) || user.studentCode?.includes(query),
       )
     }
-    return available
-  }, [allUsers, classMembers, searchQuery])
+    return users
+  }, [allUsers, classMembers, selectedIntakeLeft, searchQueryLeft, selectedRoleFilter])
 
-  const handleSelectionChange = (userId) => {
-    setSelectedMemberIds((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
-    )
-  }
-
-  const handleSelectAllAvailable = () => {
-    setSelectedMemberIds(availableUsers.map((item) => item.id))
-  }
-
-  const handleSelectAllClassMembers = () => {
-    setSelectedMemberIds(classMembers.map((m) => m.id))
-  }
-
-  const handleAddMembers = async () => {
-    if (!classId || selectedMemberIds.length === 0) {
-      toast.error('Vui lòng chọn thành viên để thêm vào lớp.')
-      return
+  const filteredClassMembers = useMemo(() => {
+    let members = [...classMembers]
+    if (searchQueryRight) {
+      const query = searchQueryRight.toLowerCase()
+      members = members.filter(
+        (user) => user.fullName?.toLowerCase().includes(query) || user.studentCode?.includes(query),
+      )
     }
-    const actionToast = toast.loading('Đang thêm thành viên...')
+    return members
+  }, [classMembers, searchQueryRight])
+
+  // --- Event Handlers ---
+  const handleAddMembers = async () => {
+    if (selectedUserIds.length === 0) return toast.error('Vui lòng chọn thành viên để thêm.')
+    const toastId = toast.loading('Đang thêm thành viên...')
     try {
-      const payload = { memberIds: selectedMemberIds }
-      await addMembersToClassroom(classId, payload)
-      toast.success('Thêm thành viên thành công!', { id: actionToast })
-      setSelectedMemberIds([])
-      await fetchAllData()
+      await addMembersToClassroom(classId, { memberIds: selectedUserIds })
+      await fetchData()
+      setSelectedUserIds([])
+      toast.success('Thêm thành viên thành công!', { id: toastId })
     } catch (error) {
-      const message = error.response?.data?.message || 'Lỗi khi thêm thành viên.'
-      toast.error(message, { id: actionToast })
+      toast.error(error.response?.data?.message || 'Lỗi khi thêm thành viên.', { id: toastId })
     }
   }
 
   const handleRemoveMembers = async () => {
-    if (!classId || selectedMemberIds.length === 0) {
-      toast.error('Vui lòng chọn thành viên để xóa khỏi lớp.')
-      return
-    }
-    const actionToast = toast.loading('Đang xóa thành viên...')
+    if (selectedUserIds.length === 0) return toast.error('Vui lòng chọn thành viên để xóa.')
+    const toastId = toast.loading('Đang xóa thành viên...')
     try {
-      const payload = { memberIds: selectedMemberIds }
-      await removeMembersFromClassroom(classId, payload)
-      toast.success('Xóa thành viên thành công!', { id: actionToast })
-      setSelectedMemberIds([])
-      await fetchAllData()
+      await removeMembersFromClassroom(classId, { memberIds: selectedUserIds })
+      await fetchData()
+      setSelectedUserIds([])
+      toast.success('Xóa thành viên thành công!', { id: toastId })
     } catch (error) {
-      const message = error.response?.data?.message || 'Lỗi khi xóa thành viên.'
-      toast.error(message, { id: actionToast })
+      toast.error(error.response?.data?.message || 'Lỗi khi xóa thành viên.', { id: toastId })
     }
   }
+
+  const handleSelectionChange = (userId) => {
+    setSelectedUserIds((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
+    )
+  }
+
+  const handleSelectAll = (list) => {
+    setSelectedUserIds(list.map((item) => item.id))
+  }
+
+  const handleSelectIntake = (item) => {
+    setSelectedIntakeLeft(item)
+    setIsDropdownOpenLeft(false)
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRefLeft.current && !dropdownRefLeft.current.contains(event.target)) {
+        setIsDropdownOpenLeft(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <div className='member-compet-admin'>
@@ -832,21 +726,49 @@ const MemberOfClassAdmin = () => {
             height='24'
             className='member-compet-admin__left-title-icon'
           />
-          <h3>Quản lý lớp học</h3>
-          <i className='fa-solid fa-angles-right'></i>
-          <h3>Thêm thành viên</h3>
+          <h3>Quản lý thành viên lớp</h3>
         </div>
         <div className='member-compet-admin__header'>
           <i
             className='member-compet-admin__back-icon fa-solid fa-arrow-left'
-            onClick={() => navigate(`/admin/manage/information/${classId}`)}></i>
+            onClick={() => navigate(`/admin/class/${classId}`)}></i>
+          <div
+            className='member-compet-admin__filter'
+            onClick={() => setIsDropdownOpenLeft(!isDropdownOpenLeft)}
+            ref={dropdownRefLeft}>
+            <Icon
+              icon='stash:filter-solid'
+              width='20'
+              height='20'
+              className='member-compet-admin__filter-icon'
+            />
+            <div className='member-compet-admin__filter-label'>{selectedIntakeLeft}</div>
+            <Icon
+              icon='mdi:chevron-down'
+              width='20'
+              height='20'
+              className='member-compet-admin__filter-arrow'
+            />
+            {isDropdownOpenLeft && (
+              <div className='member-compet-admin__dropdown'>
+                {intakeOptions.map((item, index) => (
+                  <div
+                    key={index}
+                    className='member-compet-admin__dropdown-item'
+                    onClick={() => handleSelectIntake(item)}>
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <div className='member-compet-admin__search'>
             <input
               type='text'
               placeholder='Tìm kiếm...'
               className='member-compet-admin__search-input'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQueryLeft}
+              onChange={(e) => setSearchQueryLeft(e.target.value)}
             />
             <i className='member-compet-admin__search-icon fa-solid fa-magnifying-glass'></i>
           </div>
@@ -855,7 +777,7 @@ const MemberOfClassAdmin = () => {
           <div className='member-compet-admin__left-context__title'>
             <h5>Tên thành viên</h5>
             <h5>Mã sinh viên</h5>
-            <h5>Khóa học</h5>
+            <h5>Khóa</h5>
           </div>
           <div className='member-compet-admin__left-context__list'>
             {loading ? (
@@ -874,7 +796,7 @@ const MemberOfClassAdmin = () => {
                     <h5>{item.intake}</h5>
                     <input
                       type='checkbox'
-                      checked={selectedMemberIds.includes(item.id)}
+                      checked={selectedUserIds.includes(item.id)}
                       onChange={() => handleSelectionChange(item.id)}
                     />
                   </div>
@@ -884,8 +806,16 @@ const MemberOfClassAdmin = () => {
           </div>
         </div>
         <div className='member-compet-admin__left-button'>
-          <span onClick={handleSelectAllAvailable}>Chọn tất cả</span>
+          <span onClick={() => handleSelectAll(availableUsers)}>Chọn tất cả</span>
           <button onClick={handleAddMembers}>Thêm</button>
+          {roleFilterOptions.slice(1).map((role) => (
+            <span
+              key={role}
+              onClick={() => setSelectedRoleFilter(role)}
+              className={selectedRoleFilter === role ? 'active-filter' : ''}>
+              {role}
+            </span>
+          ))}
         </div>
       </div>
 
@@ -901,7 +831,16 @@ const MemberOfClassAdmin = () => {
           <h3>Danh sách thành viên lớp</h3>
         </div>
         <div className='member-compet-admin__header'>
-          {/* Right panel search and filter can be added here if needed */}
+          <div className='member-compet-admin__search'>
+            <input
+              type='text'
+              placeholder='Tìm kiếm...'
+              className='member-compet-admin__search-input'
+              value={searchQueryRight}
+              onChange={(e) => setSearchQueryRight(e.target.value)}
+            />
+            <i className='member-compet-admin__search-icon fa-solid fa-magnifying-glass'></i>
+          </div>
         </div>
         <div className='member-compet-admin__left-context'>
           <div className='member-compet-admin__left-context__title'>
@@ -912,7 +851,7 @@ const MemberOfClassAdmin = () => {
             {loading ? (
               <p>Đang tải...</p>
             ) : (
-              classMembers.map((item, index) => (
+              filteredClassMembers.map((item, index) => (
                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
                   <div className='member-compet-admin__left-context__list-item-box'>
                     <h5 className='member-compet-admin__left-context__list-item-box-h5'>
@@ -923,7 +862,7 @@ const MemberOfClassAdmin = () => {
                   <h5>{item.studentCode}</h5>
                   <input
                     type='checkbox'
-                    checked={selectedMemberIds.includes(item.id)}
+                    checked={selectedUserIds.includes(item.id)}
                     onChange={() => handleSelectionChange(item.id)}
                   />
                 </div>
@@ -932,7 +871,7 @@ const MemberOfClassAdmin = () => {
           </div>
         </div>
         <div className='member-compet-admin__left-button'>
-          <span onClick={handleSelectAllClassMembers}>Chọn tất cả</span>
+          <span onClick={() => handleSelectAll(filteredClassMembers)}>Chọn tất cả</span>
           <button onClick={handleRemoveMembers}>Xóa</button>
           <button>Tạo chat room</button>
         </div>

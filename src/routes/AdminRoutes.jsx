@@ -1,5 +1,6 @@
+// src/routes/AdminRoutes.jsx
 import { Route } from 'react-router-dom'
-import ProtectedRoute from '../components/ProtectedRoute'
+import ProtectedRoute from '../components/ProtecedRoute/ProtectedRoute'
 import AdminPage from '../pages/AdminPage'
 
 import MainOfAdmin from '../components/Admin/HomeOfAdmin/MainOfAdmin'
@@ -22,11 +23,11 @@ import CreateOfMess from '../components/Admin/CompetOfAdmin/CreateOfMess'
 import DecentOfAdmin from '../components/Admin/DecentOfAdmin'
 import AccountOfAdmin from '../components/Admin/AccoutOfAdmin'
 
-const AdminRoutes = () => (
+const AdminRoutes = (
   <Route
     path='/admin'
     element={
-      <ProtectedRoute allowedRoles={['ADMIN']}>
+      <ProtectedRoute allowedRoles={'ADMIN'}>
         <AdminPage />
       </ProtectedRoute>
     }>
@@ -35,21 +36,24 @@ const AdminRoutes = () => (
     <Route path='home/create' element={<CreateOfMain />} />
     <Route path='home/information/:userId' element={<InforOfAdmin />} />
 
-    <Route path='manage' element={<MainOfClassAdmin />} />
-    <Route path='manage/create' element={<CreateOfClassAdmin />} />
-    <Route path='manage/information/:classId' element={<CheckOfClassAdmin />} />
-    <Route path='manage/members/:classId' element={<MemberOfClassAdmin />} />
+    {/* Class Management */}
+    <Route path='class' element={<MainOfClassAdmin />} />
+    <Route path='class/create' element={<CreateOfClassAdmin />} />
+    <Route path='class/:classId' element={<CheckOfClassAdmin />} />
+    <Route path='class/:classId/members' element={<MemberOfClassAdmin />} />
 
-    <Route path='competition' element={<MainOfCompet />} />
-    <Route path='competition/create' element={<CreateOfCompetAdmin />} />
-    <Route path='competition/:competitionId'>
-      <Route path='information' element={<IntroOfCompetAdmin />} />
+    {/* Competitions */}
+    <Route path='competitions' element={<MainOfCompet />} />
+    <Route path='competitions/create' element={<CreateOfCompetAdmin />} />
+    <Route path='competitions/:competitionId'>
+      <Route path='' element={<IntroOfCompetAdmin />} />
       <Route path='rules' element={<RolusOfCompetAdmin />} />
       <Route path='members' element={<MemberOfCompetAdmin />} />
       <Route path='notifications' element={<ListOfGroup />} />
       <Route path='notifications/create' element={<CreateOfMess />} />
     </Route>
 
+    {/* Other */}
     <Route path='decent' element={<DecentOfAdmin />} />
     <Route path='account' element={<AccountOfAdmin />} />
   </Route>

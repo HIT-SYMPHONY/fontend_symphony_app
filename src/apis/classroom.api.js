@@ -43,14 +43,14 @@ const classroomApi = () => ({
   updateClassroom: async (classroomId, formDataPayload) =>
     apiDefaultUpload.patch(`${ApiConstant.classrooms.getById}${classroomId}`, formDataPayload),
 
-  addMembersToClassroom: async (classroomId, payload) =>
-    api.post(`${ApiConstant.classrooms.members.replace('{id}', classroomId)}`, payload),
-
   getMembersInClassroom: async (classroomId, params) =>
-    api.get(`${ApiConstant.classrooms.members.replace('{id}', classroomId)}`, { params }),
+    api.get(ApiConstant.classrooms.members.replace('{id}', classroomId), { params }),
+
+  addMembersToClassroom: async (classroomId, payload) =>
+    api.post(ApiConstant.classrooms.members.replace('{id}', classroomId), payload),
 
   removeMembersFromClassroom: async (classroomId, payload) =>
-    api.delete(`${ApiConstant.classrooms.members.replace('{id}', classroomId)}`, { data: payload }),
+    api.delete(ApiConstant.classrooms.members.replace('{id}', classroomId), { data: payload }),
 })
 
 export const {

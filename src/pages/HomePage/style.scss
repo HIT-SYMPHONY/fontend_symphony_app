@@ -14,7 +14,6 @@ $class-ago-width: 210px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding-top: 20px;
 
     &__img {
       display: flex;
@@ -53,8 +52,7 @@ $class-ago-width: 210px;
 
     &__click {
       cursor: pointer;
-      margin: 5px 0;
-      padding: 10px;
+      padding: 5px;
       padding-left: 20px;
       display: flex;
       align-items: center;
@@ -79,13 +77,10 @@ $class-ago-width: 210px;
 
     &__clickone {
       cursor: pointer;
-      margin: 0;
-      padding: 10px;
       padding-left: 30px;
       color: #979797;
       display: flex;
       align-items: center;
-      gap: 5px;
       border-radius: 20px;
       transition: background-color 0.2s ease-in-out;
 
@@ -185,12 +180,23 @@ $class-ago-width: 210px;
       border-radius: 10px;
       justify-content: space-between;
       box-sizing: border-box;
-      height: 525px;
+      height: 90vh;
 
       &__div {
         box-sizing: border-box;
         width: 70%;
       }
     }
+  }
+}
+@media (min-width: 1200px) and (min-height: 780px) {
+  .flex-one .class-ago {
+    max-height: 500px;
+  }
+  .schedule .schedule__list {
+    max-height: 540px;
+  }
+  .homework .homework__baitap {
+    max-height: 630px;
   }
 }
