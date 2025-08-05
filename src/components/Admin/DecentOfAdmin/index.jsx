@@ -1,103 +1,153 @@
-import React, { useState, useRef, useEffect, useMemo, useContext } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
-// import { GlobalContext } from '../../../dataContext'
+import toast from 'react-hot-toast'
+import { getAllUsers, updateUserRoles } from '../../../apis/user.api'
 import './style.scss'
 
-const member = [
-  { id: 1, name: 'Nguyễn Văn A', msv: '2023001001', age: 'HIT 15', role: 'USER' },
-  { id: 2, name: 'Nguyễn Văn B', msv: '2023001002', age: 'HIT 16', role: 'LEADER' },
-  { id: 3, name: 'Trần Thị C', msv: '2023001003', age: 'HIT 15', role: 'USER' },
-  { id: 4, name: 'Lê Văn D', msv: '2023001004', age: 'HIT 17', role: 'ADMIN' },
-  { id: 5, name: 'Phạm Thị E', msv: '2023001005', age: 'HIT 15', role: 'USER' },
-  { id: 6, name: 'Đỗ Văn F', msv: '2023001006', age: 'HIT 16', role: 'LEADER' },
-  { id: 7, name: 'Hoàng Thị G', msv: '2023001007', age: 'HIT 17', role: 'USER' },
-  { id: 8, name: 'Ngô Văn H', msv: '2023001008', age: 'HIT 18', role: 'ADMIN' },
-  { id: 9, name: 'Vũ Thị I', msv: '2023001009', age: 'HIT 16', role: 'LEADER' },
-  { id: 10, name: 'Bùi Văn K', msv: '2023001010', age: 'HIT 15', role: 'USER' },
-]
-
 const DecentOfAdmin = () => {
-  // const { showMain, setShowMain, showNoti, setShowNoti } = useContext(GlobalContext)
   const navigate = useNavigate()
+  const [allUsers, setAllUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+
   const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
-  const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
-  const [selectedClassLeft, setSelectedClassLeft] = useState('Tất cả lớp')
-  const [selectedClassRight, setSelectedClassRight] = useState('USER')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [classOptions] = useState(['USER', 'LEADER', 'ADMIN'])
-  const [selectedMembers, setSelectedMembers] = useState([])
-  const [addedMembers, setAddedMembers] = useState([])
+  const [selectedRoleLeft, setSelectedRoleLeft] = useState('Tất cả lớp')
+  const [searchQueryLeft, setSearchQueryLeft] = useState('')
   const dropdownRefLeft = useRef(null)
+
+  const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
+  const [selectedRoleRight, setSelectedRoleRight] = useState('LEADER')
+  const [searchQueryRight, setSearchQueryRight] = useState('')
   const dropdownRefRight = useRef(null)
+
+  const [selectedUserIdsLeft, setSelectedUserIdsLeft] = useState([])
+  const [selectedUserIdsRight, setSelectedUserIdsRight] = useState([])
+
+  const roleOptions = ['USER', 'LEADER', 'ADMIN']
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await getAllUsers()
+      setAllUsers(response.data || [])
+    } catch (error) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error('Có lỗi xảy ra khi tải danh sách thành viên.')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const filteredUsersLeft = useMemo(() => {
+    let filtered = [...allUsers]
+    if (selectedRoleLeft !== 'Tất cả lớp') {
+      filtered = filtered.filter((user) => user.role === selectedRoleLeft)
+    }
+    if (searchQueryLeft) {
+      const lowercasedQuery = searchQueryLeft.toLowerCase()
+      filtered = filtered.filter(
+        (user) =>
+          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
+          user.studentCode?.includes(lowercasedQuery),
+      )
+    }
+    return filtered
+  }, [allUsers, selectedRoleLeft, searchQueryLeft])
+
+  const filteredUsersRight = useMemo(() => {
+    let filtered = allUsers.filter((user) => user.role === selectedRoleRight)
+    if (searchQueryRight) {
+      const lowercasedQuery = searchQueryRight.toLowerCase()
+      filtered = filtered.filter(
+        (user) =>
+          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
+          user.studentCode?.includes(lowercasedQuery),
+      )
+    }
+    return filtered
+  }, [allUsers, selectedRoleRight, searchQueryRight])
+
+  const handleSelectionChange = (panel, userId) => {
+    const setter = panel === 'left' ? setSelectedUserIdsLeft : setSelectedUserIdsRight
+    setter((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
+    )
+  }
+
+  const handleSelectAll = (panel) => {
+    const usersToSelect = panel === 'left' ? filteredUsersLeft : filteredUsersRight
+    const userIdsToSelect = usersToSelect.map((user) => user.id)
+    const setter = panel === 'left' ? setSelectedUserIdsLeft : setSelectedUserIdsRight
+    const currentSelection = panel === 'left' ? selectedUserIdsLeft : selectedUserIdsRight
+    const allSelected =
+      userIdsToSelect.length > 0 && userIdsToSelect.every((id) => currentSelection.includes(id))
+
+    if (allSelected) {
+      setter(currentSelection.filter((id) => !userIdsToSelect.includes(id)))
+    } else {
+      setter([...new Set([...currentSelection, ...userIdsToSelect])])
+    }
+  }
+
+  const handleAssignRole = async (newRole) => {
+    if (selectedUserIdsLeft.length === 0) {
+      toast.error('Vui lòng chọn thành viên từ danh sách bên trái để gán quyền.')
+      return
+    }
+    await updateRoles(selectedUserIdsLeft, newRole, 'Gán quyền')
+  }
+
+  const handleRemoveRole = async () => {
+    if (selectedUserIdsRight.length === 0) {
+      toast.error('Vui lòng chọn thành viên từ danh sách bên phải để xóa quyền.')
+      return
+    }
+    await updateRoles(selectedUserIdsRight, 'USER', 'Xóa quyền')
+  }
+
+  const updateRoles = async (userIds, newRole, actionName) => {
+    const actionToast = toast.loading(`Đang ${actionName.toLowerCase()}...`)
+    const payload = {
+      roleStr: newRole,
+      usersId: userIds,
+    }
+    try {
+      await updateUserRoles(payload)
+      await fetchUsers()
+      setSelectedUserIdsLeft([])
+      setSelectedUserIdsRight([])
+      toast.success(`${actionName} thành công!`, { id: actionToast })
+    } catch (error) {
+      const message = error.response?.data?.message || `Lỗi khi ${actionName.toLowerCase()}.`
+      toast.error(message, { id: actionToast })
+    }
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRefLeft.current && !dropdownRefLeft.current.contains(event.target)) {
+      if (dropdownRefLeft.current && !dropdownRefLeft.current.contains(event.target))
         setIsDropdownOpenLeft(false)
-      }
-      if (dropdownRefRight.current && !dropdownRefRight.current.contains(event.target)) {
+      if (dropdownRefRight.current && !dropdownRefRight.current.contains(event.target))
         setIsDropdownOpenRight(false)
-      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const filteredMembers = useMemo(() => {
-    return member.filter(
-      (item) =>
-        (item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.msv.includes(searchQuery)) &&
-        (selectedClassLeft === 'Tất cả lớp' || item.role === selectedClassLeft),
-    )
-  }, [searchQuery, selectedClassLeft])
-
-  const filteredAddedMembers = useMemo(() => {
-    return addedMembers.filter(
-      (item) =>
-        (item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.msv.includes(searchQuery)) &&
-        item.role === selectedClassRight,
-    )
-  }, [addedMembers, searchQuery, selectedClassRight])
-
   const handleSelectLeft = (item) => {
-    setSelectedClassLeft(item)
+    setSelectedRoleLeft(item)
     setIsDropdownOpenLeft(false)
   }
-
   const handleSelectRight = (item) => {
-    setSelectedClassRight(item)
+    setSelectedRoleRight(item)
     setIsDropdownOpenRight(false)
-  }
-
-  const handleRadioChange = (item) => {
-    setSelectedMembers((prev) =>
-      prev.includes(item.msv) ? prev.filter((msv) => msv !== item.msv) : [...prev, item.msv],
-    )
-  }
-
-  const handleSelectAll = () => {
-    setSelectedMembers(filteredMembers.map((item) => item.msv))
-  }
-
-  const handleSelectAllRight = () => {
-    setSelectedMembers(filteredAddedMembers.map((item) => item.msv))
-  }
-
-  const handleAddMembers = () => {
-    const membersToAdd = filteredMembers.filter((item) => selectedMembers.includes(item.msv))
-    setAddedMembers((prev) => [
-      ...prev,
-      ...membersToAdd.filter((item) => !prev.some((added) => added.msv === item.msv)),
-    ])
-    setSelectedMembers([])
-  }
-
-  const handleRemoveMembers = () => {
-    setAddedMembers((prev) => prev.filter((item) => !selectedMembers.includes(item.msv)))
-    setSelectedMembers([])
   }
 
   return (
@@ -110,9 +160,7 @@ const DecentOfAdmin = () => {
             height='24'
             className='decent-admin__left-title-icon'
           />
-          <h3>Quản lý cuộc thi</h3>
-          <i className='fa-solid fa-angles-right'></i>
-          <h3>HIT Contest Series - 2025</h3>
+          <h3>Phân quyền thành viên</h3>
         </div>
         <div className='decent-admin__header'>
           <i
@@ -128,7 +176,7 @@ const DecentOfAdmin = () => {
               height='20'
               className='decent-admin__filter-icon'
             />
-            <div className='decent-admin__filter-label'>{selectedClassLeft}</div>
+            <div className='decent-admin__filter-label'>{selectedRoleLeft}</div>
             <Icon
               icon='mdi:chevron-down'
               width='20'
@@ -137,7 +185,7 @@ const DecentOfAdmin = () => {
             />
             {isDropdownOpenLeft && (
               <div className='decent-admin__dropdown'>
-                {['Tất cả lớp', ...classOptions].map((item, index) => (
+                {['Tất cả lớp', ...roleOptions].map((item, index) => (
                   <div
                     key={index}
                     className='decent-admin__dropdown-item'
@@ -153,55 +201,69 @@ const DecentOfAdmin = () => {
               type='text'
               placeholder='Tìm kiếm...'
               className='decent-admin__search-input'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQueryLeft}
+              onChange={(e) => setSearchQueryLeft(e.target.value)}
             />
             <i className='decent-admin__search-icon fa-solid fa-magnifying-glass'></i>
           </div>
         </div>
         <div className='decent-admin__left-context'>
-          <div className='decent-admin__left-context__title'>
-            <h5>Tên thí sinh</h5>
-            <h5>Mã sinh viên</h5>
-            <h5>Khóa học</h5>
-          </div>
-          <div className='decent-admin__left-context__list'>
-            {filteredMembers.map((item) => (
-              <div className='decent-admin__left-context__list-item' key={item.msv}>
-                <div className='decent-admin__left-context__list-item-box'>
-                  <h5 className='decent-admin__left-context__list-item-box-h5'>{item.id}</h5>
-                  <h5>{item.name}</h5>
-                </div>
-                <h5>{item.msv}</h5>
-                <div className='decent-admin__left-context__list-item-box'>
-                  <h5>{item.age}</h5>
-                  <input
-                    type='radio'
-                    id={item.msv}
-                    checked={selectedMembers.includes(item.msv)}
-                    onChange={() => handleRadioChange(item)}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className='decent-admin__left-context__tbody-wrapper'>
+            <table className='decent-admin__left-context__table'>
+              <thead>
+                <tr>
+                  <th>Tên thành viên</th>
+                  <th>Mã sinh viên</th>
+                  <th>Khóa</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody className='decent-admin__left-context__tbody'>
+                {loading ? (
+                  <tr>
+                    <td colSpan='4' style={{ textAlign: 'center', padding: '2rem' }}>
+                      Đang tải...
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsersLeft.map((item, index) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className='user-info-cell'>
+                          <span className='user-index'>
+                            <h4>{index + 1}</h4>
+                          </span>
+                          <span>{item.fullName}</span>
+                        </div>
+                      </td>
+                      <td>{item.studentCode}</td>
+                      <td>{item.intake}</td>
+                      <td>
+                        <input
+                          type='checkbox'
+                          checked={selectedUserIdsLeft.includes(item.id)}
+                          onChange={() => handleSelectionChange('left', item.id)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
         <div className='decent-admin__left-button'>
-          <span onClick={handleSelectAll} className='decent-admin__left-button-span'>
+          <span onClick={() => handleSelectAll('left')} className='decent-admin__left-button-span'>
             Chọn tất cả
           </span>
-          <button onClick={handleAddMembers}>Thêm</button>
-          {classOptions.map((role) => (
-            <span
-              key={role}
-              onClick={() => handleSelectRight(role)}
-              className={selectedClassRight === role ? 'decent-admin__left-button-span' : ''}>
-              {role}
-            </span>
-          ))}
+          <button onClick={() => handleAssignRole('USER')}>USER</button>
+          <button onClick={() => handleAssignRole('LEADER')}>LEADER</button>
+          <button onClick={() => handleAssignRole('ADMIN')}>ADMIN</button>
         </div>
       </div>
+
       <div className='decent-admin__among'></div>
+
       <div className='decent-admin__right'>
         <div className='decent-admin__left-title'>
           <Icon
@@ -209,16 +271,16 @@ const DecentOfAdmin = () => {
             width='24'
             className='decent-admin__left-title-icon'
           />
-          <h3>Danh sách thí sinh</h3>
+          <h3>Danh sách phân quyền</h3>
         </div>
         <div className='decent-admin__header'>
           <div className='decent-admin__search'>
             <input
               type='text'
               placeholder='Tìm kiếm...'
-              className='decent-admin__search-input-second'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              className='decent-admin__search-input'
+              value={searchQueryRight}
+              onChange={(e) => setSearchQueryRight(e.target.value)}
             />
             <i className='decent-admin__search-icon fa-solid fa-magnifying-glass'></i>
           </div>
@@ -232,7 +294,7 @@ const DecentOfAdmin = () => {
               height='20'
               className='decent-admin__filter-icon'
             />
-            <div className='decent-admin__filter-label'>{selectedClassRight}</div>
+            <div className='decent-admin__filter-label'>{selectedRoleRight}</div>
             <Icon
               icon='mdi:chevron-down'
               width='20'
@@ -241,7 +303,7 @@ const DecentOfAdmin = () => {
             />
             {isDropdownOpenRight && (
               <div className='decent-admin__dropdown'>
-                {classOptions.map((item, index) => (
+                {roleOptions.map((item, index) => (
                   <div
                     key={index}
                     className='decent-admin__dropdown-item'
@@ -254,34 +316,54 @@ const DecentOfAdmin = () => {
           </div>
         </div>
         <div className='decent-admin__left-context'>
-          <div className='decent-admin__left-context__title'>
-            <h5>Tên thí sinh</h5>
-            <h5>Mã sinh viên</h5>
-          </div>
-          <div className='decent-admin__left-context__list'>
-            {filteredAddedMembers.map((item) => (
-              <div className='decent-admin__left-context__list-item' key={item.msv}>
-                <div className='decent-admin__left-context__list-item-box'>
-                  <h5 className='decent-admin__left-context__list-item-box-h5'>{item.id}</h5>
-                  <h5>{item.name}</h5>
-                </div>
-                <h5>{item.msv}</h5>
-                <input
-                  type='radio'
-                  id={item.msv}
-                  checked={selectedMembers.includes(item.msv)}
-                  onChange={() => handleRadioChange(item)}
-                />
-              </div>
-            ))}
+          <div className='decent-admin__left-context__tbody-wrapper'>
+            <table className='decent-admin__left-context__table'>
+              <thead>
+                <tr>
+                  <th>Tên thành viên</th>
+                  <th>Mã sinh viên</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody className='decent-admin__left-context__tbody'>
+                {loading ? (
+                  <tr>
+                    <td colSpan='3' style={{ textAlign: 'center', padding: '2rem' }}>
+                      Đang tải...
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsersRight.map((item, index) => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className='user-info-cell'>
+                          <span className='user-index'>
+                            <h4>{index + 1}</h4>
+                          </span>
+                          <span>{item.fullName}</span>
+                        </div>
+                      </td>
+                      <td>{item.studentCode}</td>
+                      <td>
+                        <input
+                          type='checkbox'
+                          checked={selectedUserIdsRight.includes(item.id)}
+                          onChange={() => handleSelectionChange('right', item.id)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
         <div className='decent-admin__left-button'>
-          <span onClick={handleSelectAllRight} className='decent-admin__left-button-span'>
+          <span onClick={() => handleSelectAll('right')} className='decent-admin__left-button-span'>
             Chọn tất cả
           </span>
-          <button onClick={handleRemoveMembers}>Xóa</button>
-          <button>Tạo chat room</button>
+          <button onClick={handleRemoveRole}>Xóa</button>
+          <button>Tạo nhóm chat</button>
         </div>
       </div>
     </div>

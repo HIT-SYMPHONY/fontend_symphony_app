@@ -16,3 +16,40 @@ export const formatDate = (dateString) => {
     return dateString
   }
 }
+export const parseTextToSections = (text) => {
+  if (!text || typeof text !== 'string') {
+    return []
+  }
+
+  const sections = []
+  const lines = text.split('\n')
+  let currentSection = null
+
+  lines.forEach((line) => {
+    const trimmedLine = line.trim()
+    if (trimmedLine.startsWith('# ')) {
+      if (currentSection) {
+        sections.push({ ...currentSection, content: currentSection.content.trim() })
+      }
+      currentSection = {
+        title: trimmedLine.substring(2).trim(),
+        content: '',
+      }
+    } else if (currentSection) {
+      currentSection.content += line + '\n'
+    }
+  })
+  if (currentSection) {
+    sections.push({ ...currentSection, content: currentSection.content.trim() })
+  }
+
+  return sections
+}
+
+export const toLocalDateTimeString = (isoString) => {
+  if (!isoString) return ''
+  const date = new Date(isoString)
+  const timezoneOffset = date.getTimezoneOffset() * 60000
+  const localDate = new Date(date.getTime() - timezoneOffset)
+  return localDate.toISOString().slice(0, 16)
+}

@@ -13,7 +13,7 @@ const AdminPage = () => {
   const navigate = useNavigate()
   const [showLogoutPopup, setShowLogoutPopup] = useState(false)
   const isManageSectionActive =
-    location.pathname.startsWith('/admin/class') ||
+    location.pathname.startsWith('/admin/classes') ||
     location.pathname.startsWith('/admin/competitions')
   const [isManageMenuOpen, setIsManageMenuOpen] = useState(isManageSectionActive)
 
@@ -30,7 +30,7 @@ const AdminPage = () => {
     if (isManageSectionActive) {
       setIsManageMenuOpen((prevState) => !prevState)
     } else {
-      navigate('/admin/class')
+      navigate('/admin/classes')
     }
   }
 
@@ -57,7 +57,7 @@ const AdminPage = () => {
 
         {isManageMenuOpen && (
           <div className='admin-sidebar-submenu'>
-            <NavLink to='/admin/class' className='homepage__choose__clickone' end>
+            <NavLink to='/admin/classes' className='homepage__choose__clickone' end>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
