@@ -609,8 +609,8 @@ const CheckOfClassAdmin = () => {
   const dropdownRef = useRef(null)
 
   const classOptions = [
-    { option: 'Thông tin lớp học', link: `/admin/class/${classId}` },
-    { option: 'Quản lý thành viên', link: `/admin/class/${classId}/members` },
+    { option: 'Thông tin lớp học', link: `/admin/classes/${classId}` },
+    { option: 'Quản lý thành viên', link: `/admin/classes/${classId}/members` },
   ]
 
   const processFetchedData = useCallback((classData, allUsersData) => {
@@ -641,7 +641,7 @@ const CheckOfClassAdmin = () => {
       processFetchedData(classData, allUsers)
     } catch (err) {
       toast.error('Không thể tải dữ liệu lớp học.')
-      navigate('/admin/class')
+      navigate('/admin/classes')
     } finally {
       setLoading(false)
     }
@@ -732,7 +732,7 @@ const CheckOfClassAdmin = () => {
       <div className='check-class-admin__header'>
         <i
           className='check-class-admin__back-icon fa-solid fa-arrow-left'
-          onClick={() => navigate('/admin/class')}></i>
+          onClick={() => navigate('/admin/classes')}></i>
         <div
           className='check-class-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -773,7 +773,7 @@ const CheckOfClassAdmin = () => {
         </div>
         <button
           className='check-class-admin__create-button'
-          onClick={() => navigate('/admin/class/create')}>
+          onClick={() => navigate('/admin/classes/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>

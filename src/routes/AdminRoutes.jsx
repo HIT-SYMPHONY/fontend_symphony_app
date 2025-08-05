@@ -33,24 +33,29 @@ const AdminRoutes = (
     }>
     <Route index element={<MainOfAdmin />} />
     <Route path='home' element={<MainOfAdmin />} />
-    <Route path='home/create' element={<CreateOfMain />} />
-    <Route path='home/information/:userId' element={<InforOfAdmin />} />
-
+    <Route path='users'>
+      <Route index element={<MainOfAdmin />}></Route>
+      <Route path='create' element={<CreateOfMain />}></Route>
+      <Route path=':userId' element={<InforOfAdmin />} />
+    </Route>
     {/* Class Management */}
-    <Route path='class' element={<MainOfClassAdmin />} />
-    <Route path='class/create' element={<CreateOfClassAdmin />} />
-    <Route path='class/:classId' element={<CheckOfClassAdmin />} />
-    <Route path='class/:classId/members' element={<MemberOfClassAdmin />} />
-
+    <Route path='classes'>
+      <Route index element={<MainOfClassAdmin />} />
+      <Route path='create' element={<CreateOfClassAdmin />} />
+      <Route path=':classId' element={<CheckOfClassAdmin />} />
+      <Route path=':classId/members' element={<MemberOfClassAdmin />} />
+    </Route>
     {/* Competitions */}
-    <Route path='competitions' element={<MainOfCompet />} />
-    <Route path='competitions/create' element={<CreateOfCompetAdmin />} />
-    <Route path='competitions/:competitionId'>
-      <Route path='' element={<IntroOfCompetAdmin />} />
-      <Route path='rules' element={<RolusOfCompetAdmin />} />
-      <Route path='members' element={<MemberOfCompetAdmin />} />
-      <Route path='notifications' element={<ListOfGroup />} />
-      <Route path='notifications/create' element={<CreateOfMess />} />
+    <Route path='competitions'>
+      <Route index element={<MainOfCompet />} />
+      <Route path='create' element={<CreateOfCompetAdmin />} />
+      <Route path=':competitionId'>
+        <Route index element={<IntroOfCompetAdmin />} />
+        <Route path='rules' element={<RolusOfCompetAdmin />} />
+        <Route path='members' element={<MemberOfCompetAdmin />} />
+        <Route path='notifications' element={<ListOfGroup />} />
+        <Route path='notifications/create' element={<CreateOfMess />} />
+      </Route>
     </Route>
 
     {/* Other */}

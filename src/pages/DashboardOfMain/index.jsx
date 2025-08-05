@@ -23,7 +23,7 @@ const DashboardOfMain = () => {
   const [showMain, setShowMain] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
-  const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(true)
+  const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(false)
 
   const handleLichHoc = () => {
     if (showHomework) setShowHomework(false)
@@ -47,7 +47,7 @@ const DashboardOfMain = () => {
         </div>
         <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
 
-        <NavLink to='/client/home' className='homepage__choose__click origin'>
+        <NavLink to='/client/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </NavLink>

@@ -20,16 +20,12 @@ const CreateOfMain = () => {
     resolver: yupResolver(userCreationSchema),
   })
 
-  // This function only runs if validation is successful
   const onSubmit = async (data) => {
     setLoading(true)
     const creationToast = toast.loading('Đang tạo tài khoản...')
 
-    // The backend for creating a user expects multipart/form-data
     const formData = new FormData()
-    // The JSON payload is appended as a Blob named 'data'
     formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }))
-    // Note: Image file upload logic can be added here if needed
 
     try {
       await createUser(formData)

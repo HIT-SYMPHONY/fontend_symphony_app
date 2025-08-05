@@ -338,7 +338,7 @@ const CreateOfClassAdmin = () => {
       // 5. Call the API service with the correctly formatted FormData.
       await createClassroom(formDataToSend)
       toast.success('Tạo lớp học thành công!', { id: createToast })
-      navigate('/admin/class') // Navigate to the new, correct path
+      navigate('/admin/classes') // Navigate to the new, correct path
     } catch (err) {
       const message = err.response?.data?.message || 'Tạo lớp học thất bại.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
@@ -365,7 +365,7 @@ const CreateOfClassAdmin = () => {
       <div className='create-class-admin__header'>
         <i
           className='create-class-admin__back-icon fa-solid fa-arrow-left'
-          onClick={() => navigate('/admin/class')}></i>
+          onClick={() => navigate('/admin/classes')}></i>
         {/* The dropdown and search here seem decorative as they don't affect the form. Keeping for UI consistency. */}
         <div
           className='create-class-admin__filter'

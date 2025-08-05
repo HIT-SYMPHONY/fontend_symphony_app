@@ -13,13 +13,24 @@ $class-ago-width: 210px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    padding-top: 10px;
+    padding-top: 20px;
+
+    a.homepage__choose__click.active {
+      @extend .origin;
+    }
+
+    a.homepage__choose__clickone.active {
+      @extend .child;
+    }
+
     &__img {
       display: flex;
       justify-content: center;
       img {
         width: 100px;
         height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
       }
     }
     &__h3 {
@@ -29,25 +40,37 @@ $class-ago-width: 210px;
     }
     .origin {
       background-color: $button-color !important;
-
       color: #fff !important;
-      i {
+      i,
+      .iconify,
+      span {
         color: #fff !important;
       }
       border-radius: 20px;
     }
     &__click {
       cursor: pointer;
+      margin: 5px 0;
+      padding: 10px;
       padding-left: 20px;
       display: flex;
-      padding: 5px;
       align-items: center;
-      i {
+      text-decoration: none;
+      border-radius: 20px;
+      transition: background-color 0.2s;
+
+      i,
+      .iconify {
         color: #979797;
         padding-right: 10px;
       }
       &__Icon {
         color: #979797;
+        padding-right: 10px;
+        font-size: 20px;
+      }
+      &__replace {
+        color: #fff;
         padding-right: 10px;
         font-size: 20px;
       }
@@ -68,6 +91,10 @@ $class-ago-width: 210px;
       display: flex;
       align-items: center;
       gap: 5px;
+      text-decoration: none;
+      border-radius: 20px;
+      transition: background-color 0.2s, color 0.2s;
+
       &__Icon {
         padding-right: 10px;
       }
@@ -164,12 +191,13 @@ $class-ago-width: 210px;
   }
 }
 .child {
+  background-color: transparent !important;
   color: #f27b36 !important;
   i,
   .iconify {
     color: #f27b36 !important;
   }
-}
+}.accoun
 
 .whiteP {
   color: #fff;

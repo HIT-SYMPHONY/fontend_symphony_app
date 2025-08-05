@@ -731,7 +731,7 @@ const MemberOfClassAdmin = () => {
         <div className='member-compet-admin__header'>
           <i
             className='member-compet-admin__back-icon fa-solid fa-arrow-left'
-            onClick={() => navigate(`/admin/class/${classId}`)}></i>
+            onClick={() => navigate(`/admin/classes/${classId}`)}></i>
           <div
             className='member-compet-admin__filter'
             onClick={() => setIsDropdownOpenLeft(!isDropdownOpenLeft)}
