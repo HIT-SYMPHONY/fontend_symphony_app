@@ -7,9 +7,10 @@ import { userUpdateSchema } from '../../../utils/userValidate.js'
 import { getCurrentUser, updateUser } from '../../../apis/user.api'
 import { formatDate } from '../../../utils/formatters'
 import useAuth from '../../../hooks/useAuth'
+import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import ReplaceOfAdmin from '../NotiOfAdmin/ReplaceOfNoti'
-import './style.scss'
 import placeholderImage from '../../../assets/img/Ellipse.png'
+import './style.scss'
 
 const AccountOfAdmin = () => {
   const { user, saveUser } = useAuth()
@@ -21,6 +22,7 @@ const AccountOfAdmin = () => {
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
+  const formRef = useRef(null)
 
   const {
     register,
@@ -137,6 +139,12 @@ const AccountOfAdmin = () => {
     setIsEditingPersonal(false)
   }
 
+  useOnClickOutside(formRef, () => {
+    if (isEditingPersonal) {
+      handleCancelEdit()
+    }
+  })
+
   if (loading) return <div>Đang tải...</div>
 
   const displayName =
@@ -144,7 +152,7 @@ const AccountOfAdmin = () => {
     initialData.fullName.trim() !== 'null null' &&
     initialData.fullName.trim() !== ''
       ? initialData.fullName
-      : 'HỌ VÀ TÊN'
+      : initialData.username || 'HỌ VÀ TÊN'
 
   return (
     <div className='account'>
@@ -161,7 +169,6 @@ const AccountOfAdmin = () => {
             alt='User Avatar'
             className='user-avatar-preview'
           />
-
           {isEditingPersonal && (
             <div className='image-overlay'>
               <i className='fa-solid fa-upload'></i>
@@ -178,21 +185,17 @@ const AccountOfAdmin = () => {
         </div>
         <h2>{displayName}</h2>
       </div>
+
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='account__information'>
+        <div className='account__information' ref={formRef}>
           <div className='account__information__fix'>
             <h5>Thông tin cá nhân</h5>
             {isEditingPersonal ? (
-              <>
-                <button type='submit' className='edit-button save'>
-                  Lưu
-                </button>
-                <button type='button' onClick={handleCancelEdit} className='edit-button cancel'>
-                  Hủy
-                </button>
-              </>
+              <button type='submit' className='edit-button save'>
+                Lưu
+              </button>
             ) : (
-              <span onClick={() => setIsEditingPersonal(true)} className='edit-span'>
+              <span onClick={() => setIsEditingPersonal(true)} style={{ cursor: 'pointer' }}>
                 <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
               </span>
             )}
@@ -255,6 +258,7 @@ const AccountOfAdmin = () => {
                 <span className='error-message'>{errors.studentCode.message}</span>
               )}
             </div>
+            <div className='account__info-item' style={{ visibility: 'hidden' }}></div>
           </div>
         </div>
       </form>
@@ -269,7 +273,7 @@ const AccountOfAdmin = () => {
         <div className='account__taikhoan__context'>
           <div className='account__taikhoan__info-item'>
             <span>Tên đăng nhập</span>
-            <span>{initialData.studentCode}</span>
+            <span>{initialData.username}</span>
           </div>
           <div className='account__taikhoan__info-item'>
             <span>Mật khẩu</span>

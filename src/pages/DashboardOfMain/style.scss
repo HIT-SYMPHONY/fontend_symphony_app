@@ -47,6 +47,7 @@ $class-ago-width: 210px;
       align-items: center;
       text-decoration: none;
       color: #979797;
+      transition: 0.25s all;
       i {
         color: #979797;
         padding-right: 10px;
@@ -57,10 +58,23 @@ $class-ago-width: 210px;
         padding-right: 10px;
         font-size: 20px;
       }
-    }
-
-    &__click:hover {
-      background-color: #ffefe4;
+      &:hover {
+        background-color: #ffefe4;
+        border-radius: 20px;
+        i,
+        svg {
+          color: #f06c25;
+        }
+      }
+      &.active {
+        background-color: $button-color !important;
+        color: #fff !important;
+        i,
+        svg {
+          color: #fff !important;
+        }
+        border-radius: 20px;
+      }
     }
 
     &__clickone {
@@ -73,7 +87,7 @@ $class-ago-width: 210px;
       align-items: center;
       gap: 5px;
       text-decoration: none;
-
+      transition: 0.25s all;
       &__Icon {
         padding-right: 10px;
         font-size: 18px;
@@ -81,7 +95,19 @@ $class-ago-width: 210px;
       }
 
       &:hover {
-        background-color: #ffefe4;
+        color: #f06c25;
+        i,
+        svg {
+          color: #f06c25;
+        }
+      }
+      &.active {
+        background-color: transparent !important;
+        color: #f27b36 !important;
+        i,
+        .iconify {
+          color: #f27b36 !important;
+        }
       }
     }
   }
@@ -220,4 +246,15 @@ $class-ago-width: 210px;
   .homework .homework__baitap {
     max-height: 630px;
   }
+}
+
+.whiteP {
+  color: #fff;
+  padding-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+.error-message {
+  color: #ff4d4f !important;
+  display: block;
 }
