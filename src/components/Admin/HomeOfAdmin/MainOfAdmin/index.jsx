@@ -3,12 +3,11 @@ import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
-const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 import './style.scss'
 import placeHolderImage from '../../../../assets/img/Ellipse.png'
 import { getDisplayName } from '../../../../utils/formatters'
-import { get } from 'react-hook-form'
 
+const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 const MainOfAdmin = () => {
   const navigate = useNavigate()
   const [users, setUsers] = useState([])

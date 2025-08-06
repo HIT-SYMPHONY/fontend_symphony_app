@@ -47,7 +47,6 @@ export const formatDateForAPI = (date) => {
 
 export const getDisplayName = (data) => {
   const name = data.fullName?.trim()
-  console.log(name)
   const isValid =
     name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
   return isValid ? name : 'HỌ VÀ TÊN'

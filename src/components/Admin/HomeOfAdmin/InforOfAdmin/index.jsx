@@ -1,96 +1,122 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
-import { Outlet } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { userUpdateSchema } from '../../../../utils/userValidate.js'
+import { getUserById, updateUser, getUserClasses } from '../../../../apis/user.api'
+import {
+  formatDate,
+  formatDateForAPI,
+  translateGender,
+  translateStatus,
+} from '../../../../utils/formatters'
 import './style.scss'
 
 const InforOfAdmin = () => {
   const navigate = useNavigate()
-  // Initial member data
-  const [member, setMember] = useState({
-    firstname: 'Nguyễn',
-    name: 'Nguyễn Thị Minh',
-    studentId: '2023100000',
-    email: 'nguyenthiminhan2020@gmail.com',
-    phone: '0123456789',
-    khoa: 'K15 - Công nghệ thông tin',
-    sex: 'Nữ',
-    birthday: '2000-01-01',
-    username: 'nguyenthiminhan',
-    password: '12345678',
+  const { userId } = useParams()
+
+  const [initialData, setInitialData] = useState(null)
+  const [userClasses, setUserClasses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty },
+    reset,
+  } = useForm({
+    resolver: yupResolver(userUpdateSchema),
   })
 
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState(member)
+  useEffect(() => {
+    if (!userId) return
 
-  const memberClass = [
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 1,
-      state: 'Đang diễn ra',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 1,
-      state: 'Đang diễn ra',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 1,
-      state: 'Đang diễn ra',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 2,
-      state: 'Đã kết thúc',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 1,
-      state: 'Đang diễn ra',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 2,
-      state: 'Đã kết thúc',
-      view: 'Xem chi tiết',
-    },
-    {
-      className: 'PRIVATE: Đồ họa - 2025',
-      style: 1,
-      state: 'Đang diễn ra',
-      view: 'Xem chi tiết',
-    },
-  ]
+    const fetchAllData = async () => {
+      try {
+        setLoading(true)
+        const [userResponse, classesResponse] = await Promise.all([
+          getUserById(userId),
+          getUserClasses(userId),
+        ])
 
-  // Handle input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+        const userData = userResponse.data
+        setUserClasses(classesResponse.data || [])
 
-  // Handle edit button click
-  const handleEdit = () => {
-    setIsEditing(true)
-  }
+        const formattedData = {
+          lastName: userData.lastName || '',
+          firstName: userData.firstName || '',
+          studentCode: userData.studentCode || '',
+          email: userData.email || '',
+          phoneNumber: userData.phoneNumber || '',
+          intake: userData.intake || '',
+          gender: userData.gender || '',
+          dateBirth: userData.dateBirth || '',
+        }
 
-  // Handle save button click
-  const handleSave = () => {
-    setMember(formData)
-    setIsEditing(false)
+        setInitialData(formattedData)
+        reset(formattedData)
+      } catch (error) {
+        toast.error('Không thể tải thông tin người dùng.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchAllData()
+  }, [userId, reset])
+
+  const onSubmit = async (data) => {
+    if (!isDirty) {
+      toast.error('Không có thay đổi nào để lưu.')
+      setIsEditing(false)
+      return
+    }
+    const updateToast = toast.loading('Đang cập nhật...')
+    const payload = { ...data }
+    if (payload.dateBirth instanceof Date) {
+      payload.dateBirth = formatDateForAPI(payload.dateBirth)
+    } else if (!payload.dateBirth) {
+      payload.dateBirth = null
+    }
+    const formData = new FormData()
+    formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
+
+    try {
+      const response = await updateUser(userId, formData)
+      const updatedUserData = response.data
+      const formattedData = {
+        lastName: updatedUserData.lastName || '',
+        firstName: updatedUserData.firstName || '',
+        studentCode: updatedUserData.studentCode || '',
+        email: updatedUserData.email || '',
+        phoneNumber: updatedUserData.phoneNumber || '',
+        intake: updatedUserData.intake || '',
+        gender: updatedUserData.gender || '',
+        dateBirth: updatedUserData.dateBirth || '',
+      }
+      setInitialData(formattedData)
+      reset(formattedData)
+
+      setIsEditing(false)
+      toast.success('Cập nhật thành công!', { id: updateToast })
+    } catch (error) {
+      const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
+      toast.error(message, { id: updateToast })
+    }
   }
 
   const handleCancel = () => {
-    setFormData(member)
+    console.log(1)
+    reset(initialData)
     setIsEditing(false)
   }
+  const displayValue = (value) => value || 'N/A'
 
-  const maskPassword = (password) => '•'.repeat(password.length)
+  if (loading) return <div>Đang tải...</div>
+  if (!initialData) return <div>Không tìm thấy người dùng.</div>
 
   return (
     <div className='inforofadmin'>
@@ -105,170 +131,138 @@ const InforOfAdmin = () => {
         <i className='fa-solid fa-circle-user inforofadmin__title__i'></i>
         <h2>Thông tin tài khoản</h2>
       </div>
-      <div className='inforofadmin__context'>
-        <h3>Thông tin cá nhân</h3>
-        <div className='inforofadmin__context__list'>
-          <div className='inforofadmin__context__list__box'>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Họ đệm</span>
-              {isEditing ? (
-                <input
-                  type='text'
-                  name='firstname'
-                  value={formData.firstname}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <h4>{member.firstname}</h4>
-              )}
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className='inforofadmin__context'>
+          <h3>Thông tin cá nhân</h3>
+          <div className='inforofadmin__context__list'>
+            <div className='inforofadmin__context__list__box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Họ đệm</span>
+                {isEditing ? (
+                  <input type='text' {...register('lastName')} />
+                ) : (
+                  <h4>{displayValue(initialData.lastName)}</h4>
+                )}
+              </div>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Mã sinh viên</span>
+                {isEditing ? (
+                  <input type='text' {...register('studentCode')} />
+                ) : (
+                  <h4>{displayValue(initialData.studentCode)}</h4>
+                )}
+                {errors.studentCode && (
+                  <span className='error-message'>{errors.studentCode.message}</span>
+                )}
+              </div>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Email</span>
+                {isEditing ? (
+                  <input type='email' {...register('email')} />
+                ) : (
+                  <h4>{displayValue(initialData.email)}</h4>
+                )}
+                {errors.email && <span className='error-message'>{errors.email.message}</span>}
+              </div>
             </div>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Mã sinh viên</span>
-              {isEditing ? (
-                <input
-                  type='text'
-                  name='studentId'
-                  value={formData.studentId}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <h4>{member.studentId}</h4>
-              )}
+            <div className='inforofadmin__context__list__box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Tên</span>
+                {isEditing ? (
+                  <input type='text' {...register('firstName')} />
+                ) : (
+                  <h4>{displayValue(initialData.firstName)}</h4>
+                )}
+              </div>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Số điện thoại</span>
+                {isEditing ? (
+                  <input type='text' {...register('phoneNumber')} />
+                ) : (
+                  <h4>{displayValue(initialData.phoneNumber)}</h4>
+                )}
+              </div>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Khoa</span>
+                {isEditing ? (
+                  <input type='text' {...register('intake')} />
+                ) : (
+                  <h4>{displayValue(initialData.intake)}</h4>
+                )}
+              </div>
             </div>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Email</span>
-              {isEditing ? (
-                <input
-                  type='email'
-                  name='email'
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <h4>{member.email}</h4>
-              )}
-            </div>
-          </div>
-          <div className='inforofadmin__context__list__box'>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Tên</span>
-              {isEditing ? (
-                <input type='text' name='name' value={formData.name} onChange={handleInputChange} />
-              ) : (
-                <h4>{member.name}</h4>
-              )}
-            </div>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Số điện thoại</span>
-              {isEditing ? (
-                <input
-                  type='text'
-                  name='phone'
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <h4>{member.phone}</h4>
-              )}
-            </div>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Khoa</span>
-              {isEditing ? (
-                <input type='text' name='khoa' value={formData.khoa} onChange={handleInputChange} />
-              ) : (
-                <h4>{member.khoa}</h4>
-              )}
-            </div>
-          </div>
-          <div className='inforofadmin__context__list__box'>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Giới tính</span>
-              {isEditing ? (
-                <input type='text' name='sex' value={formData.sex} onChange={handleInputChange} />
-              ) : (
-                <h4>{member.sex}</h4> // Fixed: was incorrectly showing studentId
-              )}
-            </div>
-            <div className='inforofadmin__context__list__box__item'>
-              <span>Ngày sinh</span>
-              {isEditing ? (
-                <input
-                  type='date'
-                  name='birthday'
-                  value={formData.birthday}
-                  onChange={handleInputChange}
-                />
-              ) : (
-                <h4>{member.birthday}</h4>
-              )}
+            <div className='inforofadmin__context__list__box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Giới tính</span>
+                {isEditing ? (
+                  <select {...register('gender')}>
+                    <option value='MALE'>Nam</option>
+                    <option value='FEMALE'>Nữ</option>
+                    <option value='OTHER'>Khác</option>
+                  </select>
+                ) : (
+                  <h4>{translateGender(initialData.gender)}</h4>
+                )}
+              </div>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Ngày sinh</span>
+                {isEditing ? (
+                  <input type='date' {...register('dateBirth')} />
+                ) : (
+                  <h4>{initialData.dateBirth ? formatDate(initialData.dateBirth) : 'N/A'}</h4>
+                )}
+                {errors.dateBirth && (
+                  <span className='error-message'>{errors.dateBirth.message}</span>
+                )}
+              </div>
+              <div style={{ flex: 1 }}></div>
             </div>
           </div>
-        </div>
-        <h3>Thông tin tài khoản</h3>
-        <div className='inforofadmin__context__item'>
-          <div className='inforofadmin__context__item__box'>
-            <span>Tên đăng nhập</span>
+          <div className='inforofadmin__context__button'>
             {isEditing ? (
-              <input
-                type='text'
-                name='username'
-                value={formData.username}
-                onChange={handleInputChange}
-              />
+              <>
+                <button type='submit'>
+                  <Icon icon='material-symbols:save' width='20' height='20' />
+                  Lưu
+                </button>
+                <button type='button' onClick={handleCancel}>
+                  <Icon icon='material-symbols:cancel' width='20' height='20' />
+                  Hủy
+                </button>
+
+              </>
             ) : (
-              <h4>{member.username}</h4>
-            )}
-          </div>
-          <div className='inforofadmin__context__item__box'>
-            <span>Mật khẩu</span>
-            {isEditing ? (
-              <input
-                type='text'
-                name='password'
-                value={formData.password}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <h4>{maskPassword(member.password)}</h4>
+              <span onClick={() => setIsEditing(true)} className='edit-span'>
+                <Icon icon='iconamoon:edit-fill' width='20' height='20' />
+                Chỉnh sửa
+              </span>
             )}
           </div>
         </div>
-        <div className='inforofadmin__context__button'>
-          {isEditing ? (
-            <>
-              <button onClick={handleSave}>
-                <Icon icon='material-symbols:save' width='20' height='20' />
-                Lưu
-              </button>
-              <button onClick={handleCancel}>
-                <Icon icon='material-symbols:cancel' width='20' height='20' />
-                Hủy
-              </button>
-            </>
-          ) : (
-            <button onClick={handleEdit}>
-              <Icon icon='iconamoon:edit-fill' width='20' height='20' />
-              Chỉnh sửa
-            </button>
-          )}
-        </div>
-      </div>
+      </form>
 
       <div className='inforofadmin__class'>
         <h3>Danh sách lớp học</h3>
         <div className='inforofadmin__class__list'>
-          {memberClass.map((item, index) => (
-            <div className='inforofadmin__class__list__item' key={index}>
-              <div className='inforofadmin__class__list__item__img'></div>
-              <div className='inforofadmin__class__list__item__box'>
-                <div className='inforofadmin__class__list__item__box__start'>
-                  <h4>{item.className}</h4>
-                  <span className={item.style === 1 ? 'span1' : 'span2'}>{item.state}</span>
+          {userClasses.length > 0 ? (
+            userClasses.map((item, index) => (
+              <div className='inforofadmin__class__list__item' key={index}>
+                <div className='inforofadmin__class__list__item__img'></div>
+                <div className='inforofadmin__class__list__item__box'>
+                  <div className='inforofadmin__class__list__item__box__start'>
+                    <h4>{item.name}</h4>
+                    <span className={item.status === 'COMPLETED' ? 'span2' : 'span1'}>
+                      {translateStatus(item.status)}
+                    </span>
+                  </div>
+                  <span>Xem chi tiết</span>
                 </div>
-                <span>{item.view}</span>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>Người dùng chưa tham gia lớp học nào.</p>
+          )}
         </div>
       </div>
     </div>
