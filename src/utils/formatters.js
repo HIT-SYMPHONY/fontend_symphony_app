@@ -7,6 +7,14 @@ export const translateStatus = (statusKey) => {
   return statusMap[statusKey] || statusKey
 }
 
+const genderMap = {
+  MALE: 'Nam',
+  FEMALE: 'Nữ',
+  OTHER: 'Khác',
+}
+export const translateGender = (genderKey) => {
+  return genderMap[genderKey] || 'N/A'
+}
 export const formatDate = (dateString) => {
   if (!dateString) return ''
   try {
@@ -16,35 +24,6 @@ export const formatDate = (dateString) => {
     return dateString
   }
 }
-export const parseTextToSections = (text) => {
-  if (!text || typeof text !== 'string') {
-    return []
-  }
-
-  const sections = []
-  const lines = text.split('\n')
-  let currentSection = null
-
-  lines.forEach((line) => {
-    const trimmedLine = line.trim()
-    if (trimmedLine.startsWith('# ')) {
-      if (currentSection) {
-        sections.push({ ...currentSection, content: currentSection.content.trim() })
-      }
-      currentSection = {
-        title: trimmedLine.substring(2).trim(),
-        content: '',
-      }
-    } else if (currentSection) {
-      currentSection.content += line + '\n'
-    }
-  })
-  if (currentSection) {
-    sections.push({ ...currentSection, content: currentSection.content.trim() })
-  }
-
-  return sections
-}
 
 export const toLocalDateTimeString = (isoString) => {
   if (!isoString) return ''
@@ -52,4 +31,16 @@ export const toLocalDateTimeString = (isoString) => {
   const timezoneOffset = date.getTimezoneOffset() * 60000
   const localDate = new Date(date.getTime() - timezoneOffset)
   return localDate.toISOString().slice(0, 16)
+}
+
+export const formatDateForAPI = (date) => {
+  if (!date || !(date instanceof Date) || isNaN(date)) {
+    return null
+  }
+
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
 }

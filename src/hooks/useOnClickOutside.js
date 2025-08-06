@@ -1,15 +1,9 @@
 import { useEffect } from 'react'
-
-/**
- * A custom hook that triggers a callback when a click is detected outside of a specified element.
- * @param {React.RefObject} ref - The ref attached to the element to monitor.
- * @param {function} handler - The function to call when an outside click is detected.
- */
-const useOnClickOutside = (ref, handler) => {
+const useOnClickOutside = (refs, handler) => {
   useEffect(() => {
     const listener = (event) => {
-      // Do nothing if clicking re's element or descendent elements
-      if (!ref.current || ref.current.contains(event.target)) {
+      const isClickInside = refs.some((ref) => ref.current && ref.current.contains(event.target))
+      if (isClickInside) {
         return
       }
       handler(event)
@@ -22,7 +16,7 @@ const useOnClickOutside = (ref, handler) => {
       document.removeEventListener('mousedown', listener)
       document.removeEventListener('touchstart', listener)
     }
-  }, [ref, handler])
+  }, [refs, handler])
 }
 
 export default useOnClickOutside

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../../utils/userValidate.js'
 import { getCurrentUser, updateUser } from '../../../apis/user.api'
-import { formatDate } from '../../../utils/formatters'
+import { formatDate, translateGender, formatDateForAPI } from '../../../utils/formatters'
 import useAuth from '../../../hooks/useAuth'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import ReplaceOfAdmin from '../NotiOfAdmin/ReplaceOfNoti'
@@ -23,11 +23,12 @@ const AccountOfAdmin = () => {
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
   const formRef = useRef(null)
+  const imageUploadRef = useRef(null)
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     reset,
   } = useForm({
     resolver: yupResolver(userUpdateSchema),
@@ -49,7 +50,7 @@ const AccountOfAdmin = () => {
           phoneNumber: userData.phoneNumber || '',
           intake: userData.intake || '',
           gender: userData.gender || '',
-          dateBirth: userData.dateBirth ? userData.dateBirth.split('T')[0] : '',
+          dateBirth: userData.dateBirth,
           username: userData.username || '',
           fullName: userData.fullName || '',
           imageUrl: userData.imageUrl || null,
@@ -81,15 +82,30 @@ const AccountOfAdmin = () => {
       }
     }
   }
+  const handleCancelEdit = () => {
+    reset(initialData)
+    setPreviewUrl(initialData.imageUrl)
+    setImageFile(null)
+    setIsEditingPersonal(false)
+  }
+  useOnClickOutside([formRef, imageUploadRef], () => {
+    if (isEditingPersonal) handleCancelEdit()
+  })
 
   const onSubmit = async (data) => {
-    const updateToast = toast.loading('Đang cập nhật thông tin...')
-    const payload = data
-
-    if (Object.keys(payload).length === 0 && !imageFile) {
-      toast.error('Không có thay đổi nào để lưu.', { id: updateToast })
+    if (!isDirty && !imageFile) {
+      toast.error('Không có thay đổi nào để lưu.')
       setIsEditingPersonal(false)
       return
+    }
+
+    const updateToast = toast.loading('Đang cập nhật thông tin...')
+    const payload = { ...data }
+
+    if (payload.dateBirth instanceof Date) {
+      payload.dateBirth = formatDateForAPI(payload.dateBirth)
+    } else if (!payload.dateBirth) {
+      payload.dateBirth = null
     }
 
     const formData = new FormData()
@@ -111,7 +127,7 @@ const AccountOfAdmin = () => {
         phoneNumber: updatedUserData.phoneNumber || '',
         intake: updatedUserData.intake || '',
         gender: updatedUserData.gender || '',
-        dateBirth: updatedUserData.dateBirth ? updatedUserData.dateBirth.split('T')[0] : '',
+        dateBirth: updatedUserData.dateBirth,
         username: updatedUserData.username || '',
         fullName: updatedUserData.fullName || '',
         imageUrl: updatedUserData.imageUrl || null,
@@ -132,19 +148,6 @@ const AccountOfAdmin = () => {
     }
   }
 
-  const handleCancelEdit = () => {
-    reset(initialData)
-    setPreviewUrl(initialData.imageUrl)
-    setImageFile(null)
-    setIsEditingPersonal(false)
-  }
-
-  useOnClickOutside(formRef, () => {
-    if (isEditingPersonal) {
-      handleCancelEdit()
-    }
-  })
-
   if (loading) return <div>Đang tải...</div>
 
   const displayName =
@@ -163,7 +166,8 @@ const AccountOfAdmin = () => {
       <div className='account__user'>
         <div
           className='account__user__img'
-          onClick={() => isEditingPersonal && fileInputRef.current.click()}>
+          onClick={() => isEditingPersonal && fileInputRef.current.click()}
+          ref={imageUploadRef}>
           <img
             src={previewUrl || placeholderImage}
             alt='User Avatar'
@@ -202,25 +206,53 @@ const AccountOfAdmin = () => {
           </div>
           <div className='account__information__thongtin'>
             <div className='account__info-item'>
+              <span>Họ đệm</span>
+              {isEditingPersonal ? (
+                <input type='text' {...register('lastName')} className='edit-input' />
+              ) : (
+                <span>{initialData.lastName || 'N/A'}</span>
+              )}
+              {errors.username && <span className='error-message'>{errors.username.message}</span>}
+            </div>
+            <div className='account__info-item'>
+              <span>Tên</span>
+              {isEditingPersonal ? (
+                <input type='text' {...register('firstName')} className='edit-input' />
+              ) : (
+                <span>{initialData.firstName || 'N/A'}</span>
+              )}
+              {errors.username && <span className='error-message'>{errors.username.message}</span>}
+            </div>
+            <div className='account__info-item'>
+              <span>Tên tài khoản</span>
+              {isEditingPersonal ? (
+                <input type='text' {...register('username')} className='edit-input' />
+              ) : (
+                <span>{initialData.username || 'N/A'}</span>
+              )}
+              {errors.username && <span className='error-message'>{errors.username.message}</span>}
+            </div>
+            <div className='account__info-item'>
               <span>Khóa</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('intake')} className='edit-input' />
               ) : (
                 <span>{initialData.intake || 'N/A'}</span>
               )}
+              {errors.intake && <span className='error-message'>{errors.intake.message}</span>}
             </div>
             <div className='account__info-item'>
               <span>Giới tính</span>
               {isEditingPersonal ? (
                 <select {...register('gender')} className='edit-input'>
-                  <option value=''>-- Chọn giới tính --</option>
                   <option value='MALE'>Nam</option>
                   <option value='FEMALE'>Nữ</option>
                   <option value='OTHER'>Khác</option>
                 </select>
               ) : (
-                <span>{initialData.gender || 'N/A'}</span>
+                <span>{translateGender(initialData.gender)}</span>
               )}
+              {errors.gender && <span className='error-message'>{errors.gender.message}</span>}
             </div>
             <div className='account__info-item'>
               <span>Ngày sinh</span>
@@ -229,36 +261,41 @@ const AccountOfAdmin = () => {
               ) : (
                 <span>{formatDate(initialData.dateBirth)}</span>
               )}
+              {errors.dateBirth && (
+                <span className='error-message'>{errors.dateBirth.message}</span>
+              )}
             </div>
             <div className='account__info-item'>
               <span>Email</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('email')} className='edit-input' />
               ) : (
-                <span>{initialData.email}</span>
+                <span>{initialData.email || 'N/A'}</span>
               )}
               {errors.email && <span className='error-message'>{errors.email.message}</span>}
             </div>
             <div className='account__info-item'>
-              <span>SĐ điện thoại</span>
+              <span>Số điện thoại</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('phoneNumber')} className='edit-input' />
               ) : (
                 <span>{initialData.phoneNumber || 'N/A'}</span>
               )}
+              {errors.phoneNumber && (
+                <span className='error-message'>{errors.phoneNumber.message}</span>
+              )}
             </div>
             <div className='account__info-item'>
-              <span>Mã sv</span>
+              <span>Mã sinh viên</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('studentCode')} className='edit-input' />
               ) : (
-                <span>{initialData.studentCode}</span>
+                <span>{initialData.studentCode || 'N/A'}</span>
               )}
               {errors.studentCode && (
                 <span className='error-message'>{errors.studentCode.message}</span>
               )}
             </div>
-            <div className='account__info-item' style={{ visibility: 'hidden' }}></div>
           </div>
         </div>
       </form>
@@ -273,7 +310,7 @@ const AccountOfAdmin = () => {
         <div className='account__taikhoan__context'>
           <div className='account__taikhoan__info-item'>
             <span>Tên đăng nhập</span>
-            <span>{initialData.username}</span>
+            <span>{initialData.studentCode}</span>
           </div>
           <div className='account__taikhoan__info-item'>
             <span>Mật khẩu</span>

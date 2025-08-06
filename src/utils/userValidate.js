@@ -1,3 +1,4 @@
+import { useInternalMessage } from 'antd/es/message/useMessage'
 import * as yup from 'yup'
 
 const userBaseSchema = yup.object({
@@ -10,6 +11,7 @@ const userBaseSchema = yup.object({
   gender: yup.mixed().oneOf(['MALE', 'FEMALE', 'OTHER', null, '']),
   dateBirth: yup.date().nullable().typeError('Vui lòng nhập ngày hợp lệ'),
   password: yup.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+  username: yup.string().trim(),
 })
 
 export const userCreationSchema = yup
@@ -26,25 +28,21 @@ export const userCreationSchema = yup
   .required()
 
 const toPartial = (schema) => {
-  const partialSchema = {};
-  const fields = schema.fields;
+  const partialSchema = {}
+  const fields = schema.fields
 
   for (const key in fields) {
-    let fieldSchema = fields[key];
+    let fieldSchema = fields[key]
     if (key === 'password') {
-      fieldSchema = yup.string()
-        .transform(value => value === '' ? undefined : value)
-        .min(6, "Mật khẩu phải có ít nhất 6 ký tự");
-    } else {
-      fieldSchema = fieldSchema
-        .optional()
-        .transform(value => value === '' ? undefined : value);
+      fieldSchema = yup
+        .string()
+        .transform((value) => (value === '' ? undefined : value))
+        .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
     }
-    
-    partialSchema[key] = fieldSchema;
+    partialSchema[key] = fieldSchema
   }
-  
-  return yup.object(partialSchema);
-};
 
-export const userUpdateSchema = toPartial(userBaseSchema);
+  return yup.object(partialSchema)
+}
+
+export const userUpdateSchema = toPartial(userBaseSchema)

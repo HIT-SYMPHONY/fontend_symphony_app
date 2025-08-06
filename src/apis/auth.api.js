@@ -1,4 +1,4 @@
-import { apiDefault } from './axios'
+import { apiDefault, api} from './axios'
 import { ApiConstant } from '../constants/api.constant'
 
 const authApi = () => ({
@@ -21,6 +21,16 @@ const authApi = () => ({
       email,
       tempPassword,
     }),
+  changePassword: async (payload) => api.patch(ApiConstant.auth.changePassword, payload),
+
+  verifyPassword: async (payload) => api.post(ApiConstant.auth.verifyPassword, payload),
 })
 
-export const { login, refreshToken, forgotPassword, verifyTempPassword } = authApi()
+export const {
+  login,
+  refreshToken,
+  forgotPassword,
+  verifyTempPassword,
+  changePassword,
+  verifyPassword,
+} = authApi()

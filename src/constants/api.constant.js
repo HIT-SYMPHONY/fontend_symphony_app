@@ -4,6 +4,8 @@ export const ApiConstant = {
     forgotPassword: '/auth/forgot-password',
     verifyTempPassword: '/auth/temp-password',
     refreshToken: '/auth/refresh-token',
+    changePassword: '/auth/change-password',
+    verifyPassword: '/auth/verify-password',
   },
   users: {
     base: '/users',
