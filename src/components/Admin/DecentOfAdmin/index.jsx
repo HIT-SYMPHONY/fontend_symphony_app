@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers, updateUserRoles } from '../../../apis/user.api'
 import './style.scss'
+import { getDisplayName } from '../../../utils/formatters'
 
 const DecentOfAdmin = () => {
   const navigate = useNavigate()
@@ -233,7 +234,7 @@ const DecentOfAdmin = () => {
                           <span className='user-index'>
                             <h4>{index + 1}</h4>
                           </span>
-                          <span>{item.fullName}</span>
+                          <span>{getDisplayName(item)}</span>
                         </div>
                       </td>
                       <td>{item.studentCode}</td>

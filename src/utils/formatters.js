@@ -44,3 +44,10 @@ export const formatDateForAPI = (date) => {
 
   return `${year}-${month}-${day}`
 }
+
+export const getDisplayName = (data) => {
+  const name = data.fullName?.trim()
+  const isValid =
+    name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
+  return isValid ? name : 'HỌ VÀ TÊN'
+}

@@ -5,7 +5,12 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../../utils/userValidate.js'
 import { getCurrentUser, updateUser } from '../../../apis/user.api'
-import { formatDate, translateGender, formatDateForAPI } from '../../../utils/formatters'
+import {
+  formatDate,
+  translateGender,
+  formatDateForAPI,
+  getDisplayName,
+} from '../../../utils/formatters'
 import useAuth from '../../../hooks/useAuth'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import ReplaceOfAdmin from '../NotiOfAdmin/ReplaceOfNoti'
@@ -150,12 +155,7 @@ const AccountOfAdmin = () => {
 
   if (loading) return <div>Đang tải...</div>
 
-  const displayName =
-    initialData.fullName &&
-    initialData.fullName.trim() !== 'null null' &&
-    initialData.fullName.trim() !== ''
-      ? initialData.fullName
-      : initialData.username || 'HỌ VÀ TÊN'
+  const displayName = getDisplayName(initialData)
 
   return (
     <div className='account'>
@@ -199,7 +199,7 @@ const AccountOfAdmin = () => {
                 Lưu
               </button>
             ) : (
-              <span onClick={() => setIsEditingPersonal(true)} style={{ cursor: 'pointer' }}>
+              <span onClick={() => setIsEditingPersonal(true)} className='edit-span'>
                 <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
               </span>
             )}
@@ -259,7 +259,7 @@ const AccountOfAdmin = () => {
               {isEditingPersonal ? (
                 <input type='date' {...register('dateBirth')} className='edit-input' />
               ) : (
-                <span>{formatDate(initialData.dateBirth)}</span>
+                <span>{initialData.dateBirth ? formatDate(initialData.dateBirth) : 'N/A'}</span>
               )}
               {errors.dateBirth && (
                 <span className='error-message'>{errors.dateBirth.message}</span>
@@ -303,7 +303,7 @@ const AccountOfAdmin = () => {
       <div className='account__taikhoan'>
         <div className='account__taikhoan__fix'>
           <h4>Thông tin tài khoản</h4>
-          <span onClick={() => setShowPasswordPopup(true)}>
+          <span onClick={() => setShowPasswordPopup(true)} className='edit-span'>
             <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
           </span>
         </div>

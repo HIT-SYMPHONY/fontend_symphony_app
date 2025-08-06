@@ -7,10 +7,10 @@ $background-light: #ffefe4;
 .main-admin {
   border: 2px solid $border-color;
   box-shadow: 0 4px 8px $shadow-color;
-  padding: 0 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-radius: 10px 10px 0 0;
   box-sizing: border-box;
-  min-height: calc(99vh - 50px);
+  min-height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -99,13 +99,6 @@ $background-light: #ffefe4;
     }
   }
 
-  &__context {
-    flex: 1;
-    padding: 0 5px;
-    border-radius: 10px;
-    border: 2px solid $border-color;
-  }
-
   &__search {
     border: 2px solid #c3bfbf;
     padding: 5px 10px;
@@ -129,7 +122,10 @@ $background-light: #ffefe4;
   }
 }
 .main-admin__context {
-  flex: 1;
+  margin-top: 0.8125rem;
+  padding: 0 5px;
+  border-radius: 10px;
+  border: 2px solid $border-color;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -145,6 +141,11 @@ $background-light: #ffefe4;
   }
   &__table__thead__tr {
     th {
+      position: sticky;
+      padding-block: 0.25rem;
+      top: 0;
+      background-color: #fff;
+      z-index: 1; /* ensures it stays on top */
       font-size: 1.25rem;
       text-align: left;
       font-weight: bold;
@@ -170,7 +171,7 @@ $background-light: #ffefe4;
   }
 
   &__table__tbody-wrapper {
-    max-height: 620px;
+    max-height: 610px;
     overflow-y: auto;
     &::-webkit-scrollbar {
       display: none;

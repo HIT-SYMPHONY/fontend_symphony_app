@@ -3,10 +3,11 @@ import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
-const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 import './style.scss'
 import placeHolderImage from '../../../../assets/img/Ellipse.png'
+import { getDisplayName } from '../../../../utils/formatters'
 
+const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 const MainOfAdmin = () => {
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
@@ -114,7 +115,7 @@ const MainOfAdmin = () => {
         </div>
         <button
           className='main-admin__title__create'
-          onClick={() => navigate('/admin/home/create')}>
+          onClick={() => navigate('/admin/users/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>
@@ -144,11 +145,11 @@ const MainOfAdmin = () => {
               )}
               {!loading &&
                 filteredUsers.map((user, index) => (
-                  <tr key={user.id} onClick={() => navigate(`/admin/home/information/${user.id}`)}>
+                  <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)}>
                     <td className='tbody'>
                       <h4>{index + 1}</h4>
                     </td>
-                    <td>{user.fullName}</td>
+                    <td>{getDisplayName(user)}</td>
                     <td>{user.role}</td>
                     <td>{user.studentCode}</td>
                     <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>

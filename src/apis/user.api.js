@@ -14,6 +14,8 @@ const userApi = () => ({
   getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
   updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
+  getUserClasses: async (userId) =>
+    api.get(`${ApiConstant.users.baseId}${userId}${ApiConstant.classrooms.base}`),
 })
 
 export const {
@@ -24,4 +26,5 @@ export const {
   getLeaderList,
   getCurrentUser,
   updateUserRoles,
+  getUserClasses,
 } = userApi()
