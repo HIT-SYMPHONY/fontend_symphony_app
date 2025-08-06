@@ -30,7 +30,7 @@ const LoginPage = () => {
       if (userRole === 'ADMIN') {
         navigate('/admin/home')
       } else {
-        navigate('/client')
+        navigate('/')
       }
     } catch (error) {
       if (error.response?.data?.message) {
