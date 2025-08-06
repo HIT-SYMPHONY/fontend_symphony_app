@@ -1,130 +1,150 @@
-import React, { useState, useContext } from 'react'
-import { GlobalContext } from '../../../../dataContext'
-import { Icon } from '@iconify/react'
+import React, { useState } from 'react'
+import toast from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { changePasswordSchema } from '../../../../utils/authValidate.js'
+import { changePassword, verifyPassword } from '../../../../apis/auth.api'
 import './style.scss'
 
-const ReplaceOfAdmin = ({ onSetSub }) => {
-  const { showMain, setShowMain } = useContext(GlobalContext)
-  const [frame, setFrame] = useState({
-    change: true,
-    new: false,
-    result: false,
+const ReplaceOfAdmin = ({ setShowMain }) => {
+  const [step, setStep] = useState(1)
+  const [loading, setLoading] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    trigger,
+    getValues,
+  } = useForm({
+    resolver: yupResolver(changePasswordSchema),
+    mode: 'onTouched',
   })
-  const [error, setError] = useState('')
 
-  const handleFrame = (frameName) => {
-    const frames = {
-      change: { change: true, new: false, result: false },
-      new: { change: false, new: true, result: false },
-      result: { change: false, new: false, result: true },
+  const handleCheckOldPassword = async () => {
+    const isValid = await trigger('oldPassword')
+    if (!isValid) return
+
+    setLoading(true)
+    const verifyToast = toast.loading('Đang kiểm tra...')
+    try {
+      await verifyPassword({ oldPassword: getValues('oldPassword') })
+      toast.dismiss(verifyToast)
+      setStep(2)
+    } catch (error) {
+      const message = error.response?.data?.message || 'Mật khẩu cũ không chính xác.'
+      toast.error(message, { id: verifyToast })
+    } finally {
+      setLoading(false)
     }
-    setFrame(frames[frameName] || frames.change)
-    setError('') // Reset lỗi khi chuyển frame
   }
 
-  const AccountResult = () => (
-    <div className='accountframe__relate'>
-      <h1 className='accountframe__relate__h1'>NỘP BÀI THÀNH CÔNG!</h1>
-      <div className='accountframe__relate__button'>
-        <button onClick={() => setShowMain(false)}>QUAY LẠI</button>
-      </div>
-      <i
-        className='fa-solid fa-xmark accountframe__relate__i'
-        onClick={() => setShowMain(false)}></i>
-    </div>
-  )
-
-  const AccountNew = () => {
-    const [passNew, setPassNew] = useState('')
-    const [repeat, setRepeat] = useState('')
-
-    const validatePassword = (password) => {
-      return password.length >= 8 // Yêu cầu mật khẩu ít nhất 8 ký tự
+  const onSubmit = async (data) => {
+    setLoading(true)
+    const submitToast = toast.loading('Đang đổi mật khẩu...')
+    try {
+      await changePassword({
+        oldPassword: data.oldPassword,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+      })
+      toast.success('Đổi mật khẩu thành công!', { id: submitToast })
+      setStep(3)
+    } catch (error) {
+      const message = error.response?.data?.message || 'Lỗi khi đổi mật khẩu.'
+      toast.error(message, { id: submitToast })
+    } finally {
+      setLoading(false)
     }
-
-    const handleSubmit = () => {
-      if (!passNew || !repeat) {
-        setError('Vui lòng nhập đầy đủ mật khẩu!')
-      } else if (passNew !== repeat) {
-        setError('Mật khẩu không khớp!')
-      } else if (!validatePassword(passNew)) {
-        setError('Mật khẩu phải có ít nhất 8 ký tự!')
-      } else {
-        setError('')
-        handleFrame('result') // Sửa lỗi: gọi trực tiếp handleFrame
-      }
-    }
-
-    return (
-      <div className='accountframe__pos'>
-        <h4 className='accountframe__pos__h1'>NHẬP MẬT KHẨU MỚI</h4>
-        <input
-          type='password'
-          value={passNew}
-          onChange={(e) => setPassNew(e.target.value)}
-          placeholder='Nhập mật khẩu mới...'
-          className='accountframe__pos__input'
-        />
-        <h4 className='accountframe__pos__h1'>NHẬP LẠI MẬT KHẨU MỚI</h4>
-        <input
-          type='password'
-          value={repeat}
-          onChange={(e) => setRepeat(e.target.value)}
-          placeholder='Nhập lại mật khẩu mới...'
-          className='accountframe__pos__input'
-        />
-        {error && <p className='accountframe__error'>{error}</p>}
-        <div className='accountframe__pos__button'>
-          <button onClick={handleSubmit}>XÁC NHẬN</button>
-          <button onClick={() => handleFrame('change')}>QUAY LẠI</button>
-        </div>
-        <i
-          className='fa-solid fa-xmark accountframe__pos__i'
-          onClick={() => setShowMain(false)}></i>
-      </div>
-    )
   }
 
-  const AccountChange = () => {
-    const [password, setPassword] = useState('')
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div className='accountframe__pos'>
+            <h1 className='accountframe__pos__h1'>NHẬP MẬT KHẨU CŨ CỦA BẠN!</h1>
+            <input
+              type='password'
+              placeholder='Nhập mật khẩu hiện tại...'
+              className='accountframe__pos__input'
+              {...register('oldPassword')}
+            />
+            {errors.oldPassword && (
+              <p className='accountframe__error'>{errors.oldPassword.message}</p>
+            )}
+            <div className='accountframe__pos__button'>
+              <button type='button' onClick={handleCheckOldPassword} disabled={loading}>
+                {loading ? 'ĐANG KIỂM TRA...' : 'KIỂM TRA'}
+              </button>
+              <button type='button' onClick={() => setShowMain(false)}>
+                QUAY LẠI
+              </button>
+            </div>
+            <i
+              className='fa-solid fa-xmark accountframe__pos__i'
+              onClick={() => setShowMain(false)}></i>
+          </div>
+        )
+      case 2: // AccountNew
+        return (
+          <div className='accountframe__pos'>
+            <h4 className='accountframe__pos__h1'>NHẬP MẬT KHẨU MỚI</h4>
+            <input
+              type='password'
+              placeholder='Nhập mật khẩu mới...'
+              className='accountframe__pos__input'
+              {...register('newPassword')}
+            />
+            {errors.newPassword && (
+              <p className='accountframe__error'>{errors.newPassword.message}</p>
+            )}
 
-    const handleCheck = () => {
-      if (!password) {
-        setError('Vui lòng nhập mật khẩu hiện tại!')
-      } else {
-        setError('')
-        handleFrame('new') // Sửa tương tự: gọi trực tiếp handleFrame
-      }
+            <h4 className='accountframe__pos__h1'>NHẬP LẠI MẬT KHẨU MỚI</h4>
+            <input
+              type='password'
+              placeholder='Nhập lại mật khẩu mới...'
+              className='accountframe__pos__input'
+              {...register('confirmPassword')}
+            />
+            {errors.confirmPassword && (
+              <p className='accountframe__error'>{errors.confirmPassword.message}</p>
+            )}
+
+            <div className='accountframe__pos__button'>
+              <button type='submit' disabled={loading}>
+                {loading ? 'ĐANG LƯU...' : 'XÁC NHẬN'}
+              </button>
+              <button type='button' onClick={() => setStep(1)}>
+                QUAY LẠI
+              </button>
+            </div>
+            <i
+              className='fa-solid fa-xmark accountframe__pos__i'
+              onClick={() => setShowMain(false)}></i>
+          </div>
+        )
+      case 3: // AccountResult
+        return (
+          <div className='accountframe__relate'>
+            <h1 className='accountframe__relate__h1'>ĐỔI MẬT KHẨU THÀNH CÔNG!</h1>
+            <div className='accountframe__relate__button'>
+              <button onClick={() => setShowMain(false)}>QUAY LẠI</button>
+            </div>
+            <i
+              className='fa-solid fa-xmark accountframe__relate__i'
+              onClick={() => setShowMain(false)}></i>
+          </div>
+        )
+      default:
+        return null
     }
-
-    return (
-      <div className='accountframe__pos'>
-        <h1 className='accountframe__pos__h1'>NHẬP MẬT KHẨU CŨ CỦA BẠN!</h1>
-        <input
-          type='password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder='Nhập mật khẩu hiện tại...'
-          className='accountframe__pos__input'
-        />
-        {error && <p className='accountframe__error'>{error}</p>}
-        <div className='accountframe__pos__button'>
-          <button onClick={handleCheck}>KIỂM TRA</button>
-          <button onClick={() => setShowMain(false)}>QUAY LẠI</button>
-        </div>
-        <i
-          className='fa-solid fa-xmark accountframe__pos__i'
-          onClick={() => setShowMain(false)}></i>
-      </div>
-    )
   }
 
   return (
-    <div className='accountframe'>
-      {frame.change && <AccountChange />}
-      {frame.new && <AccountNew />}
-      {frame.result && <AccountResult />}
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)} className='accountframe'>
+      {renderStep()}
+    </form>
   )
 }
 

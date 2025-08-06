@@ -4,6 +4,8 @@ export const ApiConstant = {
     forgotPassword: '/auth/forgot-password',
     verifyTempPassword: '/auth/temp-password',
     refreshToken: '/auth/refresh-token',
+    changePassword: '/auth/change-password',
+    verifyPassword: '/auth/verify-password',
   },
   users: {
     base: '/users',
@@ -12,7 +14,7 @@ export const ApiConstant = {
     getCurrentUser: '/users/me',
     getMyClassrooms: '/users/me/classrooms',
     getMyCompetitions: '/users/me/competitions',
-    getLeaders:'/users/leaders'
+    getLeaders: '/users/leaders',
   },
   classrooms: {
     base: '/classrooms',
