@@ -124,6 +124,7 @@ const Communication = () => {
                 onChange={handleInputChange}
                 rows='5'
                 style={{ width: '95%', padding: '10px' }}
+                className='manage-infor__context-infor__context__item__textarea'
               />
             ) : (
               <p>{formData.describe}</p>
@@ -192,6 +193,8 @@ const InformationManage = () => {
       {/* <CreateTest /> */}
       {/* <TestContent /> */}
       <Outlet />
+      {/* <Communication /> */}
+      {/* <Notification /> */}
     </div>
   )
 }

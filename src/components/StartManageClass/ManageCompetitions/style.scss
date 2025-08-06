@@ -4,41 +4,18 @@ $shadow-color: rgba(0, 0, 0, 0.1);
 $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
-.competition {
-  box-sizing: border-box;
-  display: flex;
-
-  .competition__among {
-    width: 2px;
-    background-color: #ccc;
-    position: relative;
+.manage-competition {
+  &__start {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    &__Icon {
+      color: $secondary-color;
+    }
   }
-
-  &__among::before,
-  &__among::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 10px;
-    height: 10px;
-    background-color: #ccc;
-    border-radius: 50%;
-  }
-
-  &__among::before {
-    top: 0;
-  }
-
-  &__among::after {
-    bottom: 0;
-  }
-
   &__left {
-    width: 70%;
     gap: 10px;
     display: flex;
-    height: 100%;
     flex-direction: column;
     justify-content: center;
     &__title {
@@ -49,7 +26,6 @@ $background-light: #ffefe4;
       }
     }
     &__board {
-      width: 99%;
       height: 200px;
       padding: 10px;
       background-color: #ccc;
@@ -67,7 +43,7 @@ $background-light: #ffefe4;
       padding: 10px;
       box-sizing: border-box;
       border-radius: 20px;
-      height: 390px;
+      height: 600px;
       overflow-y: auto;
       &::-webkit-scrollbar {
         display: none;
@@ -86,6 +62,7 @@ $background-light: #ffefe4;
         width: 100%;
         display: flex;
         gap: 20px;
+        cursor: pointer;
 
         &__board {
           width: 400px;
@@ -128,48 +105,6 @@ $background-light: #ffefe4;
           }
         }
       }
-    }
-  }
-
-  &__right {
-    padding: 10px;
-    padding-right: 0;
-    width: 28%;
-    &__body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-
-      &__board {
-        cursor: pointer;
-        width: 100%;
-        height: 150px;
-        background-size: cover;
-        background-image: url('./../../../assets/img/hit.png');
-        display: flex;
-        justify-content: end;
-        align-items: end;
-        box-sizing: border-box;
-        padding: 10px;
-        i {
-          color: #ff6911;
-          font-size: 24px;
-        }
-      }
-
-      hr {
-        width: 50%;
-      }
-    }
-
-    &__text {
-      border: 2px solid $border-color;
-      padding: 10px;
-      border-radius: 10px;
-      box-sizing: border-box;
-      height: 60%;
-      color: #ccc;
     }
   }
 }

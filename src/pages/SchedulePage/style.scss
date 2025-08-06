@@ -9,7 +9,7 @@ $shadow-color: #b5b5b5;
   border: 1px solid $border-color;
   padding: 10px;
   border-radius: 20px;
-  width: 30%;
+  width: 26%;
   overflow: hidden;
   box-sizing: border-box;
   top: 10px;
@@ -81,7 +81,7 @@ $shadow-color: #b5b5b5;
   }
 
   .schedule__list {
-    max-height: 340px;
+    max-height: 480px;
     overflow-y: auto;
     &::-webkit-scrollbar {
       display: none;
