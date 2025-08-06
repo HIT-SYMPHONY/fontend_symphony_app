@@ -5,7 +5,12 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../../utils/userValidate.js'
 import { getCurrentUser, updateUser } from '../../../apis/user.api'
-import { formatDate, translateGender, formatDateForAPI } from '../../../utils/formatters'
+import {
+  formatDate,
+  translateGender,
+  formatDateForAPI,
+  getDisplayName,
+} from '../../../utils/formatters'
 import useAuth from '../../../hooks/useAuth'
 import useOnClickOutside from '../../../hooks/useOnClickOutside'
 import ReplaceOfAdmin from '../NotiOfAdmin/ReplaceOfNoti'
@@ -150,12 +155,7 @@ const AccountOfAdmin = () => {
 
   if (loading) return <div>Đang tải...</div>
 
-  const displayName =
-    initialData.fullName &&
-    initialData.fullName.trim() !== 'null null' &&
-    initialData.fullName.trim() !== ''
-      ? initialData.fullName
-      : initialData.username || 'HỌ VÀ TÊN'
+  const displayName = getDisplayName(initialData)
 
   return (
     <div className='account'>
