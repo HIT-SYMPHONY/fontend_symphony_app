@@ -34,6 +34,10 @@ $background-light: #ffefe4;
   &__user {
     text-align: center;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     h2 {
       margin: 10px 0;
     }
@@ -84,6 +88,7 @@ $background-light: #ffefe4;
   }
 
   &__information {
+    box-shadow: 0px 0px 4px 2px #0000000d;
     border: 2px solid $border-color;
     padding: 10px;
     border-radius: 10px;
@@ -107,6 +112,7 @@ $background-light: #ffefe4;
       }
       .edit-span {
         cursor: pointer;
+        color: #ff6911;
       }
     }
     &__thongtin {
@@ -120,6 +126,8 @@ $background-light: #ffefe4;
   }
 
   &__taikhoan {
+    box-shadow: 0px 0px 4px 2px #0000000d;
+    margin-top: 0.25rem;
     border: 2px solid $border-color;
     padding: 10px;
     border-radius: 10px;
@@ -128,10 +136,10 @@ $background-light: #ffefe4;
     &__fix {
       display: flex;
       justify-content: space-between;
-      span {
-        cursor: pointer;
-        color: #ff6911;
-      }
+    }
+    .edit-span {
+      color: #ff6911;
+      cursor: pointer;
     }
     &__context {
       background-color: #ffefe4;
@@ -146,8 +154,14 @@ $background-light: #ffefe4;
       .edit-input {
         padding: 10px;
         width: 80%;
-
         border: none;
+      }
+      span:first-child {
+        font-weight: bold;
+        color: #657786;
+      }
+      span:last-child {
+        font-weight: 600;
       }
     }
   }
@@ -157,9 +171,10 @@ $background-light: #ffefe4;
     flex-direction: column;
     span:first-child {
       font-weight: bold;
+      color: #657786;
     }
     span:last-child {
-      color: #657786;
+      font-weight: 600;
     }
 
     .edit-input {

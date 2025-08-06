@@ -5,13 +5,18 @@ $background-light: #ffefe4;
 $shadow-color: #b5b5b5;
 
 .schedule {
-  position: relative;
+  position: absolute;
   border: 1px solid $border-color;
   padding: 10px;
   border-radius: 20px;
-  width: 30%;
+  width: 26%;
   overflow: hidden;
   box-sizing: border-box;
+  top: 10px;
+  right: 10px;
+  height: 96%;
+  z-index: 5;
+  background-color: #fff;
 
   &__icon {
     display: flex;
@@ -76,7 +81,7 @@ $shadow-color: #b5b5b5;
   }
 
   .schedule__list {
-    max-height: 340px;
+    max-height: 480px;
     overflow-y: auto;
     &::-webkit-scrollbar {
       display: none;

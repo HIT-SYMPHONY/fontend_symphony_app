@@ -39,9 +39,9 @@ $class-ago-width: 180px;
     display: grid;
     gap: 40px;
     overflow-y: auto;
-    max-height: 310px;
+    max-height: 450px;
     position: relative;
-    font-family: "Baloo 2", sans-serif;
+    font-family: 'Baloo 2', sans-serif;
     box-sizing: border-box;
     max-width: 100%;
 
@@ -103,5 +103,11 @@ $class-ago-width: 180px;
       font-weight: 600;
       cursor: pointer;
     }
+  }
+}
+
+@media (min-width: 1200px) and (min-height: 780px) {
+  .flex-one .class-ago {
+    max-height: 480px;
   }
 }

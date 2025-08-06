@@ -27,10 +27,10 @@ const LoginPage = () => {
       toast.success('Đăng nhập thành công!')
 
       const userRole = authPayload.authorities?.[0]?.authority
-      if (userRole === 'ADMIN' || userRole === 'LEADER') {
+      if (userRole === 'ADMIN') {
         navigate('/admin/home')
       } else {
-        navigate('/home')
+        navigate('/client')
       }
     } catch (error) {
       if (error.response?.data?.message) {

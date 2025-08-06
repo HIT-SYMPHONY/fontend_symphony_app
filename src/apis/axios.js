@@ -19,3 +19,7 @@ export const apiDefaultUpload = axios.create({
     'Content-Type': 'multipart/form-data',
   },
 })
+
+export const apiUpload = axios.create({
+  baseURL: `${import.meta.env.VITE_API_SERVER}/api/v1`,
+})

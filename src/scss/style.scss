@@ -15,12 +15,6 @@ $class-ago-width: 210px;
     box-sizing: border-box;
     padding-top: 20px;
 
-    a {
-      text-decoration: none;
-      outline: none;
-      color: black;
-    }
-
     a.homepage__choose__click.active {
       @extend .origin;
     }
@@ -203,7 +197,7 @@ $class-ago-width: 210px;
   .iconify {
     color: #f27b36 !important;
   }
-}
+}.accoun
 
 .whiteP {
   color: #fff;

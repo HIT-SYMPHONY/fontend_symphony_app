@@ -7,13 +7,6 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .informationclass {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
-  height: 90vh;
-  box-sizing: border-box;
-
   &__gioithieu {
     display: flex;
     justify-content: space-between;
@@ -56,7 +49,7 @@ $background-light: #ffefe4;
           color: #333;
         }
         span {
-          background: $primary-color;
+          background: $secondary-color;
           color: white;
           padding: 2px 10px;
           border-radius: 5px;
@@ -68,7 +61,7 @@ $background-light: #ffefe4;
         margin: 10px 0;
         svg {
           margin-right: 5px;
-          color: $primary-color;
+          color: $secondary-color;
         }
         h4 {
           margin: 0;
@@ -116,7 +109,7 @@ $background-light: #ffefe4;
           gap: 20px;
           &__tap {
             button {
-              background: $primary-color;
+              background: $secondary-color;
               color: white;
               border: none;
               padding: 5px 10px;
@@ -130,7 +123,7 @@ $background-light: #ffefe4;
           }
           &__no {
             cursor: pointer;
-            color: $primary-color;
+            color: $secondary-color;
           }
         }
         &__icon {
@@ -138,7 +131,7 @@ $background-light: #ffefe4;
           align-items: center;
           svg {
             margin-right: 5px;
-            color: $primary-color;
+            color: $secondary-color;
           }
         }
         &__book,
@@ -177,7 +170,7 @@ $background-light: #ffefe4;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(#000, 0.1);
             span {
-              background: $primary-color;
+              background: $secondary-color;
               color: white;
               padding: 5px 14px;
               border-radius: 5px;
@@ -256,6 +249,7 @@ $background-light: #ffefe4;
               .ngay {
                 width: 40px;
                 height: 40px;
+                padding: 0px 5px;
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -269,7 +263,7 @@ $background-light: #ffefe4;
               &__colum {
                 width: 5px;
                 border-radius: 10px;
-                background-color: #f28c38;
+                background-color: $secondary-color;
               }
               &__contextclass {
                 width: 100%;
@@ -288,7 +282,7 @@ $background-light: #ffefe4;
 }
 
 .color-one {
-  color: #f27b36 !important;
+  color: $secondary-color !important;
 }
 .color-two {
   color: #da0b00 !important;
@@ -297,7 +291,7 @@ $background-light: #ffefe4;
   color: #b5b5b5 !important;
 }
 .back-one {
-  background-color: #f27b36 !important;
+  background-color: $secondary-color !important;
   color: #fff;
 }
 .back-two {
@@ -323,7 +317,7 @@ $background-light: #ffefe4;
   }
 
   .flextap-one .class-tap {
-    max-height: 600px;
+    max-height: 650px;
   }
 
   .schedule .schedule__list {

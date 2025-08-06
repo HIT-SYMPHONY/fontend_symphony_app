@@ -5,12 +5,7 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .competition-infor {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
 
   .competition-infor__among {
@@ -21,7 +16,7 @@ $background-light: #ffefe4;
 
   &__among::before,
   &__among::after {
-    content: "";
+    content: '';
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -54,7 +49,7 @@ $background-light: #ffefe4;
     }
     &__board {
       width: 99%;
-      height: 30%;
+      height: 200px;
       padding: 10px;
       background-color: #ccc;
       border-radius: 20px;
@@ -69,7 +64,7 @@ $background-light: #ffefe4;
     }
     &__bang {
       box-sizing: border-box;
-      height: 60%;
+      height: 190px;
       width: 99%;
       border-radius: 20px;
       border: 2px solid $border-color;
@@ -229,7 +224,7 @@ $background-light: #ffefe4;
 }
 
 @media (min-width: 1200px) and (min-height: 780px) {
-  .competition__right__text {
-    height: 65%;
+  .competition-infor__left__bang {
+    height: 380px;
   }
 }

@@ -5,12 +5,7 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .competition {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
 
   .competition__among {
@@ -21,7 +16,7 @@ $background-light: #ffefe4;
 
   &__among::before,
   &__among::after {
-    content: "";
+    content: '';
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
@@ -43,6 +38,7 @@ $background-light: #ffefe4;
     width: 70%;
     gap: 10px;
     display: flex;
+    height: 100%;
     flex-direction: column;
     justify-content: center;
     &__title {
@@ -54,7 +50,7 @@ $background-light: #ffefe4;
     }
     &__board {
       width: 99%;
-      height: 30%;
+      height: 200px;
       padding: 10px;
       background-color: #ccc;
       border-radius: 20px;
@@ -70,8 +66,8 @@ $background-light: #ffefe4;
     &__bang {
       padding: 10px;
       box-sizing: border-box;
-      height: 60%;
       border-radius: 20px;
+      height: 390px;
       overflow-y: auto;
       &::-webkit-scrollbar {
         display: none;
@@ -92,7 +88,7 @@ $background-light: #ffefe4;
         gap: 20px;
 
         &__board {
-          width: 200px;
+          width: 400px;
           height: 100%;
           background-color: #ccc;
           border-radius: 10px;
@@ -150,7 +146,7 @@ $background-light: #ffefe4;
         width: 100%;
         height: 150px;
         background-size: cover;
-        background-image: url("./../../../assets/img/hit.png");
+        background-image: url('./../../../assets/img/hit.png');
         display: flex;
         justify-content: end;
         align-items: end;
@@ -172,13 +168,13 @@ $background-light: #ffefe4;
       padding: 10px;
       border-radius: 10px;
       box-sizing: border-box;
-      height: 55%;
+      height: 60%;
       color: #ccc;
     }
   }
 }
 @media (min-width: 1200px) and (min-height: 780px) {
-  .competition__right__text {
-    height: 65%;
+  .competition__left__bang {
+    height: 480px;
   }
 }

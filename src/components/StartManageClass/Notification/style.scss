@@ -11,6 +11,7 @@ $background-light: #ffefe4;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  height: 500px;
   gap: 10px;
   &__table {
     display: flex;
@@ -21,7 +22,7 @@ $background-light: #ffefe4;
   &__list {
     display: flex;
     flex-direction: column;
-    height: 290px;
+    height: 450px;
     gap: 10px;
     overflow-y: auto;
     scroll-behavior: smooth;

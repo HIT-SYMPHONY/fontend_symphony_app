@@ -7,7 +7,6 @@ import { translateStatus, formatDate } from '../../../../utils/formatters'
 import LoadMoreButton from '../../../../components/LoadMoreButton'
 import EndOfListMessage from '../../../../components/EndOfListMessage'
 import './style.scss'
-
 const MainOfCompet = () => {
   const navigate = useNavigate()
   const [competitions, setCompetitions] = useState([])
@@ -96,7 +95,7 @@ const MainOfCompet = () => {
               key={item.id}
               onClick={() => navigate(`/admin/competitions/${item.id}`)}>
               <div className='mainofcompet__table-box__img'>
-                {item.image && <img src={item.image} alt={item.name} />}
+                {item.image && <img src={item.image} alt={item.name} width='100%' height='100%' />}
               </div>
               <div className='mainofcompet__table-box__item'>
                 <div className='mainofcompet__table-box__item-start'>

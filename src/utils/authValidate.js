@@ -10,6 +10,6 @@ export const changePasswordSchema = yup
     confirmPassword: yup
       .string()
       .required('Vui lòng nhập lại mật khẩu mới!')
-      .oneOf([yup.ref('newPassword')], 'Mật khẩu không khớp!'), 
+      .oneOf([yup.ref('newPassword')], 'Mật khẩu không khớp!'),
   })
   .required()

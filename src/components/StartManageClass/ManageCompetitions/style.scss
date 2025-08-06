@@ -1,0 +1,115 @@
+$primary-color: #f28c38;
+$border-color: #eeecec;
+$shadow-color: rgba(0, 0, 0, 0.1);
+$secondary-color: #ff6911;
+$background-light: #ffefe4;
+
+.manage-competition {
+  &__start {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    &__Icon {
+      color: $secondary-color;
+    }
+  }
+  &__left {
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    &__title {
+      display: flex;
+      gap: 10px;
+      &__icon {
+        color: $secondary-color;
+      }
+    }
+    &__board {
+      height: 200px;
+      padding: 10px;
+      background-color: #ccc;
+      border-radius: 20px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: end;
+      align-items: end;
+      .board {
+        color: $secondary-color;
+        font-size: 24px;
+      }
+    }
+    &__bang {
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: 20px;
+      height: 600px;
+      overflow-y: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-left: 0;
+      &__box {
+        padding: 10px;
+        border: 2px solid $border-color;
+        border-radius: 10px;
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        gap: 20px;
+        cursor: pointer;
+
+        &__board {
+          width: 400px;
+          height: 100%;
+          background-color: #ccc;
+          border-radius: 10px;
+        }
+
+        &__information {
+          width: 100%;
+          p {
+            color: #b6b5b5;
+          }
+          &__list {
+            display: flex;
+            justify-content: space-between;
+            &__span1 {
+              color: $secondary-color;
+              background-color: #ffefe4;
+            }
+            &__span2 {
+              padding-left: 20px;
+              padding-right: 15px;
+              border-radius: 15px;
+              background-color: #ff6911;
+              color: #fff;
+              cursor: pointer;
+            }
+            i {
+              color: #ff6911;
+            }
+            &__span3 {
+              padding-left: 20px;
+              padding-right: 15px;
+              border-radius: 15px;
+              color: #fff;
+              cursor: pointer;
+              background-color: #b6b5b5;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media (min-width: 1200px) and (min-height: 780px) {
+  .competition__left__bang {
+    height: 480px;
+  }
+}

@@ -5,16 +5,11 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .manage-infor {
-  border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 1rem;
-  border-radius: 10px;
-  box-sizing: border-box;
-  min-height: 90vh;
   display: flex;
   flex-direction: column;
   gap: 10px;
   background-color: #fff;
+  padding: 10px;
 
   &__title {
     display: flex;
@@ -159,6 +154,11 @@ $background-light: #ffefe4;
         .box {
           display: flex;
           flex-direction: column;
+          input {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 2px solid $border-color;
+          }
         }
       }
       &__item {
@@ -172,6 +172,14 @@ $background-light: #ffefe4;
         p {
           width: 100%;
           word-wrap: break-word;
+        }
+        &__textarea {
+          width: 100%;
+          padding: 10px;
+          border-radius: 5px;
+          border: 2px solid $border-color;
+          resize: none;
+          outline: none;
         }
       }
     }

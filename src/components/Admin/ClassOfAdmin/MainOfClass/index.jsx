@@ -127,7 +127,7 @@ const MainOfClassAdmin = () => {
         </div>
         <button
           className='main-class-admin__create-button'
-          onClick={() => navigate('/admin/manage/create')}>
+          onClick={() => navigate('/admin/classes/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>
@@ -153,9 +153,7 @@ const MainOfClassAdmin = () => {
                       {translateStatus(item.status)}
                     </span>
                   </div>
-                  <span onClick={() => navigate(`/admin/manage/information/${item.id}`)}>
-                    Xem chi tiết
-                  </span>
+                  <span onClick={() => navigate(`/admin/classes/${item.id}`)}>Xem chi tiết</span>
                 </div>
               </div>
             ))}
