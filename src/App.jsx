@@ -16,7 +16,6 @@ const App = () => (
     <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
     <AuthListener />
     <Routes>
-      <Route path='/' element={<LoginPage />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/forgot-password' element={<Confirm />} />
       {ClientRoutes}

@@ -47,13 +47,13 @@ const DashboardOfMain = () => {
         </div>
         <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
 
-        <NavLink to='/client/home' className='homepage__choose__click'>
+        <NavLink to='/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </NavLink>
 
         <NavLink
-          to='/client/profile'
+          to='my-classes'
           className='homepage__choose__click'
           onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
           <i className='fa-solid fa-book'></i>
@@ -62,21 +62,21 @@ const DashboardOfMain = () => {
 
         {isClassroomMenuOpen && (
           <div>
-            <NavLink to='/client/profile/my-classes' className='homepage__choose__clickone'>
+            <NavLink to='/my-classes' className='homepage__choose__clickone'>
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp của tôi</span>
             </NavLink>
-            <NavLink to='/client/profile/my-results' className='homepage__choose__clickone'>
+            <NavLink to='/my-results' className='homepage__choose__clickone'>
               <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
               <span>Bảng kết quả</span>
             </NavLink>
           </div>
         )}
 
-        <NavLink to='/client/competitions' className='homepage__choose__click'>
+        <NavLink to='/competitions' className='homepage__choose__click'>
           <Icon
             icon='streamline-ultimate:ranking-stars-ribbon-bold'
             className='homepage__choose__click__Icon'
@@ -86,27 +86,27 @@ const DashboardOfMain = () => {
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
           <>
-            <NavLink to='/client/manage' className='homepage__choose__click'>
+            <NavLink to='/manage' className='homepage__choose__click'>
               <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
               <span>Quản lý</span>
             </NavLink>
             <div>
-              <NavLink to='/client/my-classes' className='homepage__choose__clickone'>
+              <NavLink to='/manage/classes' className='homepage__choose__clickone'>
                 <Icon
                   icon='fluent:book-star-24-regular'
                   className='homepage__choose__clickone__Icon'
                 />
-                <span>Lớp của tôi</span>
+                <span>Lớp học</span>
               </NavLink>
-              <NavLink to='/client/my-results' className='homepage__choose__clickone'>
+              <NavLink to='/manage/competitions' className='homepage__choose__clickone'>
                 <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
-                <span>Bảng kết quả</span>
+                <span>Cuộc thi</span>
               </NavLink>
             </div>
           </>
         )}
 
-        <NavLink to='/client/account' className='homepage__choose__click'>
+        <NavLink to='account' className='homepage__choose__click'>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </NavLink>

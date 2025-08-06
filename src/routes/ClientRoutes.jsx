@@ -1,5 +1,5 @@
 // src/routes/ClientRoutes.jsx
-import { Route } from 'react-router-dom'
+import { Outlet, Route } from 'react-router-dom'
 import ProtectedRoute from '../components/ProtecedRoute/ProtectedRoute'
 import HomeInformation from '../components/StartClassPage/StartMyClass/InformationClass'
 import ListMember from '../pages/ClassPage/MyResult'
@@ -34,7 +34,7 @@ import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
 const ClientRoutes = (
   <>
     <Route
-      path='/client'
+      path='/'
       element={
         <ProtectedRoute allowedRoles={['USER', 'LEADER']}>
           <DashboardOfMain />
@@ -42,47 +42,51 @@ const ClientRoutes = (
       }>
       {/* trang chủ và lớp  */}
       <Route path='home' element={<Main />} />
-      {/* trang toàn bộ lớp học  */}
-      <Route path='profile' element={<AllClassroom />} />
-      <Route path='profile/classID' element={<HomeInformation />} />
-      <Route path='profile/classID/lessionID' element={<Lesson />} />
-      <Route path='profile/classID/examID' element={<Exam />} />
-      <Route path='profile/my-classes/classID/lessionID' element={<Lesson />} />
-      <Route path='profile/my-classes/classID/examID' element={<Exam />} />
       {/* trang lớp học và thông tin lớp học của toàn bộ lớp học  */}
-      <Route path='profile/my-classes' element={<Classroom />} />
-      <Route path='profile/my-classes/classID' element={<HomeInformation />} />
-      <Route path='profile/my-classes/classID/lessionID' element={<Lesson />} />
-      <Route path='profile/my-classes/classID/examID' element={<Exam />} />
-      <Route path='profile/my-classes/classID/lessionID' element={<Lesson />} />
-      <Route path='profile/my-classes/classID/examID' element={<Exam />} />
-      {/* trang kết quả của học sinh với lớp học  */}
-      <Route path='profile/my-results' element={<ListMember />} />
-      {/* trang viết cuộc thi công khai */}
-      <Route path='competitions' element={<MainCompetition />} />
-      <Route path='competitions/competitionsID' element={<InformationCompetition />} />
-      <Route path='competitions/competitionsID/test' element={<Assignment />} />
-      <Route path='competitions/competitionsID/comment' element={<Complete />} />
-      {/* trang viết quản lý class của leader */}
-      <Route path='manage/classes' element={<MainManage />} />
-      <Route path='manage/classes/classID' element={<InformationManage />}>
-        <Route path='' element={<Communication />} />
-        <Route path='notifications' element={<Notification />} />
-        <Route path='notifications/create' element={<MemberClass />} />
-        <Route path='test' element={<TestContent />} />
-        <Route path='test/comment' element={<TestContent />} />
-        <Route path='members' element={<AllMember />} />
-        <Route path='lessions' element={<ManageLesson />} />
-        <Route path='lessions/create' element={<CreateLessonID />} />
-        <Route path='lessions/lessionID' element={<VeiwsLesson />} />
+      <Route path='my-classes'>
+        <Route index element={<Classroom />} />
+        <Route path='classID' element={<HomeInformation />} />
+        <Route path='classID/lessons/lessonID' element={<Lesson />} />
+        <Route path='classID/exams/examID' element={<Exam />} />
       </Route>
-      {/* trang viết quản lý competition của leader */}
-      <Route path='manage/competitions' element={<ManageCompetitions />} />
-      <Route path='manage/competitions/competitionID' element={<InformationOfCompet />} />
-      <Route path='manage/competitions/competitionID/rules' element={<RulesOfManageCompet />} />
-      <Route path='manage/competitions/competitionID/test' element={<TestOfManageCompet />} />
-      <Route path='manage/competitions/competitionID/members' element={<IntroOfCompetAdmin />} />
-      <Route path='manage/competitions/competitionID/comment' element={<CommentOfCompet />} />
+      {/* trang kết quả của học sinh với lớp học  */}
+      <Route path='my-results' element={<ListMember />} />
+      {/* trang cuộc thi công khai */}
+      <Route path='competitions'>
+        <Route index element={<MainCompetition />} />
+        <Route path=':competitionsID' element={<InformationCompetition />} />
+        <Route path=':competitionsID/test' element={<Assignment />} />
+        <Route path=':competitionsID/comment' element={<Complete />} />
+      </Route>
+      {/* các trang quản lý của leader */}
+      <Route
+        path='manage'
+        element={
+          <ProtectedRoute allowedRoles={['LEADER']}>
+            <Outlet />
+          </ProtectedRoute>
+        }>
+        <Route index element={<MainManage />}></Route>
+        <Route path='classes' element={<MainManage />} />
+        <Route path='classes/:classID' element={<InformationManage />}>
+          <Route index element={<Communication />} />
+          <Route path='notifications' element={<Notification />} />
+          <Route path='notifications/create' element={<MemberClass />} />
+          <Route path='test' element={<TestContent />} />
+          <Route path='test/comment' element={<TestContent />} />
+          <Route path='members' element={<AllMember />} />
+          <Route path='lessons' element={<ManageLesson />} />
+          <Route path='lessons/create' element={<CreateLessonID />} />
+          <Route path='lessons/:lessonID' element={<VeiwsLesson />} />
+        </Route>
+        <Route path='competitions' element={<ManageCompetitions />} />
+        <Route path='competitions/:competitionID' element={<InformationOfCompet />} />
+        <Route path='competitions/:competitionID/rules' element={<RulesOfManageCompet />} />
+        <Route path='competitions/:competitionID/test' element={<TestOfManageCompet />} />
+        <Route path='competitions/:competitionID/members' element={<IntroOfCompetAdmin />} />
+        <Route path='competitions/:competitionID/comment' element={<CommentOfCompet />} />
+      </Route>
+
       {/* trang viết thông tin cá nhân */}
       <Route path='account' element={<HomeAccount />} />
     </Route>
