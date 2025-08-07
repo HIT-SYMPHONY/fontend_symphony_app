@@ -15,3 +15,8 @@ img {
   max-width: 100%;
   display: block;
 }
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
