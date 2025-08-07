@@ -282,7 +282,7 @@ const CreateOfClassAdmin = () => {
     try {
       const response = await getAllUsers()
       const leaderList =
-        response.data?.filter((user) => user.role === 'LEADER' || user.role === 'ADMIN') || []
+        response.data?.filter((user) => user.role === 'LEADER') || []
       setLeaders(leaderList)
     } catch (err) {
       toast.error('Không thể tải danh sách leader.')

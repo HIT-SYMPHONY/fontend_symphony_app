@@ -17,10 +17,29 @@ export const translateGender = (genderKey) => {
 }
 export const formatDate = (dateString) => {
   if (!dateString) return ''
+
   try {
-    return new Date(dateString).toLocaleDateString('vi-VN')
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) {
+      console.error('Invalid date string provided to formatDate:', dateString)
+      return dateString
+    }
+    if (dateString.includes('T')) {
+      const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }
+
+      const timePart = date.toLocaleTimeString('vi-VN', timeOptions)
+      const datePart = date.toLocaleDateString('vi-VN')
+
+      return `${timePart} ${datePart}`
+    } else {
+      return date.toLocaleDateString('vi-VN')
+    }
   } catch (error) {
-    console.error('Invalid date string:', dateString)
+    console.error('Error formatting date:', dateString, error)
     return dateString
   }
 }
@@ -45,9 +64,51 @@ export const formatDateForAPI = (date) => {
   return `${year}-${month}-${day}`
 }
 
+export const formatDateTime = (isoString) => {
+  if (!isoString) return 'N/A'
+  try {
+    return new Date(isoString).toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    })
+  } catch (error) {
+    return 'Invalid Date'
+  }
+}
+
 export const getDisplayName = (data) => {
   const name = data.fullName?.trim()
   const isValid =
     name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
   return isValid ? name : 'HỌ VÀ TÊN'
+}
+
+export const formatDateForBox = (isoString) => {
+  if (!isoString) return ''
+  const date = new Date(isoString)
+  return `${date.getDate()}/${date.getMonth() + 1}`
+}
+
+export const getLessonStatus = (startTimeISO, endTimeISO) => {
+  if (!startTimeISO || !endTimeISO) {
+    return { text: 'Chưa xếp lịch', backgroundClass: 'back-three', colorClass: 'color-three' }
+  }
+
+  const now = new Date()
+  const startTime = new Date(startTimeISO)
+  const endTime = new Date(endTimeISO)
+
+  if (now > endTime) {
+    return { text: 'Quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
+  }
+  if (now.toDateString() === endTime.toDateString()) {
+    return { text: 'Đến hạn', backgroundClass: 'back-two', colorClass: 'color-two' }
+  }
+  if (now < startTime) {
+    return { text: 'Chưa đến hạn', backgroundClass: 'back-one', colorClass: 'color-one' }
+  }
+
+  // Fallback for any other case, like "Quá hạn"
+  return { text: 'Quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
 }

@@ -129,7 +129,7 @@ const DashboardOfMain = () => {
             </div>
             <div className='search__then'>
               {showMain ? (
-                <div>
+                <div className='no-padding'>
                   <Icon
                     icon='line-md:menu-unfold-right'
                     width='26'
@@ -169,7 +169,6 @@ const DashboardOfMain = () => {
             </div>
           </div>
 
-          {/* here */}
           <div className='context-main'>
             <Outlet />
             {showSchedule && showMain && <Schedule />}
