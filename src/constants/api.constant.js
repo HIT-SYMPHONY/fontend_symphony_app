@@ -13,13 +13,14 @@ export const ApiConstant = {
     getCurrentUser: '/users/me',
     getMyClassrooms: '/users/me/classrooms',
     getMyCompetitions: '/users/me/competitions',
-    getLeaders:'/users/leaders',
-    updateRole: '/users/role'
+    getLeaders: '/users/leaders',
+    updateRole: '/users/role',
   },
   classrooms: {
     base: '/classrooms',
     getById: '/classrooms/',
     members: '/classrooms/{id}/members',
+    getManaged: '/classrooms/by-leader',
   },
   lessons: {
     base: '/lesson',

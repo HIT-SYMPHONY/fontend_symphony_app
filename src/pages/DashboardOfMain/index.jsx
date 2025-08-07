@@ -14,6 +14,7 @@ import icon from '../../assets/img/Ellipse.png'
 import { Outlet } from 'react-router-dom'
 import logo from '../../assets/img/logo.png'
 import './style.scss'
+import { getDisplayName } from '../../utils/formatters'
 
 const DashboardOfMain = () => {
   const navigate = useNavigate()
@@ -24,6 +25,7 @@ const DashboardOfMain = () => {
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
   const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(false)
+  const [isManageMenuOpen, setIsManageMenuOpen] = useState(false)
 
   const handleLichHoc = () => {
     if (showHomework) setShowHomework(false)
@@ -45,7 +47,7 @@ const DashboardOfMain = () => {
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {user.firstName || user.username}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user.fullName)}!</h3>
 
         <NavLink to='/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
@@ -86,23 +88,28 @@ const DashboardOfMain = () => {
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
           <>
-            <NavLink to='/manage' className='homepage__choose__click'>
+            <NavLink
+              to='/manage'
+              className='homepage__choose__click'
+              onClick={() => setIsManageMenuOpen(!isManageMenuOpen)}>
               <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
               <span>Quản lý</span>
             </NavLink>
-            <div>
-              <NavLink to='/manage/classes' className='homepage__choose__clickone'>
-                <Icon
-                  icon='fluent:book-star-24-regular'
-                  className='homepage__choose__clickone__Icon'
-                />
-                <span>Lớp học</span>
-              </NavLink>
-              <NavLink to='/manage/competitions' className='homepage__choose__clickone'>
-                <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
-                <span>Cuộc thi</span>
-              </NavLink>
-            </div>
+            {isManageMenuOpen && (
+              <div>
+                <NavLink to='/manage/classes' className='homepage__choose__clickone'>
+                  <Icon
+                    icon='fluent:book-star-24-regular'
+                    className='homepage__choose__clickone__Icon'
+                  />
+                  <span>Lớp học</span>
+                </NavLink>
+                <NavLink to='/manage/competitions' className='homepage__choose__clickone'>
+                  <Icon icon='carbon:result' className='homepage__choose__clickone__Icon' />
+                  <span>Cuộc thi</span>
+                </NavLink>
+              </div>
+            )}
           </>
         )}
 
@@ -129,7 +136,7 @@ const DashboardOfMain = () => {
             </div>
             <div className='search__then'>
               {showMain ? (
-                <div className='no-padding'>
+                <div>
                   <Icon
                     icon='line-md:menu-unfold-right'
                     width='26'

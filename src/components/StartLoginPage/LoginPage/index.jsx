@@ -8,7 +8,8 @@ import useAuth from '../../../hooks/useAuth'
 import loginImg from '../../../assets/img/login.jpg'
 import logo from '../../../assets/img/logo.png'
 import './style.scss'
-
+import { getCurrentUser , getCurrentUserWithToken} from '../../../apis/user.api'
+import axios from 'axios'
 const LoginPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -21,11 +22,11 @@ const LoginPage = () => {
         studentCode: values.username,
         password: values.password,
       })
-
       const authPayload = response.data
-      saveUser(authPayload)
+      const userProfile = await getCurrentUserWithToken(authPayload.accessToken);
+      const {fullName, imageUrl} = userProfile.data
+      saveUser({...authPayload, fullName, imageUrl})
       toast.success('Đăng nhập thành công!')
-
       const userRole = authPayload.authorities?.[0]?.authority
       if (userRole === 'ADMIN') {
         navigate('/admin/home')
