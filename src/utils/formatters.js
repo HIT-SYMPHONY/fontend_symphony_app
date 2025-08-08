@@ -112,3 +112,33 @@ export const getLessonStatus = (startTimeISO, endTimeISO) => {
   // Fallback for any other case, like "Quá hạn"
   return { text: 'Quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
 }
+
+export const getHomeworkStatus = (deadlineISO) => {
+  if (!deadlineISO) {
+    return { text: 'Không có hạn nộp', backgroundClass: 'back-one', colorClass: 'color-one' }
+  }
+  try {
+    const now = new Date()
+    const deadline = new Date(deadlineISO)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const deadlineDate = new Date(deadlineISO)
+    deadlineDate.setHours(0, 0, 0, 0)
+
+    if (now > deadline) {
+      return { text: 'Đã quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
+    }
+    if (today.getTime() === deadlineDate.getTime()) {
+      return { text: 'Đến hạn hôm nay', backgroundClass: 'back-two', colorClass: 'color-two' }
+    }
+    if (now < deadline) {
+      return { text: 'Chưa đến hạn', backgroundClass: 'back-one', colorClass: 'color-one' }
+    }
+
+    return { text: 'Không xác định', backgroundClass: 'back-three', colorClass: 'color-three' }
+  } catch (error) {
+    console.error('Error calculating homework status:', deadlineISO, error)
+    return { text: 'Lỗi ngày', backgroundClass: 'back-three', colorClass: 'color-three' }
+  }
+}
