@@ -1,11 +1,9 @@
-// You can use your global $button-color variable if this file imports it,
-// otherwise, define it locally.
 $button-color: #f27b36;
 
 .load-more-container {
   display: flex;
   justify-content: center;
-  padding: 20px 0;
+  padding: 10px 0;
 }
 
 .load-more-button {
@@ -20,9 +18,10 @@ $button-color: #f27b36;
   transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
 
   &:hover {
+    background-color: darken($button-color, 8%);
   }
-
   &:disabled {
+    background-color: lighten($button-color, 15%);
     cursor: not-allowed;
     opacity: 0.8;
   }
