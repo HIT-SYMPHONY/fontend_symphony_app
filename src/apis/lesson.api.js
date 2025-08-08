@@ -9,7 +9,14 @@ const lessonApi = () => ({
   deleteLesson: async (lessonId) => api.delete(`${ApiConstant.lessons.base}/${lessonId}`),
   updateLesson: async (lessonId, payload) =>
     api.put(`${ApiConstant.lessons.base}/${lessonId}`, payload),
+  getLessonById: async (lessonId) => api.get(`${ApiConstant.lessons.base}/${lessonId}`),
 })
 
-export const { getMyLessons, createLesson, updateLesson, deleteLesson, getLessonsByClassId } =
-  lessonApi()
+export const {
+  getMyLessons,
+  createLesson,
+  updateLesson,
+  deleteLesson,
+  getLessonsByClassId,
+  getLessonById,
+} = lessonApi()

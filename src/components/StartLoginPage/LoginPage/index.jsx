@@ -8,8 +8,7 @@ import useAuth from '../../../hooks/useAuth'
 import loginImg from '../../../assets/img/login.jpg'
 import logo from '../../../assets/img/logo.png'
 import './style.scss'
-import { getCurrentUser , getCurrentUserWithToken} from '../../../apis/user.api'
-import axios from 'axios'
+import {  getCurrentUserWithToken} from '../../../apis/user.api'
 const LoginPage = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)

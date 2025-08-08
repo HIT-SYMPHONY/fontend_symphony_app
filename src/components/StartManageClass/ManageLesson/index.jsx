@@ -4,10 +4,11 @@ import toast from 'react-hot-toast'
 import { getLessonsByClassId, deleteLesson } from '../../../apis/lesson.api'
 import { formatDateTime } from '../../../utils/formatters'
 import './style.scss'
+import TextMessage from '../../TextMessage'
 
 const ManageLesson = () => {
   const navigate = useNavigate()
-  const { classID } = useParams() // Get classId from the URL
+  const { classID } = useParams()
   const [lessons, setLessons] = useState([])
   const [loading, setLoading] = useState(true)
   const [expandedItems, setExpandedItems] = useState({})
@@ -37,7 +38,7 @@ const ManageLesson = () => {
   }
 
   const handleDelete = async (lessonId, event) => {
-    event.stopPropagation() 
+    event.stopPropagation()
     if (window.confirm('Bạn có chắc chắn muốn xóa bài học này không?')) {
       const deleteToast = toast.loading('Đang xóa...')
       try {
@@ -53,9 +54,8 @@ const ManageLesson = () => {
 
   const handleEdit = (lessonId, event) => {
     event.stopPropagation()
-    toast('Chức năng chỉnh sửa đang được phát triển.')
+    navigate(`/manage/classes/${classID}/lessons/${lessonId}/edit`)
   }
-
 
   return (
     <div className='lesson-container'>
@@ -69,14 +69,16 @@ const ManageLesson = () => {
 
           <div className='managelesson__grid-body'>
             {loading ? (
-              <p>Đang tải...</p>
+              <TextMessage text='Đang tải...'></TextMessage>
             ) : lessons.length > 0 ? (
               lessons.map((item, index) => (
                 <React.Fragment key={item.id}>
                   <div className='managelesson__grid-row' onClick={() => toggleExpand(item.id)}>
                     <h5 className='managelesson__grid-row__number'>{index + 1}</h5>
                     <h5 className='managelesson__grid-row__name'>{item.title || item.content}</h5>
-                    <h5 className='managelesson__grid-row__date'>{formatDateTime(item.createdAt)}</h5>
+                    <h5 className='managelesson__grid-row__date'>
+                      {formatDateTime(item.createdAt)}
+                    </h5>
                     <div className='managelesson__grid-row-actions'>
                       <i
                         className='fa-solid fa-pen-to-square'
@@ -102,7 +104,7 @@ const ManageLesson = () => {
                 </React.Fragment>
               ))
             ) : (
-              <p>Chưa có bài học nào trong lớp này.</p>
+              <TextMessage>Chưa có bài học nào trong lớp này.</TextMessage>
             )}
           </div>
         </div>
