@@ -21,6 +21,12 @@ const classroomApi = () => ({
 
   removeMembersFromClassroom: async (classroomId, payload) =>
     api.delete(ApiConstant.classrooms.members.replace('{id}', classroomId), { data: payload }),
+
+  getClassroomMembers: async (classroomId, params) => {
+    if (!classroomId) return Promise.reject(new Error('Classroom ID is required.'))
+    const url = ApiConstant.classrooms.members.replace('{id}', classroomId)
+    return api.get(url, { params })
+  },
 })
 
 export const {
@@ -31,4 +37,5 @@ export const {
   addMembersToClassroom,
   getMembersInClassroom,
   removeMembersFromClassroom,
+  getClassroomMembers,
 } = classroomApi()

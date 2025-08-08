@@ -1,52 +1,56 @@
-import React,{ useState, useEffect } from 'react';
-import { Icon } from '@iconify/react';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from 'react'
+import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 
 // Import the specific API functions
-import { getNotificationsForCurrentUser } from '../../../apis/notification.api';
-import { getMyClasses } from '../../../apis/user.api';
+import { getNotificationsForCurrentUser } from '../../../apis/notification.api'
+import { getMyClasses } from '../../../apis/user.api'
 
-import { formatDate } from '../../../utils/formatters';
-import AdvList from '../ClassAgo/indexx';
-import './style.scss';
-import TextMessage from '../../TextMessage';
+import { formatDate } from '../../../utils/formatters'
+import AdvList from '../ClassAgo/index'
+import './style.scss'
+import TextMessage from '../../TextMessage'
 
 const Main = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const [announcements, setAnnouncements] = useState([]);
-  const [recentClasses, setRecentClasses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [announcements, setAnnouncements] = useState([])
+  const [recentClasses, setRecentClasses] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         const [notificationsResponse, classesResponse] = await Promise.all([
           getNotificationsForCurrentUser({ pageNum: 1, pageSize: 15 }),
-          getMyClasses()
-        ]);
-        
-        setAnnouncements(notificationsResponse.data?.items || []);
-        setRecentClasses(classesResponse.data || []);
+          getMyClasses(),
+        ])
 
+        setAnnouncements(notificationsResponse.data?.items || [])
+        setRecentClasses(classesResponse.data || [])
       } catch (error) {
-        toast.error("Không thể tải dữ liệu trang chủ.");
-        console.error("Dashboard fetch error:", error);
+        toast.error('Không thể tải dữ liệu trang chủ.')
+        console.error('Dashboard fetch error:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchDashboardData();
-  }, []);
+    fetchDashboardData()
+  }, [])
 
   return (
     <div className='flex-one'>
       <div className='flex-one__thongbao'>
         <div className='thongbao'>
-          <Icon icon='mingcute:notification-newdot-line' width='25' height='25' className='thongbao__Icon' />
+          <Icon
+            icon='mingcute:notification-newdot-line'
+            width='25'
+            height='25'
+            className='thongbao__Icon'
+          />
           <h3>Thông báo</h3>
         </div>
         <AdvList announcements={announcements} isLoading={loading} />
@@ -66,17 +70,23 @@ const Main = () => {
                   {item.image && <img src={item.image} alt={item.name} />}
                 </div>
                 <div className='class-ago__content'>
-                  <button className='class-ago__button' onClick={() => navigate(`/my-classes/${item.id}`)}>
+                  <button
+                    className='class-ago__button'
+                    onClick={() => navigate(`/my-classes/${item.id}`)}>
                     VÀO HỌC
                   </button>
                   <h2 className='class-ago__content__title'>Private</h2>
                   <h2 className='class-ago__content__title'>{item.name}</h2>
                   <p className='class-ago__content__info'>
-                    <span className='icon'><Icon icon='mdi:badge-account' /></span>
+                    <span className='icon'>
+                      <Icon icon='mdi:badge-account' />
+                    </span>
                     Leader: {item.leaderName || 'N/A'}
                   </p>
                   <p className='class-ago__content__info'>
-                    <span className='icon'><Icon icon='mingcute:time-line' /></span>
+                    <span className='icon'>
+                      <Icon icon='mingcute:time-line' />
+                    </span>
                     Ngày bắt đầu: {formatDate(item.startTime)}
                   </p>
                 </div>
@@ -88,7 +98,7 @@ const Main = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Main;
+export default Main

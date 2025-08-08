@@ -25,8 +25,10 @@ const userApi = () => ({
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
 
   updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
+
   getUserClasses: async (userId) =>
     api.get(`${ApiConstant.users.baseId}${userId}${ApiConstant.classrooms.base}`),
+
   getMyClasses: async () => api.get(ApiConstant.users.getMyClassrooms),
 })
 
