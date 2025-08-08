@@ -20,6 +20,7 @@ export const ApiConstant = {
     base: '/classrooms',
     getById: '/classrooms/',
     members: '/classrooms/{id}/members',
+    getManaged: '/classrooms/by-leader',
   },
   lessons: {
     base: '/lesson',

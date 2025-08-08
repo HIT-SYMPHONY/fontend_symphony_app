@@ -1,5 +1,3 @@
-// src/apis/index.js
-
 import toast from 'react-hot-toast'
 import { store } from '../store/configureStore'
 import { save as saveAuthAction, clear as logoutAction } from '../store/auth.store'
@@ -7,14 +5,20 @@ import { LocalStorage } from '../constants/localStorage.constant'
 import { refreshToken as refreshTokenApi } from './auth.api'
 import { api, apiDefault, apiDefaultUpload, apiUpload } from './axios'
 const privateRequestInterceptor = (config) => {
-  const authData = JSON.parse(localStorage.getItem(LocalStorage.auth))
-  const accessToken = authData?.accessToken
-  if (accessToken) {
-    config.headers.Authorization = `Bearer ${accessToken}`
+  if (!config.headers?.Authorization) {
+    const authData = JSON.parse(localStorage.getItem(LocalStorage.auth))
+    const accessToken = authData?.accessToken
+
+    if (accessToken) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${accessToken}`,
+      }
+    }
   }
+
   return config
 }
-
 const privateResponseInterceptor = async (error) => {
   const originalRequest = error.config
   if (error.response?.status === 401 && !originalRequest._retry) {

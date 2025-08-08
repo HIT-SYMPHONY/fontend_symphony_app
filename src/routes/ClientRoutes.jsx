@@ -31,6 +31,7 @@ import InformationOfCompet from '../components/StartManageClass/InformationOfCom
 import RulesOfManageCompet from '../components/StartManageClass/RulesOfManageCompet'
 import TestOfManageCompet from '../components/StartManageClass/TestOfManageCompet'
 import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
+import EditLesson from '../components/StartManageClass/EditLesson'
 const ClientRoutes = (
   <>
     <Route
@@ -77,6 +78,8 @@ const ClientRoutes = (
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
           <Route path='lessons/:lessonId' element={<TestContent />} />
+          <Route path='lessons/:lessonID' element={<VeiwsLesson />} />
+          <Route path='lessons/:lessonID/edit' element={<EditLesson />}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
         <Route path='competitions/:competitionID' element={<InformationOfCompet />} />

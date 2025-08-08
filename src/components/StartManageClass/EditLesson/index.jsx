@@ -1,49 +1,68 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { lessonCreationSchema } from '../../../utils/lessonValidate.js'
-import { createLesson } from '../../../apis/lesson.api'
-import './style.scss'
+import { lessonUpdateSchema } from '../../../utils/lessonValidate.js'
+import { getLessonById, updateLesson } from '../../../apis/lesson.api'
+import '../ManageLesson/style.scss'
 
-const CreateLessonID = () => {
+const EditLesson = () => {
   const navigate = useNavigate()
-  const { classID} = useParams()
+  const { classID, lessonID } = useParams()
   const [loading, setLoading] = useState(false)
+  const [pageLoading, setPageLoading] = useState(true)
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
-    resolver: yupResolver(lessonCreationSchema),
-    defaultValues: {
-      classRoomId: classID
-    },
+    resolver: yupResolver(lessonUpdateSchema),
   })
+
+  useEffect(() => {
+    const fetchLessonData = async () => {
+      if (!lessonID) {
+        toast.error('Không tìm thấy ID bài học.')
+        return
+      }
+      try {
+        setPageLoading(true)
+        const response = await getLessonById(lessonID)
+        reset(response.data)
+      } catch (error) {
+        toast.error('Không thể tải thông tin bài học.')
+      } finally {
+        setPageLoading(false)
+      }
+    }
+    fetchLessonData()
+  }, [lessonID, reset])
 
   const onSubmit = async (data) => {
     setLoading(true)
-    const creationToast = toast.loading('Đang tạo bài học...')
-    const payload = {
-      ...data,
-      startTime: data.startTime,
-      endTime: data.endTime,
-    }
+    const updateToast = toast.loading('Đang cập nhật bài học...')
+    const payload = data
 
     try {
-      await createLesson(payload)
-      toast.success('Tạo bài học thành công!', { id: creationToast })
+      console.log(lessonID)
+      await updateLesson(lessonID, payload)
+      toast.success('Cập nhật bài học thành công!', { id: updateToast })
     } catch (error) {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo bài học.'
+      const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
-        id: creationToast,
+        id: updateToast,
       })
     } finally {
       setLoading(false)
     }
+  }
+
+  if (pageLoading) {
+    return <div>Đang tải bài học...</div>
   }
 
   return (
@@ -55,10 +74,9 @@ const CreateLessonID = () => {
           height='30'
           className='createlesson__start__icon'
         />
-        <h3>Bài học</h3>
+        <h3>Chỉnh sửa bài học</h3>
       </div>
 
-      {/* --- THE FIX IS HERE: The <form> tag now wraps everything --- */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='createlesson__context'>
           <div className='createlesson__title'>
@@ -89,7 +107,6 @@ const CreateLessonID = () => {
           <div className='createlesson__time'>
             <div className='createlesson__time-wrap'>
               <label htmlFor='startTime'>Thời gian bắt đầu</label>
-              {/* Corrected id and name to match API */}
               <input type='time' id='startTime' {...register('startTime')} />
               {errors.startTime && (
                 <span className='error-message'>{errors.startTime.message}</span>
@@ -97,13 +114,11 @@ const CreateLessonID = () => {
             </div>
             <div className='createlesson__time-wrap'>
               <label htmlFor='endTime'>Thời gian kết thúc</label>
-              {/* Corrected id and name to match API */}
               <input type='time' id='endTime' {...register('endTime')} />
               {errors.endTime && <span className='error-message'>{errors.endTime.message}</span>}
             </div>
             <div className='createlesson__time-wrap'>
               <label htmlFor='dayOfWeek'>Ngày học</label>
-              {/* Corrected id and name to match API */}
               <select id='dayOfWeek' {...register('dayOfWeek')}>
                 <option value='MONDAY'>Thứ 2</option>
                 <option value='TUESDAY'>Thứ 3</option>
@@ -127,10 +142,9 @@ const CreateLessonID = () => {
           {errors.content && <span className='error-message'>{errors.content.message}</span>}
         </div>
 
-        {/* The submit button is now INSIDE the form */}
         <div className='createlesson__end'>
           <button type='submit' className='createlesson__end__submit' disabled={loading}>
-            {loading ? 'Đang lưu...' : 'Lưu'}
+            {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
         </div>
       </form>
@@ -138,4 +152,4 @@ const CreateLessonID = () => {
   )
 }
 
-export default CreateLessonID
+export default EditLesson

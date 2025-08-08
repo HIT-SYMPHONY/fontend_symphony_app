@@ -1,20 +1,40 @@
-// src/store/auth.store.js
-
 import { createSlice } from '@reduxjs/toolkit'
 import { LocalStorage } from '../constants/localStorage.constant'
+const getInitialAuthState = () => {
+  try {
+    const persistedState = localStorage.getItem(LocalStorage.auth)
+    if (persistedState === null) {
+      return null
+    }
+    return JSON.parse(persistedState)
+  } catch (e) {
+    console.warn('Could not parse auth data from localStorage. Clearing it.', e)
+    localStorage.removeItem(LocalStorage.auth)
+    return null
+  }
+}
+
 export const authStore = createSlice({
   name: 'auth',
   initialState: {
-    auth: JSON.parse(localStorage.getItem(LocalStorage.auth)) || null,
+    auth: getInitialAuthState(),
   },
   reducers: {
     save: (state, action) => {
       state.auth = action.payload
-      localStorage.setItem(LocalStorage.auth, JSON.stringify(state.auth))
+      try {
+        localStorage.setItem(LocalStorage.auth, JSON.stringify(state.auth))
+      } catch (e) {
+        console.error('Could not save auth state to localStorage.', e)
+      }
     },
     clear: (state) => {
       state.auth = null
-      localStorage.removeItem(LocalStorage.auth)
+      try {
+        localStorage.removeItem(LocalStorage.auth)
+      } catch (e) {
+        console.error('Could not clear auth state from localStorage.', e)
+      }
     },
   },
 })

@@ -5,7 +5,6 @@ const userApi = () => ({
   getAllUsers: async () => api.get(ApiConstant.users.base),
 
   getUserById: async (userId) => {
-    if (!userId) return Promise.reject(new Error('User ID is required.'))
     return api.get(`${ApiConstant.users.getById}${userId}`)
   },
 
@@ -17,13 +16,15 @@ const userApi = () => ({
   },
 
   updateUser: async (userId, formDataPayload) => {
-    if (!userId) return Promise.reject(new Error('User ID is required for update.'))
     return apiDefaultUpload.patch(`${ApiConstant.users.update}${userId}`, formDataPayload)
   },
 
   createUser: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
-
+  getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
+  getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
+  getCurrentUserWithToken: async (token) =>
+    api.get(ApiConstant.users.getCurrentUser, { headers: { Authorization: `Bearer ${token}` } }),
   updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
 
   getUserClasses: async (userId) =>
@@ -36,10 +37,11 @@ export const {
   getAllUsers,
   getUserById,
   getCurrentUser,
-  getMyClassrooms, // The new function is now exported
+  getMyClassrooms, 
   updateUser,
   createUser,
   updateUserRoles,
   getUserClasses,
   getMyClasses,
+  getCurrentUserWithToken
 } = userApi()
