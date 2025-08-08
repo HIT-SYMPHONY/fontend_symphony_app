@@ -109,7 +109,6 @@ export const getLessonStatus = (startTimeISO, endTimeISO) => {
     return { text: 'Chưa đến hạn', backgroundClass: 'back-one', colorClass: 'color-one' }
   }
 
-  // Fallback for any other case, like "Quá hạn"
   return { text: 'Quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
 }
 

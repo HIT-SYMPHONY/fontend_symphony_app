@@ -141,7 +141,7 @@ const AccountOfAdmin = () => {
       setInitialData(formattedData)
       setPreviewUrl(formattedData.imageUrl)
       reset(formattedData)
-      saveUser({ ...user, ...updatedUserData })
+      saveUser({ ...user, fullName: updatedUserData.fullName, imageUrl: updatedUserData.imageUrl })
       setIsEditingPersonal(false)
       setImageFile(null)
       toast.success('Cập nhật thành công!', { id: updateToast })

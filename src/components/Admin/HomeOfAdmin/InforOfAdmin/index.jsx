@@ -109,7 +109,6 @@ const InforOfAdmin = () => {
   }
 
   const handleCancel = () => {
-    console.log(1)
     reset(initialData)
     setIsEditing(false)
   }
@@ -230,7 +229,6 @@ const InforOfAdmin = () => {
                   <Icon icon='material-symbols:cancel' width='20' height='20' />
                   Hủy
                 </button>
-
               </>
             ) : (
               <span onClick={() => setIsEditing(true)} className='edit-span'>
