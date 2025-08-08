@@ -16,11 +16,11 @@ import Complete from '../components/StartCompetition/Complete'
 import HomeAccount from '../components/StartAccount/HomeAccount'
 import MainManage from '../components/StartManageClass/MainManage'
 import InformationManage from '../components/StartManageClass/Information'
-import { Communication } from '../components/StartManageClass/Information'
+import Communication from '../components/StartManageClass/Communication'
 import Notification from '../components/StartManageClass/Notification'
 import CreateLesson from '../components/StartManageClass/CreateLesson'
 import TestContent from '../components/StartManageClass/TestContent'
-import MemberClass from '../components/StartManageClass/MemberClass'
+import CreateNotification from '../components/StartManageClass/MemberClass'
 import AllMember from '../components/StartManageClass/AllMember'
 import ManageLesson from '../components/StartManageClass/ManageLesson'
 import CreateLessonID from '../components/StartManageClass/CreateLesson'
@@ -46,9 +46,9 @@ const ClientRoutes = (
       {/* trang lớp học và thông tin lớp học của toàn bộ lớp học  */}
       <Route path='my-classes'>
         <Route index element={<Classroom />} />
-        <Route path='classID' element={<HomeInformation />} />
-        <Route path='classID/lessons/lessonID' element={<Lesson />} />
-        <Route path='classID/exams/examID' element={<Exam />} />
+        <Route path=':classId' element={<HomeInformation />} />
+        <Route path=':classId/lessons/lessonId' element={<Lesson />} />
+        <Route path=':classId/exams/examId' element={<Exam />} />
       </Route>
       {/* trang kết quả của học sinh với lớp học  */}
       <Route path='my-results' element={<ListMember />} />
@@ -69,15 +69,15 @@ const ClientRoutes = (
         }>
         <Route index element={<MainManage />}></Route>
         <Route path='classes' element={<MainManage />} />
-        <Route path='classes/:classID' element={<InformationManage />}>
+        <Route path='classes/:classId' element={<InformationManage />}>
           <Route index element={<Communication />} />
           <Route path='notifications' element={<Notification />} />
-          <Route path='notifications/create' element={<MemberClass />} />
-          <Route path='test' element={<TestContent />} />
-          <Route path='test/comment' element={<TestContent />} />
+          <Route path='notifications/create' element={<CreateNotification />} />
+          <Route path='lessons/:lessonId/test' element={<VeiwsLesson />} />
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
+          <Route path='lessons/:lessonId' element={<TestContent />} />
           <Route path='lessons/:lessonID' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonID/edit' element={<EditLesson />}></Route>
         </Route>

@@ -31,6 +31,7 @@ export const ApiConstant = {
   notifications: {
     base: '/notifications',
     getById: '/notifications/',
+    getByClassroomId: '/notifications/classrooms/',
   },
   posts: {
     base: '/posts',
