@@ -42,13 +42,18 @@ const notificationApi = () => ({
   getNotificationsForCurrentUser: async (params) =>
     api.get(ApiConstant.notifications.base, { params }),
 
-  getNotificationsByClassId: async (classId, params) =>
-    api.get(`${ApiConstant.notifications.getById}${classId}`, { params }),
+  // getNotificationsByClassId: async (classId, params) =>
+  //   api.get(`${ApiConstant.notifications.getById}${classId}`, { params }),
 
   createNotification: async (payload) => api.post(ApiConstant.notifications.base, payload),
 
-  deleteNotification: async (notificationId) =>
-    api.delete(`${ApiConstant.notifications.getById}${notificationId}`),
+  getNotificationsByClassId: async (classroomId, params) => {
+    return api.get(`${ApiConstant.notifications.getByClassroomId}${classroomId}`, { params })
+  },
+
+  deleteNotification: async (notificationId) => {
+    return api.delete(`${ApiConstant.notifications.getById}${notificationId}`)
+  },
 })
 
 export const {

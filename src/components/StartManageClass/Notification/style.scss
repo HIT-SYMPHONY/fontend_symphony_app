@@ -47,6 +47,11 @@ $background-light: #ffefe4;
         }
       }
 
+      i {
+        color: #898988;
+        cursor: pointer;
+      }
+
       &__para {
         display: flex;
         flex-direction: column;
@@ -75,4 +80,9 @@ $background-light: #ffefe4;
       }
     }
   }
+}
+.notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }

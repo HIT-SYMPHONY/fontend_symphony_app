@@ -6,6 +6,7 @@ import Logout from '../../components/Logout'
 import icon from '../../assets/img/Ellipse.png'
 import logo from '../../assets/img/logo.png'
 import './style.scss'
+import { getDisplayName } from '../../utils/formatters'
 
 const AdminPage = () => {
   const { user } = useAuth()
@@ -40,7 +41,7 @@ const AdminPage = () => {
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {user.username}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user.fullName)}!</h3>
 
         <NavLink to='/admin/home' className='homepage__choose__click' end>
           <i className='fa-solid fa-house'></i>

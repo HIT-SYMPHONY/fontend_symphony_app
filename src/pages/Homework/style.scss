@@ -157,6 +157,9 @@ $shadow-color: #b5b5b5;
             display: flex;
             justify-content: space-between;
             gap: 5px;
+            p.ellipsis {
+              max-width: 200px;
+            }
           }
 
           p {
