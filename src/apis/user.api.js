@@ -5,7 +5,7 @@ const userApi = () => ({
   getAllUsers: async () => api.get(ApiConstant.users.base),
 
   getUserById: async (userId) => {
-    return api.get(`${ApiConstant.users.getById}${userId}`)
+    return api.get(`${ApiConstant.users.baseId}${userId}`)
   },
 
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
@@ -16,7 +16,7 @@ const userApi = () => ({
   },
 
   updateUser: async (userId, formDataPayload) => {
-    return apiDefaultUpload.patch(`${ApiConstant.users.update}${userId}`, formDataPayload)
+    return apiDefaultUpload.patch(`${ApiConstant.users.baseId}${userId}`, formDataPayload)
   },
 
   createUser: async (formDataPayload) =>
