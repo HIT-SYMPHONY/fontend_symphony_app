@@ -84,17 +84,222 @@
 
 // export default MainManage
 
+// import React, { useState, useEffect, useMemo, useCallback } from 'react'
+// import { Icon } from '@iconify/react'
+// import { useNavigate } from 'react-router-dom'
+// import toast from 'react-hot-toast'
+// import { getMyClassrooms } from '../../../apis/user.api'
+// import { translateStatus } from '../../../utils/formatters'
+// import './style.scss' // Ensure styles are moved/created for this page
+
+// const MyClassesPage = () => {
+//   const navigate = useNavigate()
+//   const [myClasses, setMyClasses] = useState([])
+//   const [loading, setLoading] = useState(true)
+//   const [searchQuery, setSearchQuery] = useState('')
+
+//   // State to control the server-side filter
+//   const [selectedStatus, setSelectedStatus] = useState(null) // null means 'all'
+
+//   // This function fetches data from the API based on the current filter state
+//   const fetchClasses = useCallback(async () => {
+//     try {
+//       setLoading(true)
+//       // Pass the selectedStatus to the API call. The API service handles the params object.
+//       const response = await getMyClassrooms(selectedStatus)
+//       // The API returns the array directly in the `data` property
+//       setMyClasses(response.data || [])
+//     } catch (error) {
+//       if (error.response?.data?.message) {
+//         toast.error(error.response.data.message)
+//       } else {
+//         toast.error('Có lỗi xảy ra khi tải danh sách lớp học của bạn.')
+//       }
+//     } finally {
+//       setLoading(false)
+//     }
+//   }, [selectedStatus]) // Re-create this function only when selectedStatus changes
+
+//   // This effect triggers the data fetch whenever the fetchClasses function is updated
+//   useEffect(() => {
+//     fetchClasses()
+//   }, [fetchClasses])
+
+//   // Client-side search still works on the data returned from the server
+//   const filteredClasses = useMemo(() => {
+//     if (!searchQuery) return myClasses
+//     const lowercasedQuery = searchQuery.toLowerCase()
+//     return myClasses.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
+//   }, [myClasses, searchQuery])
+
+//   return (
+//     <div className='manage'>
+//       <div className='manage__title'>
+//         <Icon icon='mdi:book-account' width='30' height='30' className='manage__title__icon' />
+//         <h2>Lớp học của tôi</h2>
+//       </div>
+//       <div className='manage__search'>
+//         {/* You can add a status filter dropdown here */}
+//         <select onChange={(e) => setSelectedStatus(e.target.value || null)} defaultValue=''>
+//           <option value=''>Tất cả trạng thái</option>
+//           <option value='UPCOMING'>Sắp diễn ra</option>
+//           <option value='ONGOING'>Đang diễn ra</option>
+//           <option value='COMPLETED'>Hoàn thành</option>
+//         </select>
+
+//         <div className='manage__search__container'>
+//           <input
+//             type='text'
+//             placeholder='Tìm kiếm lớp học...'
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//           />
+//           <i className='fa-solid fa-magnifying-glass'></i>
+//         </div>
+//       </div>
+//       <h3>Danh sách lớp học ({loading ? '...' : filteredClasses.length})</h3>
+//       <div className='manage__table'>
+//         {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
+
+//         {!loading && filteredClasses.length === 0 && (
+//           <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+//             Không có lớp học nào phù hợp.
+//           </div>
+//         )}
+
+//         {!loading &&
+//           filteredClasses.map((item) => (
+//             <div className='manage-table' key={item.id}>
+//               <div className='manage-table__img'>
+//                 {item.image && <img src={item.image} alt={item.name} />}
+//               </div>
+//               <div className='manage-table__context'>
+//                 <div className='manage-table__context__pair'>
+//                   <h4>{item.name}</h4>
+//                   <span>{translateStatus(item.status)}</span>
+//                 </div>
+//                 <span
+//                   className='manage-table__context__span'
+//                   onClick={() => navigate(`${item.id}`)}>
+//                   Xem chi tiết
+//                 </span>
+//               </div>
+//             </div>
+//           ))}
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default MyClassesPage
+
+// import React, { useState, useEffect, useMemo, useCallback } from 'react';
+// import { Icon } from '@iconify/react';
+// import { useNavigate } from 'react-router-dom';
+// import toast from 'react-hot-toast';
+// import { getLeaderClassrooms } from '../../../apis/leader.api';
+// import { translateStatus } from '../../../utils/formatters';
+// import './style.scss';
+
+// const MainManage = () => {
+//   const navigate = useNavigate();
+//   const [leaderClasses, setLeaderClasses] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [searchQuery, setSearchQuery] = useState('');
+
+//   // --- Data Fetching ---
+//   const fetchLeaderClasses = useCallback(async () => {
+//     try {
+//       setLoading(true);
+//       const response = await getLeaderClassrooms();
+//       // The API returns the array of classes directly in the `data` property
+//       setLeaderClasses(response.data || []);
+//     } catch (error) {
+//       if (error.response?.data?.message) {
+//         toast.error(error.response.data.message);
+//       } else {
+//         toast.error('Có lỗi xảy ra khi tải danh sách lớp học.');
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     fetchLeaderClasses();
+//   }, [fetchLeaderClasses]);
+
+//   // --- Client-Side Filtering ---
+//   const filteredClasses = useMemo(() => {
+//     if (!searchQuery) return leaderClasses;
+//     const lowercasedQuery = searchQuery.toLowerCase();
+//     return leaderClasses.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery));
+//   }, [leaderClasses, searchQuery]);
+
+//   return (
+//     <div className='manage'>
+//       <div className='manage__title'>
+//         <Icon icon='mdi:book-account' width='30' height='30' className='manage__title__icon' />
+//         <h2>Quản lý lớp học</h2>
+//       </div>
+//       <div className='manage__search'>
+//         <div className='manage__search__container'>
+//           <input
+//             type='text'
+//             placeholder='Nhập tìm kiếm...'
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//           />
+//           <i className='fa-solid fa-magnifying-glass'></i>
+//         </div>
+//       </div>
+//       <h3>Danh sách lớp quản lý ({loading ? '...' : filteredClasses.length})</h3>
+//       <div className='manage__table'>
+//         {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
+
+//         {!loading && filteredClasses.length === 0 && (
+//           <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+//             Bạn chưa quản lý lớp học nào.
+//           </div>
+//         )}
+
+//         {!loading && filteredClasses.map((item) => (
+//           <div className='manage-table' key={item.id}>
+//             <div className='manage-table__img'>
+//               {item.image && <img src={item.image} alt={item.name} />}
+//             </div>
+//             <div className='manage-table__context'>
+//               <div className='manage-table__context__pair'>
+//                 <h4>{item.name}</h4>
+//                 <span>{translateStatus(item.status)}</span>
+//               </div>
+//               <span
+//                 className='manage-table__context__span'
+//                 onClick={() => navigate(`/admin/manage/information/${item.id}`)}
+//               >
+//                 Xem chi tiết
+//               </span>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default MainManage;
+
 import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getMyClassrooms } from '../../../apis/user.api'
+import { getLeaderClassrooms } from '../../../apis/leader.api'
 import { translateStatus } from '../../../utils/formatters'
-import './style.scss' // Ensure styles are moved/created for this page
+import './style.scss'
 
-const MyClassesPage = () => {
+const MainManage = () => {
   const navigate = useNavigate()
-  const [myClasses, setMyClasses] = useState([])
+  const [leaderClasses, setLeaderClasses] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -102,13 +307,13 @@ const MyClassesPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(null) // null means 'all'
 
   // This function fetches data from the API based on the current filter state
-  const fetchClasses = useCallback(async () => {
+  const fetchLeaderClasses = useCallback(async () => {
     try {
       setLoading(true)
       // Pass the selectedStatus to the API call. The API service handles the params object.
-      const response = await getMyClassrooms(selectedStatus)
+      const response = await getLeaderClassrooms(selectedStatus)
       // The API returns the array directly in the `data` property
-      setMyClasses(response.data || [])
+      setLeaderClasses(response.data || [])
     } catch (error) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message)
@@ -120,27 +325,30 @@ const MyClassesPage = () => {
     }
   }, [selectedStatus]) // Re-create this function only when selectedStatus changes
 
-  // This effect triggers the data fetch whenever the fetchClasses function is updated
+  // This effect triggers the data fetch on mount and whenever the fetchLeaderClasses function is updated
   useEffect(() => {
-    fetchClasses()
-  }, [fetchClasses])
+    fetchLeaderClasses()
+  }, [fetchLeaderClasses])
 
   // Client-side search still works on the data returned from the server
   const filteredClasses = useMemo(() => {
-    if (!searchQuery) return myClasses
+    if (!searchQuery) return leaderClasses
     const lowercasedQuery = searchQuery.toLowerCase()
-    return myClasses.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
-  }, [myClasses, searchQuery])
+    return leaderClasses.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
+  }, [leaderClasses, searchQuery])
 
   return (
     <div className='manage'>
       <div className='manage__title'>
         <Icon icon='mdi:book-account' width='30' height='30' className='manage__title__icon' />
-        <h2>Lớp học của tôi</h2>
+        <h2>Quản lý lớp học</h2>
       </div>
       <div className='manage__search'>
-        {/* You can add a status filter dropdown here */}
-        <select onChange={(e) => setSelectedStatus(e.target.value || null)} defaultValue=''>
+        {/* 👇 THE NEW DROPDOWN IS ADDED HERE 👇 */}
+        <select
+          className='manage__status-filter' // Add a class for styling
+          onChange={(e) => setSelectedStatus(e.target.value || null)}
+          defaultValue=''>
           <option value=''>Tất cả trạng thái</option>
           <option value='UPCOMING'>Sắp diễn ra</option>
           <option value='ONGOING'>Đang diễn ra</option>
@@ -150,14 +358,14 @@ const MyClassesPage = () => {
         <div className='manage__search__container'>
           <input
             type='text'
-            placeholder='Tìm kiếm lớp học...'
+            placeholder='Nhập tìm kiếm...'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <i className='fa-solid fa-magnifying-glass'></i>
         </div>
       </div>
-      <h3>Danh sách lớp học ({loading ? '...' : filteredClasses.length})</h3>
+      <h3>Danh sách lớp quản lý ({loading ? '...' : filteredClasses.length})</h3>
       <div className='manage__table'>
         {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
 
@@ -191,4 +399,4 @@ const MyClassesPage = () => {
   )
 }
 
-export default MyClassesPage
+export default MainManage
