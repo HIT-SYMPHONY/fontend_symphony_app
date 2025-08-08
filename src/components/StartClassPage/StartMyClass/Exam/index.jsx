@@ -1,16 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Icon } from '@iconify/react'
-import { work } from '../../../../data/app'
-import { GlobalContext } from '../../../../dataContext'
-import { useOutletContext } from 'react-router-dom'
-import Classroom from '../Classroom'
-import icon from './../../../../assets/img/Ellipse.png'
-import logo from './../../../../assets/img/logo.png'
-import Frame from '../Frame'
+import { useNavigate } from 'react-router-dom'
 import Comment from '../Comment'
 import './style.scss'
 
 const Exam = () => {
+  const navigate = useNavigate()
+  const [submit, setSubmit] = useState(false)
   const [timeLeft, setTimeLeft] = useState(1 * 3600 + 30 * 60)
   const intervalRef = useRef(null)
   const formatTime = (seconds) => {
@@ -37,15 +33,21 @@ const Exam = () => {
 
   return (
     <>
-      {true ? (
-        <Comment />
+      {submit ? (
+        <Comment setSubmit={setSubmit} />
       ) : (
         <div className='exam'>
-          <h2>PRIVATE: Đồ họa - 2025</h2>
+          <div className='exam-title'>
+            <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
+            <h2>PRIVATE: Đồ họa - 2025</h2>
+          </div>
+
           <div className='exam__one'>
             <div className='exam__one__tap'>
               <strong className='exam__one__tap__than'>1</strong>
-              <strong className='tapthan'>&gt;&gt;</strong>
+              <strong className='tapthan'>
+                <i className='fa-solid fa-angles-right'></i>
+              </strong>
               <strong>Buổi 8: Kiểm tra</strong>
             </div>
             <strong
@@ -70,7 +72,7 @@ const Exam = () => {
                 width='30'
                 height='30'
                 className='exam__submit'
-                onClick={() => onSetSub(true)}
+                onClick={() => setSubmit(true)}
               />
             </div>
           </div>

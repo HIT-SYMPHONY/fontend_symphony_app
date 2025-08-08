@@ -281,8 +281,7 @@ const CreateOfClassAdmin = () => {
   const fetchLeaders = useCallback(async () => {
     try {
       const response = await getAllUsers()
-      const leaderList =
-        response.data?.filter((user) => user.role === 'LEADER') || []
+      const leaderList = response.data?.filter((user) => user.role === 'LEADER') || []
       setLeaders(leaderList)
     } catch (err) {
       toast.error('Không thể tải danh sách leader.')
@@ -406,53 +405,55 @@ const CreateOfClassAdmin = () => {
         </div>
         <div className='create-class-admin__content-body'>
           <form className='create-class-admin__content-body__form' onSubmit={handleSubmit}>
-            <div className='create-class-admin__content-body__form-item'>
-              <div>
-                <label>Tên lớp học</label>
-                <input
-                  type='text'
-                  name='name'
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                />
+            <div className='div'>
+              <div className='create-class-admin__content-body__form-item'>
+                <div>
+                  <label>Tên lớp học</label>
+                  <input
+                    type='text'
+                    name='name'
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label>Leader</label>
+                  <select
+                    name='leaderId'
+                    value={formData.leaderId}
+                    onChange={handleInputChange}
+                    required>
+                    <option value=''>Chọn leader</option>
+                    {leaders.map((leader) => (
+                      <option key={leader.id} value={leader.id}>
+                        {leader.fullName || leader.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div>
-                <label>Leader</label>
-                <select
-                  name='leaderId'
-                  value={formData.leaderId}
-                  onChange={handleInputChange}
-                  required>
-                  <option value=''>Chọn leader</option>
-                  {leaders.map((leader) => (
-                    <option key={leader.id} value={leader.id}>
-                      {leader.fullName || leader.username}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className='create-class-admin__content-body__form-table'>
-              <div>
-                <label>Ngày bắt đầu</label>
-                <input
-                  type='date'
-                  name='startTime'
-                  value={formData.startTime}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Độ dài lớp học (tuần)</label>
-                <input
-                  type='number'
-                  name='duration'
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  required
-                />
+              <div className='create-class-admin__content-body__form-table'>
+                <div>
+                  <label>Ngày bắt đầu</label>
+                  <input
+                    type='date'
+                    name='startTime'
+                    value={formData.startTime}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                <div>
+                  <label>Độ dài lớp học (tuần)</label>
+                  <input
+                    type='number'
+                    name='duration'
+                    value={formData.duration}
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
               </div>
             </div>
             <div className='create-class-admin__content-body__form-context'>
@@ -477,12 +478,12 @@ const CreateOfClassAdmin = () => {
                 />
               )}
             </div>
-            <div className='create-class-admin__content-button'>
-              <button type='submit' disabled={loading}>
-                {loading ? 'Đang tạo...' : 'Tạo'}
-              </button>
-            </div>
           </form>
+          <div className='create-class-admin__content-button'>
+            <button type='submit' disabled={loading}>
+              {loading ? 'Đang tạo...' : 'Tạo'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

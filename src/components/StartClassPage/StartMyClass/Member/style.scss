@@ -96,6 +96,17 @@ $background-light: #ffefe4;
         border-radius: 50%;
       }
     }
+
+    &__muc__title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      i {
+        font-size: 30px;
+        color: #ff6911;
+        cursor: pointer;
+      }
+    }
   }
 }
 

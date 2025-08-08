@@ -21,8 +21,11 @@ const userApi = () => ({
 
   createUser: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
+
   getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
+
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
+
   getCurrentUserWithToken: async (token) =>
     api.get(ApiConstant.users.getCurrentUser, { headers: { Authorization: `Bearer ${token}` } }),
   updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
@@ -37,11 +40,12 @@ export const {
   getAllUsers,
   getUserById,
   getCurrentUser,
-  getMyClassrooms, 
+  getMyClassrooms,
+  getLeaderList,
   updateUser,
   createUser,
   updateUserRoles,
   getUserClasses,
   getMyClasses,
-  getCurrentUserWithToken
+  getCurrentUserWithToken,
 } = userApi()

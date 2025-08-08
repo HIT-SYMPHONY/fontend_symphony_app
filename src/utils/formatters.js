@@ -77,13 +77,20 @@ export const formatDateTime = (isoString) => {
   }
 }
 
-export const getDisplayName = (data) => {
-  const name = data.fullName?.trim()
-  const isValid =
-    name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
-  return isValid ? name : 'HỌ VÀ TÊN'
+// export const getDisplayName = (data) => {
+//   const name = data.fullName?.trim()
+//   const isValid =
+//     name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
+//   return isValid ? name : 'HỌ VÀ TÊN'
+// }
+export const getDisplayName = (user) => {
+  if (!user) return 'Không rõ'
+  const name = user.fullName?.trim()
+  if (name && name.toLowerCase() !== 'null') {
+    return name
+  }
+  return user.username || 'Người dùng'
 }
-
 export const formatDateForBox = (isoString) => {
   if (!isoString) return ''
   const date = new Date(isoString)

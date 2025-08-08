@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-// import './scss/style.scss'
+import './scss/style.scss'
 
 // src/AppRoutes.jsx
 import LoginPage from './components/StartLoginPage/LoginPage'
@@ -17,6 +17,7 @@ const App = () => (
     <AuthListener />
     <Routes>
       <Route path='/login' element={<LoginPage />} />
+      <Route path='/' element={<LoginPage />} />
       <Route path='/forgot-password' element={<Confirm />} />
       {ClientRoutes}
       {AdminRoutes}

@@ -58,6 +58,7 @@ $class-ago-width: 210px;
       text-decoration: none;
       border-radius: 20px;
       transition: background-color 0.2s;
+      gap: 10px;
 
       i,
       .iconify {
@@ -197,9 +198,8 @@ $class-ago-width: 210px;
   .iconify {
     color: #f27b36 !important;
   }
-}.accoun
-
-.whiteP {
+}
+.accoun .whiteP {
   color: #fff;
   padding-right: 10px;
   width: 20px;

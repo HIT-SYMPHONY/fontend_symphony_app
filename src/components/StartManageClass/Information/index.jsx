@@ -97,6 +97,107 @@
 
 // export default InformationManage
 
+// import React, { useEffect } from 'react'
+// import { Icon } from '@iconify/react'
+// import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
+// import toast from 'react-hot-toast'
+// import useFetch from '../../../hooks/useFetch'
+// import { ApiConstant } from '../../../constants/api.constant'
+// import './style.scss'
+
+// const InformationManage = () => {
+//   const { classId } = useParams()
+//   const navigate = useNavigate()
+//   const location = useLocation()
+
+//   const {
+//     data: classroomResponse,
+//     loading,
+//     error,
+//     refetch,
+//   } = useFetch(`${ApiConstant.classrooms.getById}${classId}`)
+
+//   useEffect(() => {
+//     if (error) {
+//       toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
+//       navigate('/manage/classes')
+//     }
+//   }, [error, navigate])
+
+//   const getCurrentSection = () => {
+//     const path = location.pathname
+//     if (path.endsWith('notifications')) return 'notifications'
+//     if (path.endsWith('lessons')) return 'lessons'
+//     if (path.endsWith('tests')) return 'test'
+//     if (path.endsWith('members')) return 'members'
+//     return ''
+//   }
+
+//   const handleNavigation = (e) => {
+//     const sectionPath = e.target.value
+//     const basePath = `/manage/classes/${classId}`
+//     navigate(sectionPath ? `${basePath}/${sectionPath}` : basePath)
+//   }
+
+//   if (loading) {
+//     return <div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải thông tin lớp học...</div>
+//   }
+
+//   if (error || !classroomResponse?.data) {
+//     return null
+//   }
+
+//   const classroom = classroomResponse.data
+
+//   return (
+//     <div className='manage-infor'>
+//       <div className='manage-infor__title'>
+//         <Icon
+//           icon='mdi:book-account'
+//           width='30'
+//           height='30'
+//           className='manage-infor__title__icon'
+//         />
+//         <h2>Quản lý lớp học: {classroom.name}</h2>
+//       </div>
+
+//       <div className='manage-infor__search'>
+//         <i className='fa-solid fa-arrow-left' onClick={() => navigate('/manage/classes')} />
+//         <select
+//           className='manage-infor__search__select'
+//           name='category'
+//           value={getCurrentSection()}
+//           onChange={handleNavigation}>
+//           <option value=''>Thông tin lớp học</option>
+//           <option value='notifications'>Thông báo</option>
+//           <option value='lessons'>Bài học</option>
+//           <option value='members'>Danh sách sinh viên</option>
+//         </select>
+//         <div className='manage-infor__search__container'>
+//           <input
+//             type='text'
+//             placeholder='Nhập tìm kiếm...'
+//             className='manage-infor__search__input'
+//           />
+//           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
+//         </div>
+//         <button
+//           className='manage-infor__search__button'
+//           onClick={() => navigate('notifications/create')}>
+//           + Tạo mới
+//         </button>
+//       </div>
+
+//       <Outlet context={{ classroom, refetchClassroom: refetch }} />
+//     </div>
+//   )
+// }
+
+// export function useClassroomContext() {
+//   return useOutletContext()
+// }
+
+// export default InformationManage
 import React, { useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
@@ -120,23 +221,35 @@ const InformationManage = () => {
   useEffect(() => {
     if (error) {
       toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
-      navigate('/admin/manage')
+      navigate('/manage/classes')
     }
   }, [error, navigate])
 
   const getCurrentSection = () => {
     const path = location.pathname
-    if (path.endsWith('/notifications')) return 'notifications'
-    if (path.endsWith('/lessons')) return 'lessons'
-    if (path.endsWith('/tests')) return 'tests'
-    if (path.endsWith('/members')) return 'members'
+    if (path.endsWith('notifications')) return 'notifications'
+    if (path.endsWith('lessons')) return 'lessons'
+    if (path.endsWith('tests')) return 'tests'
+    if (path.endsWith('members')) return 'members'
     return ''
   }
 
   const handleNavigation = (e) => {
     const sectionPath = e.target.value
-    const basePath = `/admin/manage/information/${classId}`
+    const basePath = `/manage/classes/${classId}`
     navigate(sectionPath ? `${basePath}/${sectionPath}` : basePath)
+  }
+
+  // Hàm xử lý nút "Tạo mới"
+  const handleCreate = () => {
+    const section = getCurrentSection()
+    if (section === 'notifications') {
+      navigate(`/manage/classes/${classId}/notifications/create`)
+    } else if (section === 'lessons') {
+      navigate(`/manage/classes/${classId}/lessons/create`)
+    } else {
+      toast.error('Chức năng tạo mới không khả dụng cho danh mục này.')
+    }
   }
 
   if (loading) {
@@ -162,7 +275,7 @@ const InformationManage = () => {
       </div>
 
       <div className='manage-infor__search'>
-        <i className='fa-solid fa-arrow-left' onClick={() => navigate('/admin/manage')} />
+        <i className='fa-solid fa-arrow-left' onClick={() => navigate('/manage/classes')} />
         <select
           className='manage-infor__search__select'
           name='category'
@@ -171,7 +284,6 @@ const InformationManage = () => {
           <option value=''>Thông tin lớp học</option>
           <option value='notifications'>Thông báo</option>
           <option value='lessons'>Bài học</option>
-          <option value='tests'>Kiểm Tra</option>
           <option value='members'>Danh sách sinh viên</option>
         </select>
         <div className='manage-infor__search__container'>
@@ -182,7 +294,9 @@ const InformationManage = () => {
           />
           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
         </div>
-        <button className='manage-infor__search__button'>+ Tạo mới</button>
+        <button className='manage-infor__search__button' onClick={handleCreate}>
+          + Tạo mới
+        </button>
       </div>
 
       <Outlet context={{ classroom, refetchClassroom: refetch }} />

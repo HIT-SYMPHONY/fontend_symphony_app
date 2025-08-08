@@ -153,32 +153,38 @@ $background-light: #ffefe4;
     &-body {
       &__form {
         display: flex;
-        flex-direction: column;
+        justify-content: space-around;
         gap: 20px;
         align-items: center;
 
         &-item {
           display: flex;
-          justify-content: space-around;
+          flex-direction: column;
           width: 90%;
           & div {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            // align-items: center;
 
             input {
               padding: 5px 20px;
               border: 2px solid #ccc;
               border-radius: 30px;
-              min-width: 400px;
+              width: 350px;
+            }
+
+            select {
+              border-radius: 5px;
+              border: 2px solid #ccc;
+              width: 390px;
+              padding: 5px 0px;
             }
           }
         }
 
         &-table {
           display: flex;
-          justify-content: space-around;
+          flex-direction: column;
           width: 90%;
           & div {
             display: flex;
@@ -190,6 +196,7 @@ $background-light: #ffefe4;
               padding: 5px 20px;
               border: 2px solid #ccc;
               border-radius: 30px;
+              width: 350px;
             }
           }
         }
@@ -249,4 +256,9 @@ $background-light: #ffefe4;
       }
     }
   }
+}
+.div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

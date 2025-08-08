@@ -809,10 +809,10 @@ const RolusOfCompetAdmin = () => {
   const [selectedClass, setSelectedClass] = useState('Thể lệ')
   const dropdownRef = useRef(null)
   const classOptions = [
-    { option: 'Giới thiệu', link: `/admin/competition/${competitionId}/information` },
-    { option: 'Thể lệ', link: `/admin/competition/${competitionId}/rules` },
-    { option: 'Quản lý cuộc thi', link: `/admin/competition/${competitionId}/members` },
-    { option: 'Thông báo', link: `/admin/competition/${competitionId}/notifications` },
+    { option: 'Giới thiệu', link: `/admin/competitions/${competitionId}` },
+    { option: 'Thể lệ', link: `/admin/competitions/${competitionId}/rules` },
+    { option: 'Quản lý cuộc thi', link: `/admin/competitions/${competitionId}/members` },
+    { option: 'Thông báo', link: `/admin/competitions/${competitionId}/notifications` },
   ]
 
   // --- Data Fetching ---
@@ -898,7 +898,7 @@ const RolusOfCompetAdmin = () => {
       <div className='rolus-compet-admin__header'>
         <i
           className='rolus-compet-admin__back-icon fa-solid fa-arrow-left'
-          onClick={() => navigate('/admin/competition')}></i>
+          onClick={() => navigate('/admin/competitions')}></i>
         <div
           className='rolus-compet-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -939,7 +939,7 @@ const RolusOfCompetAdmin = () => {
         </div>
         <button
           className='rolus-compet-admin__create-button'
-          onClick={() => navigate('/admin/competition/create')}>
+          onClick={() => navigate('/admin/competitions/create')}>
           <i className='fa-solid fa-plus'></i>
           Tạo mới
         </button>

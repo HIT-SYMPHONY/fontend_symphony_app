@@ -7,12 +7,7 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .comment {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   justify-content: space-between;
   &__left {
@@ -46,6 +41,7 @@ $background-light: #ffefe4;
       padding: 10px;
       box-shadow: 0 4px 8px $shadow-color;
       width: 100%;
+      height: 320px;
     }
     &__three {
       border: 2px solid $border-color;
@@ -55,6 +51,17 @@ $background-light: #ffefe4;
       padding: 10px;
       box-shadow: 0 4px 8px $shadow-color;
       width: 100%;
+      height: 220px;
+    }
+    &-title {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      i {
+        color: $secondary-color;
+        font-size: 30px;
+        cursor: pointer;
+      }
     }
   }
   &__right {

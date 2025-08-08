@@ -635,10 +635,10 @@ const ListOfGroup = () => {
   const dropdownRef = useRef(null)
 
   const classOptions = [
-    { option: 'Giới thiệu', link: `/admin/competition/${competitionId}/information` },
-    { option: 'Thể lệ', link: `/admin/competition/${competitionId}/rules` },
-    { option: 'Quản lý cuộc thi', link: `/admin/competition/${competitionId}/members` },
-    { option: 'Thông báo', link: `/admin/competition/${competitionId}/notification` },
+    { option: 'Giới thiệu', link: `/admin/competitions/${competitionId}` },
+    { option: 'Thể lệ', link: `/admin/competitions/${competitionId}/rules` },
+    { option: 'Quản lý cuộc thi', link: `/admin/competitions/${competitionId}/members` },
+    { option: 'Thông báo', link: `/admin/competitions/${competitionId}/notifications` },
   ]
 
   const fetchNotifications = useCallback(async () => {
@@ -701,7 +701,7 @@ const ListOfGroup = () => {
       <div className='list-member-admin__header'>
         <i
           className='list-member-admin__back-icon fa-solid fa-arrow-left'
-          onClick={() => navigate(`/admin/competition`)}></i>
+          onClick={() => navigate(`/admin/competitions`)}></i>
         <div
           className='list-member-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}

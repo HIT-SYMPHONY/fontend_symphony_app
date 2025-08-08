@@ -9,7 +9,7 @@ import './style.scss'
 import { getDisplayName } from '../../../utils/formatters'
 
 const AllMember = () => {
-  const { classID } = useParams()
+  const { classId } = useParams()
   const [members, setMembers] = useState([])
   const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
   const [loading, setLoading] = useState(true)
@@ -17,11 +17,11 @@ const AllMember = () => {
 
   const fetchMembers = useCallback(
     async (page = 1, isLoadMore = false) => {
-      if (!classID) return
+      if (!classId) return
       isLoadMore ? setLoadingMore(true) : setLoading(true)
       try {
         const params = { pageNum: page, pageSize: 10 }
-        const response = await getMembersInClassroom(classID, params)
+        const response = await getMembersInClassroom(classId, params)
         const content = response.data
 
         if (content && content.items) {
@@ -44,7 +44,7 @@ const AllMember = () => {
         isLoadMore ? setLoadingMore(false) : setLoading(false)
       }
     },
-    [classID],
+    [classId],
   )
 
   useEffect(() => {

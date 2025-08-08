@@ -31,6 +31,7 @@ import InformationOfCompet from '../components/StartManageClass/InformationOfCom
 import RulesOfManageCompet from '../components/StartManageClass/RulesOfManageCompet'
 import TestOfManageCompet from '../components/StartManageClass/TestOfManageCompet'
 import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
+import EditLesson from '../components/StartManageClass/EditLesson'
 import {
   Introduction,
   Rules,
@@ -52,11 +53,12 @@ const ClientRoutes = (
       <Route path='my-classes'>
         <Route index element={<Classroom />} />
         <Route path=':classId' element={<HomeInformation />} />
-        <Route path=':classId/lessons/lessonId' element={<Lesson />} />
+        <Route path=':classId/lessons/:lessonId' element={<Lesson />} />
         <Route path=':classId/exams/examId' element={<Exam />} />
       </Route>
       {/* trang kết quả của học sinh với lớp học  */}
       <Route path='my-results' element={<ListMember />} />
+      <Route path='my-results/comment' element={<Complete />} />
       {/* trang cuộc thi công khai */}
       <Route path='competitions'>
         <Route index element={<MainCompetition />} />
