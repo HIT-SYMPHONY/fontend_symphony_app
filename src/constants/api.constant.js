@@ -45,8 +45,14 @@ export const ApiConstant = {
     getMembers: '/competition-users/',
     getNonMembers: '/competition-users/',
   },
+  competitionUsers: {
+    join: '/competition-users/join',
+  },
   commentPosts: {
     base: '/comment-posts',
     getById: '/comment-posts/',
+  },
+  leader: {
+    base: '',
   },
 }

@@ -31,7 +31,12 @@ import InformationOfCompet from '../components/StartManageClass/InformationOfCom
 import RulesOfManageCompet from '../components/StartManageClass/RulesOfManageCompet'
 import TestOfManageCompet from '../components/StartManageClass/TestOfManageCompet'
 import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
-import EditLesson from '../components/StartManageClass/EditLesson'
+import {
+  Introduction,
+  Rules,
+  Rating,
+  YourTest,
+} from '../components/StartCompetition/InformationPage'
 const ClientRoutes = (
   <>
     <Route
@@ -55,9 +60,14 @@ const ClientRoutes = (
       {/* trang cuộc thi công khai */}
       <Route path='competitions'>
         <Route index element={<MainCompetition />} />
-        <Route path=':competitionsID' element={<InformationCompetition />} />
-        <Route path=':competitionsID/test' element={<Assignment />} />
-        <Route path=':competitionsID/comment' element={<Complete />} />
+        <Route path=':competitionsId' element={<InformationCompetition />}>
+          <Route index element={<Introduction />} /> {/* Default tab */}
+          <Route path='rules' element={<Rules />} />
+          <Route path='rating' element={<Rating />} />
+          <Route path='my-test' element={<YourTest />} />{' '}
+        </Route>
+        <Route path=':competitionsId/test' element={<Assignment />} />
+        <Route path=':competitionsId/comment' element={<Complete />} />
       </Route>
       {/* các trang quản lý của leader */}
       <Route
@@ -82,11 +92,11 @@ const ClientRoutes = (
           <Route path='lessons/:lessonID/edit' element={<EditLesson />}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
-        <Route path='competitions/:competitionID' element={<InformationOfCompet />} />
-        <Route path='competitions/:competitionID/rules' element={<RulesOfManageCompet />} />
-        <Route path='competitions/:competitionID/test' element={<TestOfManageCompet />} />
-        <Route path='competitions/:competitionID/members' element={<IntroOfCompetAdmin />} />
-        <Route path='competitions/:competitionID/comment' element={<CommentOfCompet />} />
+        <Route path='competitions/:competitionId' element={<InformationOfCompet />} />
+        <Route path='competitions/:competitionId/rules' element={<RulesOfManageCompet />} />
+        <Route path='competitions/:competitionId/test' element={<TestOfManageCompet />} />
+        <Route path='competitions/:competitionId/members' element={<IntroOfCompetAdmin />} />
+        <Route path='competitions/:competitionId/comment' element={<CommentOfCompet />} />
       </Route>
 
       {/* trang viết thông tin cá nhân */}

@@ -45,8 +45,6 @@ const VeiwsLesson = () => {
               setSubmit(!submit)
             }}
           />
-          <h3>Nhập Điểm</h3>
-          <h2 className={submit ? 'cap__right__h2 cap-h2' : 'cap__right__h2'}></h2>
           <h2 className={submit ? 'cap__right__h2 cap-h2' : 'cap__right__h2'}>Xác Nhận</h2>
         </div>
       </div>
