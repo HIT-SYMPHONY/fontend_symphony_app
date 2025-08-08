@@ -41,7 +41,7 @@ const AdminPage = () => {
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user.fullName)}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user)}!</h3>
 
         <NavLink to='/admin/home' className='homepage__choose__click' end>
           <i className='fa-solid fa-house'></i>

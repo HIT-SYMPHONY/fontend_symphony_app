@@ -4,6 +4,7 @@ import { save as saveAuthAction, clear as logoutAction } from '../store/auth.sto
 import { LocalStorage } from '../constants/localStorage.constant'
 import { refreshToken as refreshTokenApi } from './auth.api'
 import { api, apiDefault, apiDefaultUpload, apiUpload } from './axios'
+import { getCurrentUserWithToken } from './user.api'
 const privateRequestInterceptor = (config) => {
   if (!config.headers?.Authorization) {
     const authData = JSON.parse(localStorage.getItem(LocalStorage.auth))
@@ -33,7 +34,15 @@ const privateResponseInterceptor = async (error) => {
     try {
       const refreshResponse = await refreshTokenApi({ refreshToken: currentRefreshToken })
       const newAccessToken = refreshResponse.data.accessToken
-      const newAuthData = { ...authData, accessToken: newAccessToken }
+      const userProfileResponse = await getCurrentUserWithToken(newAccessToken)
+      const { fullName, imageUrl } = userProfileResponse.data
+
+      const newAuthData = {
+        ...authData,
+        accessToken: newAccessToken,
+        fullName, 
+        imageUrl, 
+      }
       store.dispatch(saveAuthAction(newAuthData))
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
       return api(originalRequest)

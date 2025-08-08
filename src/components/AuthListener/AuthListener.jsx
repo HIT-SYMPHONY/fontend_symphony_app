@@ -12,7 +12,7 @@ const AuthListener = () => {
 
   useEffect(() => {
     if (wasLoggedIn.current && !user) {
-      navigate('/login')
+      navigate('/login', { replace: true })
     }
     wasLoggedIn.current = !!user
   }, [user, navigate])
