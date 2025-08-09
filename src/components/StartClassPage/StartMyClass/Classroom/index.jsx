@@ -44,7 +44,7 @@ const Classroom = () => {
               height='25'
               className='plustap__plus__Icon'
             />
-            <h3>Lớp học gần đây</h3>
+            <h2>Lớp học gần đây</h2>
           </div>
           <div className='plustap__infor'>
             <span className='plustap__infor__span'>▲ Lớp đang học</span>

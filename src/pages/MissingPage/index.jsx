@@ -14,7 +14,7 @@ const userRole = user?.authorities?.[0]?.authority
         Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm kiếm. Đường dẫn có thể đã bị hỏng
         hoặc trang đã được di chuyển.
       </p>
-      <Link to={userRole === 'ADMIN' ? '/admin/home' : '/'} className='missing-page__home-link'>
+      <Link to={userRole === 'ADMIN' ? '/admin/home' : '/home'} className='missing-page__home-link'>
         Quay về trang chủ
       </Link>
     </div>

@@ -166,18 +166,23 @@ $background-light: #ffefe4;
           .lesson-item {
             display: flex;
             align-items: center;
-
-            padding: 5px;
-            background: #fff5e6;
-            border-radius: 5px;
+            border: 1px solid #f27b36;
+            background: #ffefe4;
+            border-radius: 12px;
             box-shadow: 0 2px 4px rgba(#000, 0.1);
             span {
-              background: $secondary-color;
+              background: #f48a4c;
               color: white;
-              padding: 5px 14px;
               border-radius: 5px;
               margin-right: 10px;
               font-weight: bold;
+              box-sizing: border-box;
+              width: 40px;
+              aspect-ratio: 1;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 12px;
             }
 
             .lesson-details {

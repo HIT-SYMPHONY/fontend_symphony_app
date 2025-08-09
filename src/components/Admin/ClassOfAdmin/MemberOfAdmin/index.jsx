@@ -598,21 +598,17 @@ const MemberOfClassAdmin = () => {
   const [loading, setLoading] = useState(true)
   const [selectedUserIds, setSelectedUserIds] = useState([])
 
-  // --- State for LEFT panel controls ---
   const [searchQueryLeft, setSearchQueryLeft] = useState('')
   const [selectedIntakeLeft, setSelectedIntakeLeft] = useState('Tất cả lớp')
   const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
   const dropdownRefLeft = useRef(null)
   const intakeOptions = ['Tất cả lớp', 'K16', 'K17', 'K18', 'K19', 'K20']
 
-  // --- State for RIGHT panel controls ---
   const [searchQueryRight, setSearchQueryRight] = useState('')
 
-  // --- State for the NEW role filter in the bottom bar ---
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('Tất cả')
   const roleFilterOptions = ['Tất cả', 'USER', 'LEADER', 'ADMIN']
 
-  // --- Data Fetching ---
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {

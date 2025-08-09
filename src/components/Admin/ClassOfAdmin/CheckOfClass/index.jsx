@@ -587,7 +587,7 @@ import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getClassroomById, updateClassroom } from '../../../../apis/classroom.api'
-import { getAllUsers } from '../../../../apis/user.api'
+import { getAllUsers, getLeaderList } from '../../../../apis/user.api'
 import { formatDate } from '../../../../utils/formatters'
 import './style.scss'
 
@@ -613,10 +613,7 @@ const CheckOfClassAdmin = () => {
     { option: 'Quản lý thành viên', link: `/admin/classes/${classId}/members` },
   ]
 
-  const processFetchedData = useCallback((classData, allUsersData) => {
-    const leaderList = allUsersData.filter(
-      (user) => user.role === 'LEADER' || user.role === 'ADMIN',
-    )
+  const processFetchedData = useCallback((classData, leaderList) => {
     setLeaders(leaderList)
     setClassroom(classData)
     setPreviewUrl(classData.image)
@@ -627,13 +624,15 @@ const CheckOfClassAdmin = () => {
       startTime: classData.startTime ? classData.startTime.split('T')[0] : '',
       duration: classData.duration || '',
       description: classData.description || '',
+      timeSlot: classData.timeSlot || '',
+      endTime: classData.endTime || '',
     })
   }, [])
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const [classRes, usersRes] = await Promise.all([getClassroomById(classId), getAllUsers()])
+      const [classRes, usersRes] = await Promise.all([getClassroomById(classId), getLeaderList()])
 
       const classData = classRes.data
       const allUsers = usersRes.data || []
@@ -672,6 +671,8 @@ const CheckOfClassAdmin = () => {
       startTime: `${editForm.startTime}T00:00:00Z`,
       duration: parseInt(editForm.duration),
       description: editForm.description,
+      timeSlot: editForm.timeSlot,
+      endTime: editForm.endTime,
     }
 
     const formData = new FormData()
@@ -700,6 +701,8 @@ const CheckOfClassAdmin = () => {
       startTime: classroom.startTime.split('T')[0],
       duration: classroom.duration,
       description: classroom.description,
+      timeSlot: classroom.timeSlot,
+      endTime: classroom.endTime,
     })
     setPreviewUrl(classroom.image)
     setImageFile(null)
@@ -855,7 +858,17 @@ const CheckOfClassAdmin = () => {
                 </div>
                 <div>
                   <span>Ngày kết thúc</span>
-                  <h5>{/* This field does not exist in the API response */}</h5>
+                  {isEditing ? (
+                    <input
+                      type='date'
+                      name='endTime'
+                      value={editForm.endTime}
+                      onChange={handleInputChange}
+                      className='check-class-admin__input'
+                    />
+                  ) : (
+                    <h5>{formatDate(classroom.endTime)}</h5>
+                  )}
                 </div>
                 <div>
                   <span>Độ dài lớp học (tuần)</span>
@@ -872,8 +885,18 @@ const CheckOfClassAdmin = () => {
                   )}
                 </div>
                 <div>
-                  <span>Lịch lớp học</span>
-                  <h5>{/* This field does not exist in the API response */}</h5>
+                  <span>Độ dài lớp học (tuần)</span>
+                  {isEditing ? (
+                    <input
+                      type='text'
+                      name='timeSlot'
+                      value={editForm.timeSlot}
+                      onChange={handleInputChange}
+                      className='check-class-admin__input'
+                    />
+                  ) : (
+                    <h5>{classroom.timeSlot}</h5>
+                  )}
                 </div>
               </div>
             </form>

@@ -3,7 +3,6 @@ import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import './scss/style.scss'
 
-// src/AppRoutes.jsx
 import LoginPage from './components/StartLoginPage/LoginPage'
 import AdminRoutes from './routes/AdminRoutes'
 import ClientRoutes from './routes/ClientRoutes'

@@ -40,6 +40,8 @@ const InformationManage = () => {
         return `/manage/classes/${classId}/notifications/create`
       case 'lessons':
         return `/manage/classes/${classId}/lessons/create`
+      case 'tests':
+        return `/manage/classes/${classId}/tests/create`
       default:
         return null
     }

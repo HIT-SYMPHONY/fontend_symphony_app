@@ -93,7 +93,7 @@ $background-light: #ffefe4;
     position: relative;
     display: flex;
     align-items: center;
-    flex:1;
+    flex: 1;
 
     &-input {
       flex: 1;
@@ -115,7 +115,7 @@ $background-light: #ffefe4;
   }
 
   &__create-button {
-    padding: 8px 15px ;
+    padding: 8px 15px;
     background-color: $background-light;
     color: $secondary-color;
     border: 2px solid $secondary-color;
@@ -170,13 +170,15 @@ $background-light: #ffefe4;
           align-items: center;
           width: 70%;
           &-item {
+            font-size: 1.125rem;
             display: flex;
-            justify-content: space-around;
-            width: 90%;
+            width: 100%;
+            gap: 1.25rem;
             & div {
               display: flex;
               flex-direction: column;
               gap: 5px;
+              flex: 1;
 
               input {
                 padding: 5px 20px;
@@ -185,15 +187,19 @@ $background-light: #ffefe4;
                 min-width: 200px;
               }
             }
+            select {
+              padding: 5px 20px;
+              border: 2px solid #ccc;
+            }
           }
 
           &-table {
             display: flex;
-            justify-content: space-around;
-            gap: 10px;
+            gap: 1.5rem;
             width: 100%;
 
             & div {
+              flex: 1;
               display: flex;
               flex-direction: column;
               gap: 5px;

@@ -51,14 +51,14 @@ const Main = () => {
             height='25'
             className='thongbao__Icon'
           />
-          <h3>Thông báo</h3>
+          <h2>Thông báo</h2>
         </div>
         <AdvList announcements={announcements} isLoading={loading} />
       </div>
       <div className='flex-one__plus'>
         <div className='plus'>
           <Icon icon='fluent:book-star-24-regular' width='25' height='25' className='plus__Icon' />
-          <h3>Lớp học gần đây</h3>
+          <h2>Lớp học gần đây</h2>
         </div>
         <div className='class-ago thay2'>
           {loading ? (
@@ -73,7 +73,6 @@ const Main = () => {
                   <button
                     className='class-ago__button'
                     onClick={() => {
-                      console.log(item.id)
                       navigate(`/my-classes/${item.id}`)
                     }}>
                     VÀO HỌC
