@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import toast from 'react-hot-toast'
@@ -22,8 +22,23 @@ const DashboardOfMain = () => {
   const [showMain, setShowMain] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
-  const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(false)
   const [isManageMenuOpen, setIsManageMenuOpen] = useState(false)
+
+  const isMyClassroomActive =
+    location.pathname.startsWith('/my-classes') || location.pathname.startsWith('/my-results')
+  const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(isMyClassroomActive)
+
+  useEffect(() => {
+    setClassroomMenuOpen(isMyClassroomActive)
+  },[isClassroomMenuOpen])
+
+  const handleManageClick = () => {
+    if (isMyClassroomActive) {
+      setClassroomMenuOpen((prevState) => !prevState)
+    } else {
+      navigate('/my-classes')
+    }
+  }
 
   const handleLichHoc = () => {
     if (showHomework) setShowHomework(false)
@@ -45,7 +60,7 @@ const DashboardOfMain = () => {
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user.fullName)}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user)}!</h3>
 
         <NavLink to='/home' className='homepage__choose__click'>
           <i className='fa-solid fa-house'></i>
@@ -54,13 +69,15 @@ const DashboardOfMain = () => {
 
         <NavLink
           to='my-classes'
-          className='homepage__choose__click'
-          onClick={() => setClassroomMenuOpen(!isClassroomMenuOpen)}>
+          className={
+            isMyClassroomActive ? 'homepage__choose__click origin' : 'homepage__choose__click'
+          }
+          onClick={handleManageClick}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
         </NavLink>
 
-        {isClassroomMenuOpen && (
+        {isMyClassroomActive && (
           <div>
             <NavLink to='/my-classes' className='homepage__choose__clickone'>
               <Icon

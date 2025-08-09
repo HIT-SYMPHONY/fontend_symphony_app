@@ -1,41 +1,41 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import toast from 'react-hot-toast'
-import { getMyLessons } from '../../apis/lesson.api'
-import { getLessonStatus, formatDateForBox, formatDateTime } from '../../utils/formatters'
+import { getMyPosts } from '../../apis/post.api'
+import { getPostStatus, formatDateForBox, formatDateTime, getDisplayName } from '../../utils/formatters'
 import menuBookRounded from '@iconify-icons/material-symbols/menu-book-rounded'
 import './style.scss'
 
 const Homework = () => {
-  const [allLessons, setAllLessons] = useState([])
+  const [allPosts, setAllPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [selectedClass, setSelectedClass] = useState('Tất cả')
 
   useEffect(() => {
-    const fetchLessons = async () => {
+    const fetchPosts = async () => {
       try {
         setLoading(true)
-        const response = await getMyLessons()
-        setAllLessons(response.data || [])
+        const response = await getMyPosts()
+        setAllPosts(response.data || [])
       } catch (error) {
-        toast.error('Không thể tải danh sách bài học.')
+        toast.error('Không thể tải danh sách bài tập.')
       } finally {
         setLoading(false)
       }
     }
-    fetchLessons()
+    fetchPosts()
   }, [])
 
   const classOptions = useMemo(() => {
-    const classNames = allLessons.map((lesson) => lesson.className)
+    const classNames = allPosts.map((post) => post.classRoomName)
     return ['Tất cả', ...new Set(classNames)]
-  }, [allLessons])
+  }, [allPosts])
 
-  const filteredLessons = useMemo(() => {
-    if (selectedClass === 'Tất cả') return allLessons
-    return allLessons.filter((lesson) => lesson.className === selectedClass)
-  }, [allLessons, selectedClass])
+  const filteredPosts = useMemo(() => {
+    if (selectedClass === 'Tất cả') return allPosts
+    return allPosts.filter((post) => post.classRoomName === selectedClass)
+  }, [allPosts, selectedClass])
 
   const toggleDropdown = () => setIsOpen((prev) => !prev)
   const handleSelectClass = (className) => {
@@ -78,16 +78,16 @@ const Homework = () => {
       </div>
       <div className='homework__baitap'>
         {loading ? (
-          <p>Đang tải bài học...</p>
-        ) : filteredLessons.length > 0 ? (
-          filteredLessons.map((item) => {
-            const status = getLessonStatus(item.startTime, item.endTime)
+          <p>Đang tải bài tập...</p>
+        ) : filteredPosts.length > 0 ? (
+          filteredPosts.map((item) => {
+            const status = getPostStatus(item.deadline)
 
             return (
               <div key={item.id} className='baitap'>
                 <div className='div'>
                   <span className={`vien ${status.backgroundClass}`}>
-                    {formatDateForBox(item.endTime)}
+                    {formatDateForBox(item.deadline)}
                   </span>
                   <div className={status.colorClass}>
                     <h5>CHƯA HOÀN THÀNH</h5>
@@ -97,26 +97,25 @@ const Homework = () => {
                     </div>
                   </div>
                 </div>
-                <h5>{item.className}</h5>
+                <h5>Lớp: {item.classRoomName}</h5>
                 <div className='baitap__content'>
                   <div className={`vien ${status.backgroundClass}`}></div>
                   <div>
                     <div className='daucuoi'>
                       <p>Tên bài tập:</p>
-                      <p className='ellipsis'>{item.title || item.content}</p>{' '}
-                      {/* Fallback to content if title is null */}
+                      <p className='ellipsis'>{item.title}</p>
                     </div>
                     <div className='daucuoi'>
                       <p>Người giao bài:</p>
-                      <p>{item.leaderName}</p>
+                      <p>{getDisplayName(item)}</p>
                     </div>
                     <div className='daucuoi'>
                       <p>Thời gian giao:</p>
-                      <p>{formatDateTime(item.startTime)}</p>
+                      <p>{formatDateTime(item.createdAt)}</p>
                     </div>
                     <div className='daucuoi'>
                       <p>Hạn nộp:</p>
-                      <p>{formatDateTime(item.endTime)}</p>
+                      <p>{formatDateTime(item.deadline)}</p>
                     </div>
                   </div>
                 </div>
@@ -124,7 +123,7 @@ const Homework = () => {
             )
           })
         ) : (
-          <p>Không có bài học nào.</p>
+          <p>Không có bài tập nào.</p>
         )}
       </div>
     </div>

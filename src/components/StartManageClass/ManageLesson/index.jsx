@@ -9,7 +9,6 @@ import TextMessage from '../../TextMessage'
 const ManageLesson = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
-
   const [lessons, setLessons] = useState([])
   const [loading, setLoading] = useState(true)
   const [expandedItems, setExpandedItems] = useState({})

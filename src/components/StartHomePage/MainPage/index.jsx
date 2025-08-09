@@ -72,7 +72,10 @@ const Main = () => {
                 <div className='class-ago__content'>
                   <button
                     className='class-ago__button'
-                    onClick={() => navigate(`/my-classes/${item.id}`)}>
+                    onClick={() => {
+                      console.log(item.id)
+                      navigate(`/my-classes/${item.id}`)
+                    }}>
                     VÀO HỌC
                   </button>
                   <h2 className='class-ago__content__title'>Private</h2>

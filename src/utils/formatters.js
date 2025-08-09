@@ -119,7 +119,7 @@ export const getLessonStatus = (startTimeISO, endTimeISO) => {
   return { text: 'Quá hạn', backgroundClass: 'back-three', colorClass: 'color-three' }
 }
 
-export const getHomeworkStatus = (deadlineISO) => {
+export const getPostStatus = (deadlineISO) => {
   if (!deadlineISO) {
     return { text: 'Không có hạn nộp', backgroundClass: 'back-one', colorClass: 'color-one' }
   }

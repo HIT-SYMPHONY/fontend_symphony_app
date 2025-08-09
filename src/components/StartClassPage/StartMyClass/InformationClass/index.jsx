@@ -484,23 +484,18 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import toast from 'react-hot-toast'
 
-// --- Core Tools from our Architecture ---
 import { getClassroomById } from '../../../../apis/classroom.api'
 import { getLessonsByClassroomId } from '../../../../apis/lesson.api.js'
 import { formatDate, translateStatus } from '../../../../utils/formatters'
 import { getPostsByClassroomId } from '../../../../apis/post.api.js'
 
-// --- UI Components ---
 import Member from '../Member'
-// --- Styles ---
 import './style.scss'
 
-// A small helper for post status, can be moved to formatters.js
 const getHomeworkStatus = (deadline) => {
   const now = new Date()
   const deadlineDate = new Date(deadline)
   if (deadlineDate < now) return { text: 'Đã hết hạn', style: 3 }
-  // Add more logic for ' sắp đến hạn' if needed
   return { text: 'Chưa hoàn thành', style: 1 }
 }
 
@@ -528,14 +523,12 @@ const HomeInformation = () => {
     const loadingToast = toast.loading('Đang tải thông tin lớp học...')
     try {
       setLoading(true)
-      // Fetch all data in parallel for better performance
       const [classroomResponse, lessonsResponse, postsResponse] = await Promise.all([
         getClassroomById(classId),
         getLessonsByClassroomId(classId),
         getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }),
       ])
 
-      // The interceptor gives us { status, data }, we need the inner `data`
       setClassroom(classroomResponse.data)
       setLessons(lessonsResponse.data || [])
       setPosts(postsResponse.data?.items || [])

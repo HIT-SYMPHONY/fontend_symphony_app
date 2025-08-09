@@ -14,7 +14,6 @@ const AllMember = () => {
   const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-
   const fetchMembers = useCallback(
     async (page = 1, isLoadMore = false) => {
       if (!classId) return

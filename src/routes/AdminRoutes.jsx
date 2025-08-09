@@ -22,6 +22,7 @@ import CreateOfMess from '../components/Admin/CompetOfAdmin/CreateOfMess'
 
 import DecentOfAdmin from '../components/Admin/DecentOfAdmin'
 import AccountOfAdmin from '../components/Admin/AccoutOfAdmin'
+import AccountPage from '../pages/AccountPage'
 
 const AdminRoutes = (
   <Route
@@ -60,7 +61,7 @@ const AdminRoutes = (
 
     {/* Other */}
     <Route path='decent' element={<DecentOfAdmin />} />
-    <Route path='account' element={<AccountOfAdmin />} />
+    <Route path='account' element={<AccountPage />} />
   </Route>
 )
 
