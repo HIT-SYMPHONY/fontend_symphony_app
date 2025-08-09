@@ -10,6 +10,7 @@ const postApi = () => ({
 
     return api.get(url, { params })
   },
+  getMyPosts: async () => api.get(ApiConstant.users.getMyPosts),
 })
 
-export const { getPostsByClassroomId } = postApi()
+export const { getPostsByClassroomId, getMyPosts } = postApi()

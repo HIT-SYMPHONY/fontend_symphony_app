@@ -8,23 +8,23 @@ import TextMessage from '../../TextMessage'
 
 const ManageLesson = () => {
   const navigate = useNavigate()
-  const { classID } = useParams()
+  const { classId } = useParams()
   const [lessons, setLessons] = useState([])
   const [loading, setLoading] = useState(true)
   const [expandedItems, setExpandedItems] = useState({})
 
   const fetchLessons = useCallback(async () => {
-    if (!classID) return
+    if (!classId) return
     try {
       setLoading(true)
-      const response = await getLessonsByClassId(classID)
+      const response = await getLessonsByClassId(classId)
       setLessons(response.data || [])
     } catch (error) {
       toast.error('Không thể tải danh sách bài học.')
     } finally {
       setLoading(false)
     }
-  }, [classID])
+  }, [classId])
 
   useEffect(() => {
     fetchLessons()
@@ -54,7 +54,7 @@ const ManageLesson = () => {
 
   const handleEdit = (lessonId, event) => {
     event.stopPropagation()
-    navigate(`/manage/classes/${classID}/lessons/${lessonId}/edit`)
+    navigate(`/manage/classes/${classId}/lessons/${lessonId}/edit`)
   }
 
   return (

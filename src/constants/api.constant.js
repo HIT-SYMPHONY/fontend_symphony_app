@@ -15,6 +15,7 @@ export const ApiConstant = {
     getMyCompetitions: '/users/me/competitions',
     getLeaders: '/users/leaders',
     updateRole: '/users/role',
+    getMyPosts: '/users/me/posts',
   },
   classrooms: {
     base: '/classrooms',

@@ -37,6 +37,8 @@ import {
   Rating,
   YourTest,
 } from '../components/StartCompetition/InformationPage'
+import EditLesson from '../components/StartManageClass/EditLesson'
+import AccountPage from '../pages/AccountPage'
 const ClientRoutes = (
   <>
     <Route
@@ -87,7 +89,7 @@ const ClientRoutes = (
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
-          <Route path='lessons/:lessonId' element={<TestContent />} />
+          <Route path='tests' element={<TestContent />} />
           <Route path='lessons/:lessonID' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonID/edit' element={<EditLesson />}></Route>
         </Route>
@@ -100,7 +102,7 @@ const ClientRoutes = (
       </Route>
 
       {/* trang viết thông tin cá nhân */}
-      <Route path='account' element={<HomeAccount />} />
+      <Route path='account' element={<AccountPage />} />
     </Route>
   </>
 )
