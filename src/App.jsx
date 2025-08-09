@@ -10,6 +10,8 @@ import ClientRoutes from './routes/ClientRoutes'
 import Confirm from './components/StartLoginPage/Confirm'
 import AuthListener from './components/AuthListener/AuthListener'
 import { Toaster } from 'react-hot-toast'
+import MissingPage from './pages/MissingPage'
+import UnauthorizedPage from './pages/UnauthorizedPage'
 
 const App = () => (
   <>
@@ -17,10 +19,11 @@ const App = () => (
     <AuthListener />
     <Routes>
       <Route path='/login' element={<LoginPage />} />
-      <Route path='/' element={<LoginPage />} />
       <Route path='/forgot-password' element={<Confirm />} />
+      <Route path='/unauthorized' element={<UnauthorizedPage />} />
       {ClientRoutes}
       {AdminRoutes}
+      <Route path='*' element={<MissingPage />} />
     </Routes>
   </>
 )

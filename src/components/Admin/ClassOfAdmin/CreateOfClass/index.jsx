@@ -372,8 +372,8 @@ const CreateOfClassAdmin = () => {
           ref={dropdownRef}>
           <Icon
             icon='stash:filter-solid'
-            width='20'
-            height='20'
+            width='28'
+            height='28'
             className='create-class-admin__filter-icon'
           />
           <div className='create-class-admin__filter-label'>Tất cả</div>

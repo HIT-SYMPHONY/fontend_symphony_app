@@ -7,7 +7,7 @@ $background-light: #ffefe4;
 .main-class-admin {
   border: 2px solid $border-color;
   box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
+  padding: 0 1rem;
   border-radius: 10px;
   box-sizing: border-box;
   height: 90vh;
@@ -22,7 +22,8 @@ $background-light: #ffefe4;
   -ms-overflow-style: none;
   &__header {
     display: flex;
-    justify-content: space-between;
+    margin-top: .5rem;
+    gap: 3rem;
     align-items: center;
   }
 
@@ -96,11 +97,12 @@ $background-light: #ffefe4;
   }
 
   &__search {
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
-
     &-input {
+      flex: 1;
       padding: 10px 10px;
       border: 1px solid #ccc;
       border-radius: 20px;
@@ -120,7 +122,7 @@ $background-light: #ffefe4;
   }
 
   &__create-button {
-    padding: 5px 10px;
+    padding: 8px 15px;
     background-color: $background-light;
     color: $secondary-color;
     border: 2px solid $secondary-color;

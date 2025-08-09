@@ -78,8 +78,8 @@ const MainOfAdmin = () => {
           ref={dropdownRef}>
           <Icon
             icon='stash:filter-solid'
-            width='20'
-            height='20'
+            width='28'
+            height='28'
             className='main-admin__title__choose__icon'
           />
           <div className='main-admin__title__choose__label'>

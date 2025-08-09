@@ -10,7 +10,7 @@ import '../ManageLesson/style.scss'
 
 const EditLesson = () => {
   const navigate = useNavigate()
-  const { classID, lessonID } = useParams()
+  const { classID, lessonId } = useParams()
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
 
@@ -25,13 +25,13 @@ const EditLesson = () => {
 
   useEffect(() => {
     const fetchLessonData = async () => {
-      if (!lessonID) {
+      if (!lessonId) {
         toast.error('Không tìm thấy ID bài học.')
         return
       }
       try {
         setPageLoading(true)
-        const response = await getLessonById(lessonID)
+        const response = await getLessonById(lessonId)
         reset(response.data)
       } catch (error) {
         toast.error('Không thể tải thông tin bài học.')
@@ -40,7 +40,7 @@ const EditLesson = () => {
       }
     }
     fetchLessonData()
-  }, [lessonID, reset])
+  }, [lessonId, reset])
 
   const onSubmit = async (data) => {
     setLoading(true)
@@ -48,8 +48,8 @@ const EditLesson = () => {
     const payload = data
 
     try {
-      console.log(lessonID)
-      await updateLesson(lessonID, payload)
+      console.log(lessonId)
+      await updateLesson(lessonId, payload)
       toast.success('Cập nhật bài học thành công!', { id: updateToast })
     } catch (error) {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'

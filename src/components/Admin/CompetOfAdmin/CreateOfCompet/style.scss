@@ -15,6 +15,9 @@ $background-light: #ffefe4;
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
+  form {
+    flex: 1;
+  }
   &::-webkit-scrollbar {
     display: none;
   }
@@ -64,7 +67,7 @@ $background-light: #ffefe4;
   }
 
   &__create-button {
-    padding: 5px 10px;
+    padding: 8px 15px;
     background-color: $background-light;
     color: $secondary-color;
     border: 2px solid $secondary-color;
@@ -77,6 +80,7 @@ $background-light: #ffefe4;
     padding: 10px;
     border-radius: 10px;
     box-sizing: border-box;
+    height: 100%;
 
     &-title {
       display: flex;

@@ -10,7 +10,7 @@ import './style.scss'
 
 const CreateLessonID = () => {
   const navigate = useNavigate()
-  const { classID} = useParams()
+  const { classId } = useParams()
   const [loading, setLoading] = useState(false)
 
   const {
@@ -20,7 +20,7 @@ const CreateLessonID = () => {
   } = useForm({
     resolver: yupResolver(lessonCreationSchema),
     defaultValues: {
-      classRoomId: classID
+      classRoomId: classId,
     },
   })
 
@@ -58,7 +58,6 @@ const CreateLessonID = () => {
         <h3>Bài học</h3>
       </div>
 
-      {/* --- THE FIX IS HERE: The <form> tag now wraps everything --- */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='createlesson__context'>
           <div className='createlesson__title'>
@@ -89,7 +88,6 @@ const CreateLessonID = () => {
           <div className='createlesson__time'>
             <div className='createlesson__time-wrap'>
               <label htmlFor='startTime'>Thời gian bắt đầu</label>
-              {/* Corrected id and name to match API */}
               <input type='time' id='startTime' {...register('startTime')} />
               {errors.startTime && (
                 <span className='error-message'>{errors.startTime.message}</span>
@@ -97,7 +95,6 @@ const CreateLessonID = () => {
             </div>
             <div className='createlesson__time-wrap'>
               <label htmlFor='endTime'>Thời gian kết thúc</label>
-              {/* Corrected id and name to match API */}
               <input type='time' id='endTime' {...register('endTime')} />
               {errors.endTime && <span className='error-message'>{errors.endTime.message}</span>}
             </div>
