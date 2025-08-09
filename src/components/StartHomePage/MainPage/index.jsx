@@ -78,8 +78,7 @@ const Main = () => {
                     }}>
                     VÀO HỌC
                   </button>
-                  <h2 className='class-ago__content__title'>Private</h2>
-                  <h2 className='class-ago__content__title'>{item.name}</h2>
+                  <h2 className='class-ago__content__title ellipsis'>{item.name}</h2>
                   <p className='class-ago__content__info'>
                     <span className='icon'>
                       <Icon icon='mdi:badge-account' />

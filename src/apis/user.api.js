@@ -31,6 +31,7 @@ const userApi = () => ({
   getUserClasses: async (userId) =>
     api.get(`${ApiConstant.users.baseId}${userId}${ApiConstant.classrooms.base}`),
   getMyClasses: async () => api.get(ApiConstant.users.getMyClassrooms),
+  getMyCompetitions: async () => api.get(ApiConstant.users.getMyCompetitions),
 })
 
 export const {
@@ -42,7 +43,7 @@ export const {
   getLeaderList,
   getCurrentUser,
   updateUserRoles,
-
+  getMyCompetitions,
   getCurrentUserWithToken,
   getUserClasses,
   getMyClasses,

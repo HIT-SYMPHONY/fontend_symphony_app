@@ -130,7 +130,7 @@ const TableResult = ({ onSetSub }) => {
               <div className='body__thongtin'>
                 <hr />
                 <div className='body__thongtin__title'>
-                  <span>Tên Bài</span>
+                  <span>Tên bài</span>
                   <span>Điểm</span>
                   <span>Thông tin chi tiết</span>
                 </div>

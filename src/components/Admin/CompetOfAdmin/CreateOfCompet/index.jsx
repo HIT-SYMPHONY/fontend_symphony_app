@@ -17,7 +17,7 @@ const CreateOfCompetAdmin = () => {
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(competitionCreationSchema),
-    mode: 'onChange', // Validate on change for instant feedback
+    mode: 'onTouched', // Validate on change for instant feedback
   })
 
   const [loading, setLoading] = useState(false)

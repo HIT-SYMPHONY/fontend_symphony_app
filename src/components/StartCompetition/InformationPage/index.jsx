@@ -244,10 +244,6 @@ import { getCompetitionById } from '../../../apis/competition.api'
 import useAuth from '../../../hooks/useAuth'
 import './style.scss'
 
-// ===================================================================
-//  TAB CONTENT COMPONENTS
-// ===================================================================
-
 const Introduction = () => {
   const { competition } = useOutletContext()
   if (!competition) return null
@@ -340,13 +336,8 @@ const YourTest = () => {
   )
 }
 
-// ===================================================================
-//  MAIN PAGE COMPONENT (THE LAYOUT/SHELL)
-// ===================================================================
-
 const InformationCompetition = () => {
-  const { competitionsId } = useParams() // Note: Your route uses 'competitionsId'
-  console.log('Competition ID:', competitionsId)
+  const { competitionsId } = useParams() 
   const [competition, setCompetition] = useState(null)
   const [loading, setLoading] = useState(true)
 

@@ -228,55 +228,77 @@
 // }
 
 // export default MainCompetition
-
 import React, { useState, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-
-// --- Core Tools ---
 import { getAllCompetitions } from '../../../apis/competition.api'
-import { joinCompetition } from '../../../apis/competitionUser.api' // 👈 1. Import the new API function
+import { joinCompetition } from '../../../apis/competitionUser.api'
+import { getMyCompetitions } from '../../../apis/user.api'
 import { formatDate, translateStatus } from '../../../utils/formatters'
-
-// --- Styles ---
+import LoadMoreButton from '../../LoadMoreButton'
+import EndOfListMessage from '../../EndOfListMessage'
 import './style.scss'
 
 const MainCompetition = () => {
   const navigate = useNavigate()
   const [competitions, setCompetitions] = useState([])
+  const [myCompetitions, setMyCompetitions] = useState([]) // 👈 State for joined competitions
+  const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [joinLoading, setJoinLoading] = useState(null)
 
-  const fetchCompetitions = useCallback(async () => {
+  const fetchCompetitions = useCallback(async (page, isLoadMore = false) => {
+    isLoadMore ? setLoadingMore(true) : setLoading(true)
     try {
-      setLoading(true)
-      const params = { pageNum: 1, pageSize: 10, sortBy: 'startTime', isAscending: false }
-      const response = await getAllCompetitions(params)
-      setCompetitions(response.data?.items || [])
-    } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error('Có lỗi xảy ra khi tải danh sách cuộc thi.')
+      const params = { pageNum: page, pageSize: 10, sortBy: 'startTime', isAscending: false }
+      const [allCompetitionsResponse, myCompetitionsResponse] = await Promise.all([
+        getAllCompetitions(params),
+        getMyCompetitions(),
+      ])
+
+      const allContent = allCompetitionsResponse.data
+      const myContent = myCompetitionsResponse.data
+
+      if (allContent && allContent.items) {
+        if (isLoadMore) {
+          setCompetitions((prev) => [...prev, ...allContent.items])
+        } else {
+          setCompetitions(allContent.items)
+        }
       }
+      if (allContent && allContent.meta) {
+        setPagination({
+          pageNum: allContent.meta.pageNum,
+          totalPages: allContent.meta.totalPages,
+          totalElements: allContent.meta.totalElements,
+        })
+      }
+      if (myContent && myContent.items) {
+        setMyCompetitions(myContent.items)
+      }
+    } catch (error) {
+      if (error.response?.data?.message) toast.error(error.response.data.message)
+      else toast.error('Có lỗi xảy ra khi tải danh sách cuộc thi.')
     } finally {
-      setLoading(false)
+      isLoadMore ? setLoadingMore(false) : setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchCompetitions()
+    fetchCompetitions(1)
   }, [fetchCompetitions])
 
-  // 👇 2. Create the handler for the "Đăng ký" button
-  const handleJoinCompetition = async (competitionId) => {
-    setJoinLoading(competitionId) // Set loading state for this specific button
+  const handleJoinCompetition = async (competitionId, event) => {
+    event.stopPropagation()
+    setJoinLoading(competitionId)
     try {
       const payload = { competitionId: competitionId }
       await joinCompetition(payload)
       toast.success('Đăng ký tham gia thành công!')
-      navigate(`${competitionId}`)
+      // After successfully joining, refetch all data to update both lists
+      await fetchCompetitions(1)
     } catch (error) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message)
@@ -287,6 +309,13 @@ const MainCompetition = () => {
       setJoinLoading(null)
     }
   }
+
+  const handleLoadMore = () => {
+    const nextPage = pagination.pageNum + 1
+    fetchCompetitions(nextPage, true)
+  }
+
+  const hasMore = pagination.pageNum < pagination.totalPages
 
   return (
     <div className='competition'>
@@ -305,12 +334,17 @@ const MainCompetition = () => {
         </div>
         <div className='competition__left__bang'>
           {loading && <p style={{ padding: '1rem' }}>Đang tải các cuộc thi...</p>}
+
           {!loading && competitions.length === 0 && (
             <p style={{ padding: '1rem' }}>Chưa có cuộc thi nào.</p>
           )}
+
           {!loading &&
             competitions.map((contest) => (
-              <div className='competition__left__bang__box' key={contest.id}>
+              <div
+                className='competition__left__bang__box'
+                key={contest.id}
+                onClick={() => navigate(`/competitions/${contest.id}`)}>
                 <div className='competition__left__bang__box__board'>
                   {contest.image && <img src={contest.image} alt={contest.name} />}
                 </div>
@@ -320,30 +354,54 @@ const MainCompetition = () => {
                     <span className='competition__left__bang__box__information__list__span1'>
                       {translateStatus(contest.status)}
                     </span>
-
-                    {/* 👇 3. Make the button functional */}
                     <button
                       className='competition__left__bang__box__information__list__span2'
-                      onClick={() => handleJoinCompetition(contest.id)}
-                      disabled={joinLoading === contest.id}>
-                      {joinLoading === contest.id ? 'Đang xử lý...' : 'Đăng ký'}
+                      onClick={(e) => handleJoinCompetition(contest.id, e)}
+                      disabled={
+                        joinLoading === contest.id ||
+                        myCompetitions.some((mc) => mc.id === contest.id)
+                      }>
+                      {joinLoading === contest.id
+                        ? 'Đang xử lý...'
+                        : myCompetitions.some((mc) => mc.id === contest.id)
+                        ? 'Đã tham gia'
+                        : 'Đăng ký'}
                     </button>
-
                     <i className='fa-solid fa-circle-info'></i>
                   </div>
                   <p>Ngày bắt đầu: {formatDate(contest.startTime)}</p>
                 </div>
               </div>
             ))}
+
+          <LoadMoreButton isLoading={loadingMore} hasMore={hasMore} onClick={handleLoadMore} />
+          <EndOfListMessage
+            isLoading={loading}
+            hasMore={hasMore}
+            itemCount={competitions.length}
+            itemName='cuộc thi'
+          />
         </div>
       </div>
       <div className='competition__among'></div>
       <div className='competition__right'>
         <h2>Bạn đang tham gia</h2>
         <div className='competition__right__body'>
-          <div className='competition__right__body__board'>
-            <i className='fa-solid fa-circle-info'></i>
-          </div>
+          {loading ? (
+            <p>Đang tải...</p>
+          ) : myCompetitions.length > 0 ? (
+            myCompetitions.map((contest) => (
+              <div
+                key={contest.id}
+                className='competition__right__body__board'
+                onClick={() => navigate(`/competitions/${contest.id}`)}>
+                <i className='fa-solid fa-circle-info'></i>
+                <span>{contest.name}</span>
+              </div>
+            ))
+          ) : (
+            <p>Bạn chưa tham gia cuộc thi nào.</p>
+          )}
           <hr />
         </div>
         <h3>Giới thiệu</h3>
