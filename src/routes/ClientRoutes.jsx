@@ -39,6 +39,7 @@ import {
   YourTest,
 } from '../components/StartCompetition/InformationPage'
 import AccountPage from '../pages/AccountPage'
+import CreateTest from '../components/StartManageClass/CreateTest'
 const ClientRoutes = (
   <>
     <Route
@@ -55,7 +56,7 @@ const ClientRoutes = (
         <Route index element={<Classroom />} />
         <Route path=':classId' element={<HomeInformation />} />
         <Route path=':classId/lessons/:lessonId' element={<Lesson />} />
-        <Route path=':classId/exams/examId' element={<Exam />} />
+        <Route path=':classId/exams/:examId' element={<Exam />} />
       </Route>
       {/* trang kết quả của học sinh với lớp học  */}
       <Route path='my-results' element={<ListMember />} />
@@ -67,7 +68,7 @@ const ClientRoutes = (
           <Route index element={<Introduction />} /> {/* Default tab */}
           <Route path='rules' element={<Rules />} />
           <Route path='rating' element={<Rating />} />
-          <Route path='my-test' element={<YourTest />} />{' '}
+          <Route path='my-test' element={<YourTest />} />
         </Route>
         <Route path=':competitionsId/test' element={<Assignment />} />
         <Route path=':competitionsId/comment' element={<Complete />} />
@@ -86,13 +87,14 @@ const ClientRoutes = (
           <Route index element={<Communication />} />
           <Route path='notifications' element={<Notification />} />
           <Route path='notifications/create' element={<CreateNotification />} />
-          <Route path='lessons/:lessonId/test' element={<VeiwsLesson />} />
+          <Route path='tests/:testId/grade' element={<VeiwsLesson />} />
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
-          <Route path='lessons/create' element={<CreateLessonID />} />
+          <Route path='lessons/create'  element={<CreateLessonID />} />
           <Route path='tests' element={<TestContent />} />
           <Route path='lessons/:lessonId' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonId/edit' element={<EditLesson />}></Route>
+          <Route path='tests/create' element={<CreateTest />}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
         <Route path='competitions/:competitionId' element={<InformationOfCompet />} />

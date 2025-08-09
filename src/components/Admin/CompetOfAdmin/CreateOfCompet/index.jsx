@@ -17,7 +17,7 @@ const CreateOfCompetAdmin = () => {
     formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(competitionCreationSchema),
-    mode: 'onTouched', // Validate on change for instant feedback
+    mode: 'onTouched',
   })
 
   const [loading, setLoading] = useState(false)
@@ -53,12 +53,8 @@ const CreateOfCompetAdmin = () => {
   }
 
   const onSubmit = async (data) => {
-    // This function will now be called correctly.
-    // 'data' will contain all validated fields from the form.
     setLoading(true)
     const creationToast = toast.loading('Đang tạo cuộc thi...')
-
-    // The 'data' object from the form now matches the API payload perfectly.
     const submissionPayload = {
       name: data.name,
       description: data.description,
@@ -180,7 +176,6 @@ const CreateOfCompetAdmin = () => {
               )}
 
               <span>Thể lệ</span>
-              {/* --- THE FIX IS HERE (Part 2) --- */}
               <textarea
                 placeholder='Nhập thể lệ'
                 className='create-compet-admin__context-enter__right-textarea'

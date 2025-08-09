@@ -94,11 +94,15 @@ $background-light: #ffefe4;
           span {
             background-color: #ffefe4;
             color: #ff6911;
+            font-weight: 600;
+            padding: 0 4px;
+            border-radius: 4px;
           }
         }
         &__span {
           color: #ff6911;
           cursor: pointer;
+          font-weight: 600;
         }
       }
     }

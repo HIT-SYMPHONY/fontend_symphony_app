@@ -41,7 +41,6 @@ const MainManage = () => {
       <div className='manage__title'>
         <Icon icon='mdi:book-account' width='30' height='30' className='manage__title__icon' />
         <h2>Quản lý lớp học</h2>
-        <h2>Quản lý lớp học</h2>
       </div>
       <div className='manage__search'>
         <div className='manage__search__container'>

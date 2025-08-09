@@ -18,6 +18,7 @@ $background-light: #ffefe4;
   &__header {
     display: flex;
     justify-content: space-between;
+    gap: 3rem;
     align-items: center;
   }
 
@@ -90,11 +91,13 @@ $background-light: #ffefe4;
   }
 
   &__search {
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
 
     &-input {
+      flex: 1;
       padding: 10px 10px;
       border: 1px solid #ccc;
       border-radius: 20px;

@@ -6,7 +6,7 @@ import useAuth from '../../../hooks/useAuth'
 
 const CheckEmail = ({ setDisplay, email }) => {
   const navigate = useNavigate()
-  const { saveUser } = useAuth()
+  const { saveUser, user } = useAuth()
   const [tempPassword, setTempPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
@@ -23,7 +23,10 @@ const CheckEmail = ({ setDisplay, email }) => {
       saveUser(authPayload)
 
       toast.success('Xác thực thành công! Đang đăng nhập...')
-      navigate('/home')
+      const userRole = authPayload?.authorities?.[0]?.authority
+      if (userRole === 'ADMIN') {
+        navigate('/admin/home')
+      } else navigate('/home')
     } catch (error) {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message)

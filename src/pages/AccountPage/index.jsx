@@ -161,7 +161,7 @@ const AccountPage = () => {
     <div className='account'>
       <div className='account__symbol'>
         <i className='fa-solid fa-circle-user'></i>
-        <h3>Tài Khoản</h3>
+        <h2>Tài Khoản</h2>
       </div>
       <div className='account__user'>
         <div

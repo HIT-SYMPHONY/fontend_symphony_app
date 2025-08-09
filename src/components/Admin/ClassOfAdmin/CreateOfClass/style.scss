@@ -152,17 +152,13 @@ $background-light: #ffefe4;
     }
 
     &-body {
+      padding: 0 2rem;
       &__form {
-        display: flex;
-        justify-content: space-around;
-        gap: 20px;
-        align-items: center;
-
         &-item {
           display: flex;
-          flex-direction: column;
-          width: 90%;
+          gap: 2rem;
           & div {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -181,18 +177,23 @@ $background-light: #ffefe4;
               padding: 5px 0px;
             }
           }
+          textarea {
+            height: 100%;
+          }
         }
 
         &-table {
-          display: flex;
-          flex-direction: column;
-          width: 90%;
+          width: 100%;
+          gap: 2rem;
+          display: flex !important;
+          flex-direction: row !important;
+          & > div {
+            flex: 1;
+          }
           & div {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            // align-items: center;
-
             input {
               padding: 5px 20px;
               border: 2px solid #ccc;
@@ -240,6 +241,7 @@ $background-light: #ffefe4;
     }
 
     &-button {
+      margin-top: 20px;
       display: flex;
       justify-content: end;
       padding-right: 30px;
@@ -263,3 +265,24 @@ $background-light: #ffefe4;
   flex-direction: column;
   gap: 10px;
 }
+
+.image-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d9d9d9;
+  border-radius: 20px;
+  max-width: 200px;
+}
+.image-input-container {
+  max-width: 200px;
+  height: 180px;
+  img {
+    max-width: 200px;
+    max-height: 180px;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+}
+

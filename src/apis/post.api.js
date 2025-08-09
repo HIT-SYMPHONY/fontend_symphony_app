@@ -11,6 +11,8 @@ const postApi = () => ({
     return api.get(url, { params })
   },
   getMyPosts: async () => api.get(ApiConstant.users.getMyPosts),
+  createPost: async (payload) => api.post(ApiConstant.posts.base, payload),
+  getPostById: async (postId) => api.get(`${ApiConstant.posts.base}/${postId}`),
 })
 
-export const { getPostsByClassroomId, getMyPosts } = postApi()
+export const { getPostsByClassroomId, getMyPosts, createPost , getPostById} = postApi()

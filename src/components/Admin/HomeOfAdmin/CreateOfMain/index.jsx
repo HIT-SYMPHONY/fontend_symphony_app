@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userCreationSchema } from '../../../../utils/userValidate.js'
-import { createUser } from '../../../../apis/user.api'
+import { createUser } from '../../../../apis/user.api.js'
 import './style.scss'
 
 const CreateOfMain = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect ,useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './style.scss'
 import TextMessage from '../../../TextMessage'
@@ -9,7 +9,7 @@ const Lesson = () => {
   const navigate = useNavigate()
   const { lessonId } = useParams()
   const [pageLoading, setPageLoading] = useState(true)
-  const [lesson,setLesson] = useState()
+  const [lesson, setLesson] = useState(null)
   useEffect(() => {
     const fetchLessonData = async () => {
       if (!lessonId) {
@@ -19,11 +19,14 @@ const Lesson = () => {
       try {
         setPageLoading(true)
         const response = await getLessonById(lessonId)
-        console.log(response.data)
         setLesson(response.data)
       } catch (error) {
+        if (error.response?.data?.message) {
+          toast.error(error.response.data.message)
+        } else {
+          toast.error('Không thể tải thông tin bài học.')
+        }
         navigate('/home')
-        toast.error('Không thể tải thông tin bài học.') 
       } finally {
         setPageLoading(false)
       }
@@ -35,6 +38,10 @@ const Lesson = () => {
     return <TextMessage text='Đang tải bài học...'></TextMessage>
   }
 
+  if (!lesson) {
+    return <TextMessage text='Không thể hiển thị bài học.' />
+  }
+
   return (
     <div className='viewlession'>
       <div className='viewlession-title'>
@@ -43,10 +50,6 @@ const Lesson = () => {
       </div>
 
       <div className='viewlession__one'>
-        <strong className='viewlession__one__than'>1 </strong>
-        <strong className='than'>
-          <i className='fa-solid fa-angles-right'></i>
-        </strong>
         <strong>{lesson.title || 'N/A'}</strong>
         <strong className='than'>
           <i className='fa-solid fa-angles-right'></i>
@@ -54,7 +57,8 @@ const Lesson = () => {
         <strong>Đề cương bài học</strong>
       </div>
       <div className='viewlession__two'>
-        <strong>Nội dung: {lesson.content || ''} </strong>
+        <strong>Nội dung</strong>
+        <p>{lesson.content || ''} </p>
       </div>
     </div>
   )

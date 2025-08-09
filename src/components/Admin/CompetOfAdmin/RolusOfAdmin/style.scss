@@ -23,6 +23,7 @@ $background-light: #ffefe4;
 
   &__header {
     display: flex;
+    gap: 3rem;
     justify-content: space-between;
     align-items: center;
   }
@@ -97,11 +98,13 @@ $background-light: #ffefe4;
   }
 
   &__search {
+    flex: 1;
     position: relative;
     display: flex;
     align-items: center;
 
     &-input {
+      flex: 1;
       padding: 10px 10px;
       border: 1px solid #ccc;
       border-radius: 20px;
@@ -122,9 +125,9 @@ $background-light: #ffefe4;
 
   &__create-button {
     padding: 8px 15px;
-    background-color: #dfdede;
-    color: #5d5c5c;
-    border: 2px solid #aaaaaa;
+    background-color: #ffefe4;
+    color: #ff6911;
+    border: 2px solid #ff6911;
     border-radius: 20px;
     cursor: pointer;
   }
