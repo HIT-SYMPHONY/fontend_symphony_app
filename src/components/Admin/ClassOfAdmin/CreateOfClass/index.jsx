@@ -251,17 +251,17 @@
 // }
 
 // export default CreateOfClassAdmin
+
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { createClassroom } from '../../../../apis/classroom.api' // Import the correct API function
+import { createClassroom } from '../../../../apis/classroom.api'
 import { getAllUsers } from '../../../../apis/user.api'
 import './style.scss'
 
 const CreateOfClassAdmin = () => {
   const navigate = useNavigate()
-
   const [leaders, setLeaders] = useState([])
   const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState(null)
@@ -272,16 +272,15 @@ const CreateOfClassAdmin = () => {
     duration: '',
     leaderId: '',
   })
-
   const fileInputRef = useRef(null)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false) // Dropdown state (UI only)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
 
-  // Fetch users to populate the leader dropdown
   const fetchLeaders = useCallback(async () => {
     try {
       const response = await getAllUsers()
-      const leaderList = response.data?.filter((user) => user.role === 'LEADER') || []
+      const leaderList =
+        response.data?.filter((user) => user.role === 'LEADER' || user.role === 'ADMIN') || []
       setLeaders(leaderList)
     } catch (err) {
       toast.error('Không thể tải danh sách leader.')
@@ -292,13 +291,11 @@ const CreateOfClassAdmin = () => {
     fetchLeaders()
   }, [fetchLeaders])
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  // Handle image file selection
   const handleFileChange = (event) => {
     const file = event.target.files[0]
     if (file) {
@@ -307,37 +304,27 @@ const CreateOfClassAdmin = () => {
     }
   }
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     const createToast = toast.loading('Đang tạo lớp học...')
 
-    // --- THE CRITICAL FIX IS HERE ---
-    // 1. Prepare the JSON payload as specified by the backend.
     const payload = {
       name: formData.name,
       startTime: formData.startTime,
       duration: parseInt(formData.duration),
       leaderId: formData.leaderId,
     }
-
-    // 2. Create a FormData object.
     const formDataToSend = new FormData()
-
-    // 3. Append the JSON payload as a Blob with the key "data".
     formDataToSend.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
-
-    // 4. Append the image file with the key "image", if it exists.
     if (imageFile) {
       formDataToSend.append('image', imageFile)
     }
 
     try {
-      // 5. Call the API service with the correctly formatted FormData.
       await createClassroom(formDataToSend)
       toast.success('Tạo lớp học thành công!', { id: createToast })
-      navigate('/admin/classes') // Navigate to the new, correct path
+      navigate(-1)
     } catch (err) {
       const message = err.response?.data?.message || 'Tạo lớp học thất bại.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
@@ -348,7 +335,6 @@ const CreateOfClassAdmin = () => {
     }
   }
 
-  // UI-only handlers
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -364,8 +350,7 @@ const CreateOfClassAdmin = () => {
       <div className='create-class-admin__header'>
         <i
           className='create-class-admin__back-icon fa-solid fa-arrow-left'
-          onClick={() => navigate('/admin/classes')}></i>
-        {/* The dropdown and search here seem decorative as they don't affect the form. Keeping for UI consistency. */}
+          onClick={() => navigate('/admin/manage')}></i>
         <div
           className='create-class-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -404,6 +389,7 @@ const CreateOfClassAdmin = () => {
           <h3>Tạo lớp học mới</h3>
         </div>
         <div className='create-class-admin__content-body'>
+          {/* The form now wraps everything including the button */}
           <form className='create-class-admin__content-body__form' onSubmit={handleSubmit}>
             <div className='div'>
               <div className='create-class-admin__content-body__form-item'>
@@ -478,12 +464,13 @@ const CreateOfClassAdmin = () => {
                 />
               )}
             </div>
+            {/* The button is now INSIDE the form */}
+            <div className='create-class-admin__content-button'>
+              <button type='submit' disabled={loading}>
+                {loading ? 'Đang tạo...' : 'Tạo'}
+              </button>
+            </div>
           </form>
-          <div className='create-class-admin__content-button'>
-            <button type='submit' disabled={loading}>
-              {loading ? 'Đang tạo...' : 'Tạo'}
-            </button>
-          </div>
         </div>
       </div>
     </div>
