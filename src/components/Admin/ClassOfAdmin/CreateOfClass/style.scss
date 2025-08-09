@@ -22,7 +22,7 @@ $background-light: #ffefe4;
   -ms-overflow-style: none;
   &__header {
     display: flex;
-    justify-content: space-between;
+    gap: 3rem;
     align-items: center;
   }
 
@@ -99,13 +99,14 @@ $background-light: #ffefe4;
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1;
 
     &-input {
+      flex: 1;
       padding: 10px 10px;
       border: 1px solid #ccc;
       border-radius: 20px;
       outline: none;
-      min-width: 450px;
     }
 
     &-icon {
@@ -120,7 +121,7 @@ $background-light: #ffefe4;
   }
 
   &__create-button {
-    padding: 5px 10px;
+    padding: 8px 15px;
     background-color: $background-light;
     color: $secondary-color;
     border: 2px solid $secondary-color;

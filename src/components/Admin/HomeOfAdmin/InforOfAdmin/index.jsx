@@ -254,7 +254,7 @@ const InforOfAdmin = () => {
                       {translateStatus(item.status)}
                     </span>
                   </div>
-                  <span>Xem chi tiết</span>
+                  <span onClick={() => navigate(`/admin/users/${userId}/classes/${item.id}`)}>Xem chi tiết</span>
                 </div>
               </div>
             ))

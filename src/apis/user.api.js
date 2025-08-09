@@ -40,8 +40,6 @@ export const {
   getLeaderList,
   getCurrentUser,
   updateUserRoles,
-  getMyClasses,
-  getCurrentUserWithToken,
   getUserClasses,
   getMyClasses,
   getCurrentUserWithToken,

@@ -38,7 +38,6 @@ import {
   Rating,
   YourTest,
 } from '../components/StartCompetition/InformationPage'
-import EditLesson from '../components/StartManageClass/EditLesson'
 import AccountPage from '../pages/AccountPage'
 const ClientRoutes = (
   <>
@@ -77,7 +76,7 @@ const ClientRoutes = (
       <Route
         path='manage'
         element={
-          <ProtectedRoute allowedRoles={['LEADER']}>
+          <ProtectedRoute allowedRoles={['LEADER', 'ADMIN']}>
             <Outlet />
           </ProtectedRoute>
         }>
@@ -92,8 +91,8 @@ const ClientRoutes = (
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
           <Route path='tests' element={<TestContent />} />
-          <Route path='lessons/:lessonID' element={<VeiwsLesson />} />
-          <Route path='lessons/:lessonID/edit' element={<EditLesson />}></Route>
+          <Route path='lessons/:lessonId' element={<VeiwsLesson />} />
+          <Route path='lessons/:lessonId/edit' element={<EditLesson />}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
         <Route path='competitions/:competitionId' element={<InformationOfCompet />} />

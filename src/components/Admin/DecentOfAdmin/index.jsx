@@ -156,9 +156,9 @@ const DecentOfAdmin = () => {
       <div className='decent-admin__left'>
         <div className='decent-admin__left-title'>
           <Icon
-            icon='mdi:book-account'
-            width='24'
-            height='24'
+            icon='fluent:people-star-24-filled'
+            width='28'
+            height='28'
             className='decent-admin__left-title-icon'
           />
           <h3>Phân quyền thành viên</h3>
@@ -173,8 +173,8 @@ const DecentOfAdmin = () => {
             ref={dropdownRefLeft}>
             <Icon
               icon='stash:filter-solid'
-              width='20'
-              height='20'
+              width='24'
+              height='24'
               className='decent-admin__filter-icon'
             />
             <div className='decent-admin__filter-label'>{selectedRoleLeft}</div>
@@ -291,8 +291,8 @@ const DecentOfAdmin = () => {
             ref={dropdownRefRight}>
             <Icon
               icon='stash:filter-solid'
-              width='20'
-              height='20'
+              width='24'
+              height='24'
               className='decent-admin__filter-icon'
             />
             <div className='decent-admin__filter-label'>{selectedRoleRight}</div>

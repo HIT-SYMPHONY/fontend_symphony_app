@@ -467,9 +467,14 @@ const IntroOfCompetAdmin = () => {
           className='intro-compet-admin__filter'
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           ref={dropdownRef}>
-          <Icon icon='stash:filter-solid' width='20' height='20' />
+          <Icon icon='stash:filter-solid' width='28' height='28' className='intro-compet-admin__filter-icon' />
           <div className='intro-compet-admin__filter-label'>{selectedClass}</div>
-          <Icon icon='mdi:chevron-down' width='20' height='20' />
+          <Icon
+            icon='mdi:chevron-down'
+            width='20'
+            height='20'
+            className='intro-compet-admin__filter-icon'
+          />
           {isDropdownOpen && (
             <div className='intro-compet-admin__dropdown'>
               {classOptions.map((item, index) => (

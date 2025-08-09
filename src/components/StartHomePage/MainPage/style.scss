@@ -3,10 +3,12 @@ $class-ago-width: 180px;
 
 .flex-one {
   &__thongbao {
+    margin-bottom: 1rem;
     .thongbao {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-bottom: 8px;
       &__Icon {
         color: $button-color;
       }
@@ -19,6 +21,7 @@ $class-ago-width: 180px;
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-bottom: .5rem;
     &__Icon {
       color: $button-color;
     }
@@ -113,6 +116,6 @@ $class-ago-width: 180px;
 
 @media (min-width: 1200px) and (min-height: 780px) {
   .flex-one .class-ago {
-    max-height: 480px;
+    max-height: 500px;
   }
 }

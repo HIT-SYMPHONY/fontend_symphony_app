@@ -23,6 +23,8 @@ import CreateOfMess from '../components/Admin/CompetOfAdmin/CreateOfMess'
 import DecentOfAdmin from '../components/Admin/DecentOfAdmin'
 import AccountOfAdmin from '../components/Admin/AccoutOfAdmin'
 import AccountPage from '../pages/AccountPage'
+import Classroom from '../components/StartClassPage/StartMyClass/Classroom'
+import HomeInformation from '../components/StartClassPage/StartMyClass/InformationClass'
 
 const AdminRoutes = (
   <Route
@@ -38,6 +40,7 @@ const AdminRoutes = (
       <Route index element={<MainOfAdmin />}></Route>
       <Route path='create' element={<CreateOfMain />}></Route>
       <Route path=':userId' element={<InforOfAdmin />} />
+      <Route path=':userId/classes/:classId' element={<HomeInformation/>}></Route>
     </Route>
     {/* Class Management */}
     <Route path='classes'>

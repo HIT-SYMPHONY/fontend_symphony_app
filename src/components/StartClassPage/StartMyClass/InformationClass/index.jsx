@@ -639,7 +639,7 @@ const HomeInformation = () => {
                         <span>{index + 1}</span>
                         <div className='lesson-details'>
                           <p>
-                            Bài {index + 1}: {lesson.content}
+                            Bài {index + 1}: {lesson.title}
                           </p>
                         </div>
                         <div className='lesson-date' onClick={() => toggleLessonBox(lesson.id)}>

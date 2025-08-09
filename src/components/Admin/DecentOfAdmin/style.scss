@@ -42,6 +42,7 @@ $background-light: #ffefe4;
     min-width: 150px;
     cursor: pointer;
     user-select: none;
+    padding: .25rem;
 
     &-icon {
       color: #f26522;
@@ -100,7 +101,7 @@ $background-light: #ffefe4;
     align-items: center;
 
     &-input {
-      padding: 5px 5px;
+      padding: 10px 10px;
       border: 1px solid #ccc;
       border-radius: 20px;
       outline: none;
@@ -123,7 +124,7 @@ $background-light: #ffefe4;
   }
 
   &__create-button {
-    padding: 5px 10px;
+    padding: 8px 15px;
     background-color: #dfdede;
     color: #5d5c5c;
     border: 2px solid #aaaaaa;
