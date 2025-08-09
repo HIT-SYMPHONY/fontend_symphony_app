@@ -8,12 +8,10 @@ import { getLessonById } from '../../../../apis/lesson.api'
 const Lesson = () => {
   const navigate = useNavigate()
   const { lessonId } = useParams()
-  const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
   const [lesson,setLesson] = useState()
   useEffect(() => {
     const fetchLessonData = async () => {
-      console.log(lessonId)
       if (!lessonId) {
         toast.error('Không tìm thấy ID bài học.')
         return
@@ -21,9 +19,11 @@ const Lesson = () => {
       try {
         setPageLoading(true)
         const response = await getLessonById(lessonId)
+        console.log(response.data)
         setLesson(response.data)
       } catch (error) {
-        toast.error('Không thể tải thông tin bài học.')
+        navigate('/home')
+        toast.error('Không thể tải thông tin bài học.') 
       } finally {
         setPageLoading(false)
       }
@@ -39,7 +39,7 @@ const Lesson = () => {
     <div className='viewlession'>
       <div className='viewlession-title'>
         <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
-        <h2>{lesson.classRoomName}</h2>
+        <h2>{lesson.classRoomName || 'N/A'}</h2>
       </div>
 
       <div className='viewlession__one'>
@@ -47,14 +47,14 @@ const Lesson = () => {
         <strong className='than'>
           <i className='fa-solid fa-angles-right'></i>
         </strong>
-        <strong>{lesson.title}</strong>
+        <strong>{lesson.title || 'N/A'}</strong>
         <strong className='than'>
           <i className='fa-solid fa-angles-right'></i>
         </strong>
         <strong>Đề cương bài học</strong>
       </div>
       <div className='viewlession__two'>
-        <strong>Nội dung: {lesson.content} </strong>
+        <strong>Nội dung: {lesson.content || ''} </strong>
       </div>
     </div>
   )
