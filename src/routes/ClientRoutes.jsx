@@ -31,14 +31,13 @@ import InformationOfCompet from '../components/StartManageClass/InformationOfCom
 import RulesOfManageCompet from '../components/StartManageClass/RulesOfManageCompet'
 import TestOfManageCompet from '../components/StartManageClass/TestOfManageCompet'
 import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
-import EditLesson from '../components/StartManageClass/EditLesson'
+import EditLesson from '../components/StartManageClass/EditLesson/index'
 import {
   Introduction,
   Rules,
   Rating,
   YourTest,
 } from '../components/StartCompetition/InformationPage'
-import EditLesson from '../components/StartManageClass/EditLesson'
 import AccountPage from '../pages/AccountPage'
 const ClientRoutes = (
   <>
