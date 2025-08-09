@@ -17,10 +17,11 @@ const authApi = () => ({
       email,
       password,
     }),
-  verifyTempPassword: async ({ email, tempPassword }) =>
+  verifyTempPassword: async ({ email, tempPassword, newPassword }) =>
     apiDefault.post(ApiConstant.auth.verifyTempPassword, {
       email,
       tempPassword,
+      newPassword,
     }),
   changePassword: async (payload) => api.patch(ApiConstant.auth.changePassword, payload),
 
