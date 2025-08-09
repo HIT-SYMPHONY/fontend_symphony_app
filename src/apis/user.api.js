@@ -21,6 +21,7 @@ const userApi = () => ({
 
   createUser: async (formDataPayload) =>
     apiDefaultUpload.post(ApiConstant.users.base, formDataPayload),
+
   getLeaderList: async () => api.get(ApiConstant.users.getLeaders),
   getCurrentUserWithToken: async (token) =>
     api.get(ApiConstant.users.getCurrentUser, { headers: { Authorization: `Bearer ${token}` } }),
@@ -42,4 +43,6 @@ export const {
   getMyClasses,
   getCurrentUserWithToken,
   getUserClasses,
+  getMyClasses,
+  getCurrentUserWithToken,
 } = userApi()

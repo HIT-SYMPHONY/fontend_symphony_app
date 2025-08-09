@@ -7,15 +7,19 @@ $secondary-color: #ff6911;
 $background-light: #ffefe4;
 
 .exam {
-  border: 2px solid $border-color;
-  padding: 10px;
-  box-shadow: 0 4px 8px $shadow-color;
-  border-radius: 10px;
-  box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  &-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    i {
+      color: $secondary-color;
+      font-size: 30px;
+      cursor: pointer;
+    }
+  }
   &__one {
     display: flex;
     justify-content: space-between;
@@ -54,6 +58,7 @@ $background-light: #ffefe4;
     box-sizing: border-box;
     padding: 10px;
     box-shadow: 0 4px 8px $shadow-color;
+    height: 280px;
   }
   &__nop {
     border: 2px solid $border-color;
@@ -62,6 +67,7 @@ $background-light: #ffefe4;
     box-sizing: border-box;
     padding: 10px;
     box-shadow: 0 4px 8px $shadow-color;
+    height: 250px;
   }
 
   &__label {
@@ -71,34 +77,33 @@ $background-light: #ffefe4;
   }
 
   &__input-wrapper {
-    position: relative;
-
     border-radius: 10px;
-
     background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    padding-bottom: 10px;
+    box-sizing: border-box;
   }
 
   &__textarea {
-    width: 100%;
+    width: 90%;
     resize: none;
-    overflow-y: auto;
+    height: 200px;
     border: none;
     outline: none;
-    font-size: 12px;
+    font-size: 16px;
     line-height: 1.4;
     box-sizing: border-box;
   }
 
   &__submit {
-    position: absolute;
-    right: 10px;
-    bottom: -20px;
     background-color: #f26522;
     color: #fff;
     border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;

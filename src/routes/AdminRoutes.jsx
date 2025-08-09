@@ -13,7 +13,7 @@ import CheckOfClassAdmin from '../components/Admin/ClassOfAdmin/CheckOfClass'
 import MemberOfClassAdmin from '../components/Admin/ClassOfAdmin/MemberOfAdmin'
 
 import MainOfCompet from '../components/Admin/CompetOfAdmin/MainOfCompet'
-// import CreateOfCompetAdmin from '../components/Admin/CompetOfAdmin/CreateOfCompet'
+import CreateOfCompetAdmin from '../components/Admin/CompetOfAdmin/CreateOfCompet'
 import IntroOfCompetAdmin from '../components/Admin/CompetOfAdmin/IntroOfCompet'
 import RolusOfCompetAdmin from '../components/Admin/CompetOfAdmin/RolusOfAdmin'
 import MemberOfCompetAdmin from '../components/Admin/CompetOfAdmin/MemberOfCompet'
@@ -49,7 +49,7 @@ const AdminRoutes = (
     {/* Competitions */}
     <Route path='competitions'>
       <Route index element={<MainOfCompet />} />
-      {/* <Route path='create' element={<CreateOfCompetAdmin />} /> */}
+      <Route path='create' element={<CreateOfCompetAdmin />} />
       <Route path=':competitionId'>
         <Route index element={<IntroOfCompetAdmin />} />
         <Route path='rules' element={<RolusOfCompetAdmin />} />

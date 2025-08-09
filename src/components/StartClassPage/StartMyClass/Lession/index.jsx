@@ -1,10 +1,16 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import './style.scss'
 
 const Lesson = () => {
+  const navigate = useNavigate()
   return (
     <div className='viewlession'>
-      <h2>PRIVATE: Đồ họa - 2025</h2>
+      <div className='viewlession-title'>
+        <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
+        <h2>PRIVATE: Đồ họa - 2025</h2>
+      </div>
+
       <div className='viewlession__one'>
         <strong className='viewlession__one__than'>1 </strong>
         <strong className='than'>

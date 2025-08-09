@@ -1,26 +1,21 @@
 import React, { useState, useEffect, useRef, useContext } from 'react'
 import { Icon } from '@iconify/react'
-import { work } from '../../../../data/app'
-import { GlobalContext } from '../../../../dataContext'
-import Classroom from '../Classroom'
-import icon from './../../../../assets/img/Ellipse.png'
-import logo from './../../../../assets/img/logo.png'
+import { useNavigate } from 'react-router-dom'
 import Frame from '../Frame'
 import './style.scss'
 
-const Comment = () => {
-  const context = useContext(GlobalContext)
+const Comment = ({ setSubmit }) => {
+  const navigate = useNavigate()
   const [sub, setSub] = useState(false)
-  if (!context) {
-    console.error('GlobalContext is undefined. Ensure HomePage is wrapped in GlobalProvider.')
-    return <div>Lỗi: Không tìm thấy GlobalContext!</div>
-  }
 
   return (
     <>
       <div className='comment'>
         <div className='comment__left'>
-          <h2>PRIVATE: Đồ họa - 2025</h2>
+          <div className='comment__left-title'>
+            <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
+            <h2>PRIVATE: Đồ họa - 2025</h2>
+          </div>
           <div className='comment__left__one'>
             <strong className='comment__left__one__than'>1</strong>
             <strong className='comment__left__one__more'>

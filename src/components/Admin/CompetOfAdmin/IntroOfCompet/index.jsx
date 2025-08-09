@@ -493,7 +493,7 @@ const IntroOfCompetAdmin = () => {
         </div>
         <button
           className='intro-compet-admin__create-button'
-          onClick={() => navigate('/admin/competition/create')}>
+          onClick={() => navigate('/admin/competitions/create')}>
           <i className='fa-solid fa-plus'></i> Tạo mới
         </button>
       </div>

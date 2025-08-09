@@ -273,7 +273,7 @@ import { getClassroomById, getMembersInClassroom } from '../../../../apis/classr
 import { formatDate } from '../../../../utils/formatters'
 import './style.scss'
 
-const AdminClassMembersPage = () => {
+const AdminClassMembersPage = ({ setOpenChat }) => {
   const navigate = useNavigate()
   const { classId } = useParams()
 
@@ -332,8 +332,12 @@ const AdminClassMembersPage = () => {
     <div className='member-contain'>
       <div className='member-contain__title'>
         <div className='member-contain__title__muc'>
-          <h2>{loading ? 'Đang tải...' : classroom?.name || 'Không có tên'}</h2>
-          <h3>Danh sách thành viên</h3>
+          <h1>{loading ? 'Đang tải...' : classroom?.name || 'Không có tên'}</h1>
+          <div className='member-contain__title__muc__title'>
+            <i className='fa-solid fa-arrow-left' onClick={() => setOpenChat(false)}></i>
+            <h2>Danh sách thành viên</h2>
+          </div>
+
           <p>Số lượng thành viên: {loading ? '...' : pagination.totalElements}</p>
         </div>
         <div className='member-contain__title__icon'>

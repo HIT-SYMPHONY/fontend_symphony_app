@@ -33,8 +33,9 @@ $background-light: #ffefe4;
 
 // Main grid component
 .all-member__grid {
-  box-shadow: 2px 2px 4px 4px #00000040;
+  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.2);
   padding-block: 15px;
+  padding: 10px;
   border-radius: 12px;
   background-color: #fff;
   %grid-row-styles {
@@ -94,7 +95,6 @@ $background-light: #ffefe4;
       margin: 0;
       font-weight: 500;
     }
-
 
     &__number {
       background-color: #f48a4c;

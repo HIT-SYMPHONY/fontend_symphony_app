@@ -21,7 +21,6 @@ const InformationManage = () => {
   useEffect(() => {
     if (error) {
       toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
-      // Navigate back to the leader's class management page
       navigate('/manage/classes')
     }
   }, [error, navigate])
@@ -32,11 +31,10 @@ const InformationManage = () => {
     if (path.includes('/lessons')) return 'lessons'
     if (path.includes('/tests')) return 'tests'
     if (path.includes('/members')) return 'members'
-    return '' // Represents the main "Thông tin lớp học" tab
+    return '' 
   }, [location.pathname])
 
   const createPath = useMemo(() => {
-    // These paths are now relative to the current route or absolute from the root
     switch (getCurrentSection) {
       case 'notifications':
         return `/manage/classes/${classId}/notifications/create`

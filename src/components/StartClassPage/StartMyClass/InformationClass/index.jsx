@@ -568,7 +568,7 @@ const HomeInformation = () => {
   return (
     <>
       {openChat ? (
-        <Member />
+        <Member setOpenChat={setOpenChat} />
       ) : (
         <div className='informationclass'>
           <div className='informationclass__gioithieu'>
@@ -654,7 +654,7 @@ const HomeInformation = () => {
                         className='lesson-box'
                         style={{ display: expandedLessons[lesson.id] ? 'block' : 'none' }}>
                         <p onClick={() => navigate(`lessons/${lesson.id}`)}>Đề cương bài học</p>
-                        <p>Bài Tập</p>
+                        <p onClick={() => navigate('exams/examId')}>Bài Tập</p>
                       </div>
                     </div>
                   ))
