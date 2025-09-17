@@ -2,10 +2,10 @@ import { api, apiDefaultUpload } from '.'
 import { ApiConstant } from '../constants/api.constant'
 
 const userApi = () => ({
-  getAllUsers: async () => api.get(ApiConstant.users.base),
+  getAllUsers: async (params) => api.get(ApiConstant.users.base, {params}),
 
   getUserById: async (userId) => {
-    return api.get(`${ApiConstant.users.baseId}${userId}`)
+    return api.get(ApiConstant.users.getById(userId))
   },
 
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
@@ -16,7 +16,7 @@ const userApi = () => ({
   },
 
   updateUser: async (userId, formDataPayload) => {
-    return apiDefaultUpload.patch(`${ApiConstant.users.baseId}${userId}`, formDataPayload)
+    return apiDefaultUpload.patch(ApiConstant.users.getById(userId), formDataPayload)
   },
 
   createUser: async (formDataPayload) =>
@@ -28,10 +28,18 @@ const userApi = () => ({
     api.get(ApiConstant.users.getCurrentUser, { headers: { Authorization: `Bearer ${token}` } }),
 
   updateUserRoles: async (payload) => api.patch(ApiConstant.users.updateRole, payload),
-  getUserClasses: async (userId) =>
-    api.get(`${ApiConstant.users.baseId}${userId}${ApiConstant.classrooms.base}`),
+
+  getUserClasses: async (userId) => {
+    return api.get(ApiConstant.users.getUserClasses(userId))
+  },
+
   getMyClasses: async () => api.get(ApiConstant.users.getMyClassrooms),
+
   getMyCompetitions: async () => api.get(ApiConstant.users.getMyCompetitions),
+
+  resetPassword: async (userId) => {
+    return api.patch(ApiConstant.users.resetPassword(userId))
+  },
 })
 
 export const {
@@ -47,4 +55,5 @@ export const {
   getCurrentUserWithToken,
   getUserClasses,
   getMyClasses,
+  resetPassword,
 } = userApi()

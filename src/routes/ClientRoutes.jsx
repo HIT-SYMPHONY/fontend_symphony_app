@@ -45,7 +45,7 @@ const ClientRoutes = (
     <Route
       path='/'
       element={
-        <ProtectedRoute allowedRoles={['USER', 'LEADER']}>
+        <ProtectedRoute allowedRoles={['USER', 'LEADER', 'ADMIN']}>
           <DashboardOfMain />
         </ProtectedRoute>
       }>

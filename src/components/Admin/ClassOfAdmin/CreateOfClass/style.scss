@@ -6,14 +6,13 @@ $background-light: #ffefe4;
 
 .create-class-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  height: calc(100vh - 50px);
+  gap: 5px;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -21,6 +20,7 @@ $background-light: #ffefe4;
   scrollbar-width: none;
   -ms-overflow-style: none;
   &__header {
+    margin-top: 0.5rem;
     display: flex;
     gap: 3rem;
     align-items: center;
@@ -285,4 +285,3 @@ $background-light: #ffefe4;
     width: 100%;
   }
 }
-

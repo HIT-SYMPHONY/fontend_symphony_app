@@ -1,80 +1,109 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers, updateUserRoles } from '../../../apis/user.api'
-import './style.scss'
 import { getDisplayName } from '../../../utils/formatters'
+import useDebounce from '../../../hooks/useDebounce'
+import useOnClickOutside from '../../../hooks/useOnClickOutside'
+import LoadMoreButton from '../../LoadMoreButton'
+import EndOfListMessage from '../../EndOfListMessage'
+import './style.scss'
+import {PAGE_SIZE, roleFilterOptions} from '../../../constants/commonConstant'
+
 
 const DecentOfAdmin = () => {
   const navigate = useNavigate()
-  const [allUsers, setAllUsers] = useState([])
-  const [loading, setLoading] = useState(true)
 
-  const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
-  const [selectedRoleLeft, setSelectedRoleLeft] = useState('Tất cả lớp')
+  // State for the left panel
+  const [usersLeft, setUsersLeft] = useState([])
+  const [loadingLeft, setLoadingLeft] = useState(true)
+  const [loadingMoreLeft, setLoadingMoreLeft] = useState(false)
+  const [currentPageLeft, setCurrentPageLeft] = useState(1)
+  const [hasMoreLeft, setHasMoreLeft] = useState(false)
+  const [selectedRoleLeft, setSelectedRoleLeft] = useState('Tất cả')
   const [searchQueryLeft, setSearchQueryLeft] = useState('')
-  const dropdownRefLeft = useRef(null)
+  const [selectedUserIdsLeft, setSelectedUserIdsLeft] = useState([])
+  const debouncedSearchLeft = useDebounce(searchQueryLeft, 500)
 
-  const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
-  const [selectedRoleRight, setSelectedRoleRight] = useState('LEADER')
+  // State for the right panel
+  const [usersRight, setUsersRight] = useState([])
+  const [loadingRight, setLoadingRight] = useState(true)
+  const [loadingMoreRight, setLoadingMoreRight] = useState(false)
+  const [currentPageRight, setCurrentPageRight] = useState(1)
+  const [hasMoreRight, setHasMoreRight] = useState(false)
+  const [selectedRoleRight, setSelectedRoleRight] = useState('Tất cả')
   const [searchQueryRight, setSearchQueryRight] = useState('')
+  const [selectedUserIdsRight, setSelectedUserIdsRight] = useState([])
+  const debouncedSearchRight = useDebounce(searchQueryRight, 500)
+
+  // Common state and refs
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
+  const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
+  const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
+  const dropdownRefLeft = useRef(null)
   const dropdownRefRight = useRef(null)
 
-  const [selectedUserIdsLeft, setSelectedUserIdsLeft] = useState([])
-  const [selectedUserIdsRight, setSelectedUserIdsRight] = useState([])
+  const closeDropdowns = useCallback(() => {
+    setIsDropdownOpenLeft(false)
+    setIsDropdownOpenRight(false)
+  }, [])
+  useOnClickOutside([dropdownRefLeft, dropdownRefRight], closeDropdowns)
 
-  const roleOptions = ['USER', 'LEADER', 'ADMIN']
+  // --- API Fetching Logic ---
+  const fetchUsersForPanel = useCallback(
+    async (panel, page, isLoadMore = false) => {
+      const isLeft = panel === 'left'
+      const setLoading = isLeft ? setLoadingLeft : setLoadingRight
+      const setLoadingMore = isLeft ? setLoadingMoreLeft : setLoadingMoreRight
+      const setUsers = isLeft ? setUsersLeft : setUsersRight
+      const setCurrentPage = isLeft ? setCurrentPageLeft : setCurrentPageRight
+      const setHasMore = isLeft ? setHasMoreLeft : setHasMoreRight
+      const keyword = isLeft ? debouncedSearchLeft : debouncedSearchRight
+      const role = isLeft ? selectedRoleLeft : selectedRoleRight
+      const roleParam = role === 'Tất cả' ? null : role
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true)
-      const response = await getAllUsers()
-      setAllUsers(response.data || [])
-    } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error('Có lỗi xảy ra khi tải danh sách thành viên.')
+      if (isLoadMore) setLoadingMore(true)
+      else setLoading(true)
+
+      try {
+        const params = {
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+          keyword: keyword || null,
+          role: roleParam,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+
+        const response = await getAllUsers(filteredParams)
+        const { items = [], meta } = response.data || {}
+
+        setUsers((prev) => (isLoadMore ? [...prev, ...items] : items))
+        if (meta) {
+          setCurrentPage(meta.pageNum)
+          setHasMore(meta.pageNum < meta.totalPages)
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Lỗi khi tải danh sách thành viên.')
+      } finally {
+        if (isLoadMore) setLoadingMore(false)
+        else setLoading(false)
       }
-    } finally {
-      setLoading(false)
-    }
-  }
+    },
+    [debouncedSearchLeft, selectedRoleLeft, debouncedSearchRight, selectedRoleRight],
+  )
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsersForPanel('left', 1)
+  }, [selectedRoleLeft, debouncedSearchLeft, refetchTrigger])
 
-  const filteredUsersLeft = useMemo(() => {
-    let filtered = [...allUsers]
-    if (selectedRoleLeft !== 'Tất cả lớp') {
-      filtered = filtered.filter((user) => user.role === selectedRoleLeft)
-    }
-    if (searchQueryLeft) {
-      const lowercasedQuery = searchQueryLeft.toLowerCase()
-      filtered = filtered.filter(
-        (user) =>
-          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-          user.studentCode?.includes(lowercasedQuery),
-      )
-    }
-    return filtered
-  }, [allUsers, selectedRoleLeft, searchQueryLeft])
+  useEffect(() => {
+    fetchUsersForPanel('right', 1)
+  }, [selectedRoleRight, debouncedSearchRight, refetchTrigger])
 
-  const filteredUsersRight = useMemo(() => {
-    let filtered = allUsers.filter((user) => user.role === selectedRoleRight)
-    if (searchQueryRight) {
-      const lowercasedQuery = searchQueryRight.toLowerCase()
-      filtered = filtered.filter(
-        (user) =>
-          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-          user.studentCode?.includes(lowercasedQuery),
-      )
-    }
-    return filtered
-  }, [allUsers, selectedRoleRight, searchQueryRight])
-
+  // --- Event Handlers ---
   const handleSelectionChange = (panel, userId) => {
     const setter = panel === 'left' ? setSelectedUserIdsLeft : setSelectedUserIdsRight
     setter((prev) =>
@@ -83,69 +112,51 @@ const DecentOfAdmin = () => {
   }
 
   const handleSelectAll = (panel) => {
-    const usersToSelect = panel === 'left' ? filteredUsersLeft : filteredUsersRight
-    const userIdsToSelect = usersToSelect.map((user) => user.id)
-    const setter = panel === 'left' ? setSelectedUserIdsLeft : setSelectedUserIdsRight
+    const users = panel === 'left' ? usersLeft : usersRight
+    const userIds = users.map((u) => u.id)
     const currentSelection = panel === 'left' ? selectedUserIdsLeft : selectedUserIdsRight
-    const allSelected =
-      userIdsToSelect.length > 0 && userIdsToSelect.every((id) => currentSelection.includes(id))
+    const setter = panel === 'left' ? setSelectedUserIdsLeft : setSelectedUserIdsRight
+    const allSelected = userIds.length > 0 && userIds.every((id) => currentSelection.includes(id))
 
     if (allSelected) {
-      setter(currentSelection.filter((id) => !userIdsToSelect.includes(id)))
+      setter(currentSelection.filter((id) => !userIds.includes(id)))
     } else {
-      setter([...new Set([...currentSelection, ...userIdsToSelect])])
+      setter([...new Set([...currentSelection, ...userIds])])
     }
-  }
-
-  const handleAssignRole = async (newRole) => {
-    if (selectedUserIdsLeft.length === 0) {
-      toast.error('Vui lòng chọn thành viên từ danh sách bên trái để gán quyền.')
-      return
-    }
-    await updateRoles(selectedUserIdsLeft, newRole, 'Gán quyền')
-  }
-
-  const handleRemoveRole = async () => {
-    if (selectedUserIdsRight.length === 0) {
-      toast.error('Vui lòng chọn thành viên từ danh sách bên phải để xóa quyền.')
-      return
-    }
-    await updateRoles(selectedUserIdsRight, 'USER', 'Xóa quyền')
   }
 
   const updateRoles = async (userIds, newRole, actionName) => {
-    const actionToast = toast.loading(`Đang ${actionName.toLowerCase()}...`)
-    const payload = {
-      roleStr: newRole,
-      usersId: userIds,
-    }
+    const toastId = toast.loading(`Đang ${actionName.toLowerCase()}...`)
     try {
-      await updateUserRoles(payload)
-      await fetchUsers()
+      await updateUserRoles({ roleStr: newRole, usersId: userIds })
       setSelectedUserIdsLeft([])
       setSelectedUserIdsRight([])
-      toast.success(`${actionName} thành công!`, { id: actionToast })
+      setRefetchTrigger((prev) => prev + 1)
+      toast.success(`${actionName} thành công!`, { id: toastId })
     } catch (error) {
-      const message = error.response?.data?.message || `Lỗi khi ${actionName.toLowerCase()}.`
-      toast.error(message, { id: actionToast })
+      toast.error(error.response?.data?.message || `Lỗi khi ${actionName.toLowerCase()}.`, {
+        id: toastId,
+      })
     }
   }
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRefLeft.current && !dropdownRefLeft.current.contains(event.target))
-        setIsDropdownOpenLeft(false)
-      if (dropdownRefRight.current && !dropdownRefRight.current.contains(event.target))
-        setIsDropdownOpenRight(false)
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  const handleAssignRole = (newRole) => {
+    if (selectedUserIdsLeft.length === 0)
+      return toast.error('Vui lòng chọn thành viên để gán quyền.')
+    updateRoles(selectedUserIdsLeft, newRole, 'Gán quyền')
+  }
+
+  const handleRemoveRole = () => {
+    if (selectedUserIdsRight.length === 0)
+      return toast.error('Vui lòng chọn thành viên để xóa quyền.')
+    updateRoles(selectedUserIdsRight, 'USER', 'Xóa quyền') 
+  }
 
   const handleSelectLeft = (item) => {
     setSelectedRoleLeft(item)
     setIsDropdownOpenLeft(false)
   }
+
   const handleSelectRight = (item) => {
     setSelectedRoleRight(item)
     setIsDropdownOpenRight(false)
@@ -186,7 +197,7 @@ const DecentOfAdmin = () => {
             />
             {isDropdownOpenLeft && (
               <div className='decent-admin__dropdown'>
-                {['Tất cả lớp', ...roleOptions].map((item, index) => (
+                {roleFilterOptions.map((item, index) => (
                   <div
                     key={index}
                     className='decent-admin__dropdown-item'
@@ -220,14 +231,14 @@ const DecentOfAdmin = () => {
                 </tr>
               </thead>
               <tbody className='decent-admin__left-context__tbody'>
-                {loading ? (
+                {loadingLeft ? (
                   <tr>
                     <td colSpan='4' style={{ textAlign: 'center', padding: '2rem' }}>
                       Đang tải...
                     </td>
                   </tr>
-                ) : (
-                  filteredUsersLeft.map((item, index) => (
+                ) : usersLeft.length > 0 ? (
+                  usersLeft.map((item, index) => (
                     <tr key={item.id}>
                       <td>
                         <div className='user-info-cell'>
@@ -248,10 +259,29 @@ const DecentOfAdmin = () => {
                       </td>
                     </tr>
                   ))
+                ) : (
+                  <tr>
+                    <td colSpan='4'>
+                      <p style={{ textAlign: 'center', padding: '2rem' }}>
+                        Không tìm thấy thành viên.
+                      </p>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
+          <LoadMoreButton
+            hasMore={hasMoreLeft}
+            isLoading={loadingMoreLeft}
+            onClick={() => fetchUsersForPanel('left', currentPageLeft + 1, true)}
+          />
+          <EndOfListMessage
+            isLoading={loadingLeft}
+            hasMore={hasMoreLeft}
+            itemCount={usersLeft.length}
+            itemName='thành viên'
+          />
         </div>
         <div className='decent-admin__left-button'>
           <span onClick={() => handleSelectAll('left')} className='decent-admin__left-button-span'>
@@ -265,6 +295,7 @@ const DecentOfAdmin = () => {
 
       <div className='decent-admin__among'></div>
 
+      {/* Right Panel */}
       <div className='decent-admin__right'>
         <div className='decent-admin__left-title'>
           <Icon
@@ -304,7 +335,7 @@ const DecentOfAdmin = () => {
             />
             {isDropdownOpenRight && (
               <div className='decent-admin__dropdown'>
-                {roleOptions.map((item, index) => (
+                {roleFilterOptions.map((item, index) => (
                   <div
                     key={index}
                     className='decent-admin__dropdown-item'
@@ -327,14 +358,14 @@ const DecentOfAdmin = () => {
                 </tr>
               </thead>
               <tbody className='decent-admin__left-context__tbody'>
-                {loading ? (
+                {loadingRight ? (
                   <tr>
                     <td colSpan='3' style={{ textAlign: 'center', padding: '2rem' }}>
                       Đang tải...
                     </td>
                   </tr>
-                ) : (
-                  filteredUsersRight.map((item, index) => (
+                ) : usersRight.length > 0 ? (
+                  usersRight.map((item, index) => (
                     <tr key={item.id}>
                       <td>
                         <div className='user-info-cell'>
@@ -354,10 +385,29 @@ const DecentOfAdmin = () => {
                       </td>
                     </tr>
                   ))
+                ) : (
+                  <tr>
+                    <td colSpan='3'>
+                      <p style={{ textAlign: 'center', padding: '2rem' }}>
+                        Không có thành viên nào với quyền này.
+                      </p>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
+          <LoadMoreButton
+            hasMore={hasMoreRight}
+            isLoading={loadingMoreRight}
+            onClick={() => fetchUsersForPanel('right', currentPageRight + 1, true)}
+          />
+          <EndOfListMessage
+            isLoading={loadingRight}
+            hasMore={hasMoreRight}
+            itemCount={usersRight.length}
+            itemName='thành viên'
+          />
         </div>
         <div className='decent-admin__left-button'>
           <span onClick={() => handleSelectAll('right')} className='decent-admin__left-button-span'>
@@ -370,5 +420,5 @@ const DecentOfAdmin = () => {
     </div>
   )
 }
-// onClick={() => setShowNoti(true)}
+
 export default DecentOfAdmin

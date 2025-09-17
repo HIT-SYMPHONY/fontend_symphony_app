@@ -6,13 +6,12 @@ $background-light: #ffefe4;
 
 .member-compet-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   gap: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
+  height: calc(100vh - 50px);
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -135,10 +134,11 @@ $background-light: #ffefe4;
     display: flex;
     flex-direction: column;
     gap: 5px;
-    width: 58%;
+    flex: 1;
     &-title {
       display: flex;
       gap: 10px;
+      margin-top: 0.5rem;
       align-items: center;
       &-icon {
         color: #f26522;
@@ -151,12 +151,15 @@ $background-light: #ffefe4;
     &-context {
       display: flex;
       flex-direction: column;
-      gap: 10px;
       height: 80%;
-
+      font-size: 1.125rem;
+      font-weight: 600;
       &__title {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 70px 2.5fr 2fr 0.5fr 50px;
+        gap: 10px;
+        align-items: center;
+        padding: 10px 0;
       }
       &__list {
         display: flex;
@@ -170,19 +173,24 @@ $background-light: #ffefe4;
         scrollbar-width: none;
         -ms-overflow-style: none;
         &-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: grid;
+          grid-template-columns: 70px 2.5fr 2fr 0.5fr 50px;
+          gap: 10px;
           border: 1px solid #f48a4c;
-          border-radius: 5px;
-          padding-right: 10px;
+          border-radius: 12px;
+          align-items: center;
           &-box {
             display: flex;
             align-items: center;
             gap: 20px;
             &-h5 {
-              padding: 5px 15px;
-              border-radius: 5px;
+              width: 40px;
+              height: 40px;
+              font-size: 1.5rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 12px;
               background-color: #f48a4c;
               color: #fff;
             }
@@ -197,9 +205,19 @@ $background-light: #ffefe4;
       display: flex;
       gap: 20px;
       justify-content: end;
-      span {
-        color: #f26522;
+      align-items: center;
+      p {
+        color: #f06c25;
+        font-weight: 700;
         cursor: pointer;
+      }
+      span {
+        cursor: pointer;
+        color: #a2a2a2;
+        font-weight: 700;
+        border-radius: 32px;
+        border: 2px solid rgba(162, 162, 162, 0.8);
+        padding: 0px 12px;
       }
       button {
         padding: 5px 20px;
@@ -230,7 +248,7 @@ $background-light: #ffefe4;
     display: flex;
     flex-direction: column;
     gap: 5px;
-    width: 40%;
+    flex: 1;
     &-title {
       display: flex;
       gap: 10px;
@@ -275,8 +293,13 @@ $background-light: #ffefe4;
             align-items: center;
             gap: 20px;
             &-h5 {
-              padding: 5px 15px;
-              border-radius: 5px;
+              width: 40px;
+              height: 40px;
+              font-size: 1.5rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-radius: 12px;
               background-color: #f48a4c;
               color: #fff;
             }
@@ -287,5 +310,10 @@ $background-light: #ffefe4;
         }
       }
     }
+  }
+  &__active-filter {
+    color: #f06c25 !important;
+    border: 2px solid #f06c25 !important;
+    background: #ffefe4;
   }
 }

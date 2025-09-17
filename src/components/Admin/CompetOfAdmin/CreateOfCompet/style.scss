@@ -6,14 +6,13 @@ $background-light: #ffefe4;
 
 .create-compet-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  height: calc(100vh - 50px);
+  gap: 5px;
   overflow-y: auto;
   form {
     flex: 1;
@@ -28,6 +27,7 @@ $background-light: #ffefe4;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 0.5rem;
   }
 
   &__back-icon {
@@ -80,7 +80,6 @@ $background-light: #ffefe4;
     padding: 10px;
     border-radius: 10px;
     box-sizing: border-box;
-    height: 100%;
 
     &-title {
       display: flex;

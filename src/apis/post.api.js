@@ -6,13 +6,16 @@ const postApi = () => ({
     if (!classroomId) {
       return Promise.reject(new Error('Classroom ID is required.'))
     }
-    const url = `${ApiConstant.posts.base}/${classroomId}`
+    const url = ApiConstant.posts.getByClassroomId(classroomId)
 
     return api.get(url, { params })
   },
+
   getMyPosts: async () => api.get(ApiConstant.users.getMyPosts),
+
   createPost: async (payload) => api.post(ApiConstant.posts.base, payload),
-  getPostById: async (postId) => api.get(`${ApiConstant.posts.base}/${postId}`),
+
+  getPostById: async (postId) => api.get(ApiConstant.posts.getById(postId)),
 })
 
-export const { getPostsByClassroomId, getMyPosts, createPost , getPostById} = postApi()
+export const { getPostsByClassroomId, getMyPosts, createPost, getPostById } = postApi()

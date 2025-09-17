@@ -6,19 +6,19 @@ $background-light: #ffefe4;
 
 .mess {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 50px);
   gap: 5px;
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 0.5rem;
   }
 
   &__back-icon {
