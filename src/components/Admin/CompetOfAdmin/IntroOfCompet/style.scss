@@ -6,14 +6,13 @@ $background-light: #ffefe4;
 
 .intro-compet-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  height: calc(100vh - 50px);
+  gap: 5px;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -26,6 +25,10 @@ $background-light: #ffefe4;
     justify-content: space-between;
     align-items: center;
     gap: 3rem;
+    margin-top: 0.5rem;
+  }
+  &__image-preview {
+    object-fit: cover;
   }
 
   &__back-icon {
@@ -164,7 +167,10 @@ $background-light: #ffefe4;
           span {
             color: #989898;
           }
-          input {
+          h5 {
+            font-size: 1.125rem;
+          }
+          input, select {
             padding: 5px 10px;
             border-radius: 5px;
             border: 2px solid #cfcfcf;
@@ -176,6 +182,7 @@ $background-light: #ffefe4;
         flex-direction: column;
         gap: 5px;
         padding-top: 10px;
+
         span {
           color: #989898;
         }

@@ -6,6 +6,8 @@ import { getManagedClasses } from '../../../apis/classroom.api'
 import { translateStatus } from '../../../utils/formatters'
 import './style.scss'
 import TextMessage from '../../TextMessage/'
+import LoadMoreButton from '../../LoadMoreButton'
+import EndOfListMessage from '../../EndOfListMessage'
 
 const MainManage = () => {
   const navigate = useNavigate()
@@ -17,7 +19,7 @@ const MainManage = () => {
       try {
         setLoading(true)
         const response = await getManagedClasses()
-        setManagedClasses(response.data || [])
+        setManagedClasses(response.data.items || [])
       } catch (error) {
         if (error.response?.data?.message) {
           toast.error(error.response.data.message)

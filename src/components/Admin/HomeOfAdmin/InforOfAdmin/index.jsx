@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../../../utils/userValidate.js'
-import { getUserById, updateUser, getUserClasses } from '../../../../apis/user.api'
+import { getUserById, updateUser, getUserClasses, resetPassword } from '../../../../apis/user.api'
 import {
   formatDate,
   formatDateForAPI,
@@ -13,6 +13,7 @@ import {
   translateStatus,
 } from '../../../../utils/formatters'
 import './style.scss'
+import TextMessage from '../../../TextMessage'
 
 const InforOfAdmin = () => {
   const navigate = useNavigate()
@@ -112,10 +113,34 @@ const InforOfAdmin = () => {
     reset(initialData)
     setIsEditing(false)
   }
+
+  const handleResetPassword = async () => {
+    if (
+      !window.confirm(
+        `Bạn có chắc chắn muốn reset mật khẩu cho người dùng ${initialData.lastName} ${initialData.firstName}?`,
+      )
+    ) {
+      return
+    }
+    const resetToast = toast.loading('Đang reset mật khẩu...')
+    try {
+      const response = await resetPassword(userId)
+      console.log(response)
+      const newPassword = response.data.newPassword
+      toast.success(`Reset mật khẩu thành công! Mật khẩu mới là ${newPassword}`, {
+        id: resetToast,
+        duration: 10000,
+      })
+    } catch (error) {
+      const message = error.response?.data?.message || 'Lỗi khi reset mật khẩu'
+      toast.error(message, { id: resetToast })
+    }
+  }
+
   const displayValue = (value) => value || 'N/A'
 
-  if (loading) return <div>Đang tải...</div>
-  if (!initialData) return <div>Không tìm thấy người dùng.</div>
+  if (loading) return <TextMessage>Đang tải...</TextMessage>
+  if (!initialData) return <TextMessage>Không tìm thấy người dùng.</TextMessage>
 
   return (
     <div className='inforofadmin'>
@@ -218,6 +243,28 @@ const InforOfAdmin = () => {
               <div style={{ flex: 1 }}></div>
             </div>
           </div>
+          <h3>Thống tin tài khoản</h3>
+          <div className='inforofadmin__context__list inforofadmin__horizontal-list'>
+            <div className='inforofadmin__context__list__box inforofadmin__horizontal-list-box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Tên đăng nhập</span>
+                <h4>{displayValue(initialData.studentCode)}</h4>
+              </div>
+            </div>
+            <div className='inforofadmin__context__list__box inforofadmin__horizontal-list-box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Mật khẩu</span>
+                <div className='inforofadmin__reset-wrap'>
+                  <h4>{'*'.repeat(8)}</h4>
+                  {!isEditing && (
+                    <div className='inforofadmin__reset-button' onClick={handleResetPassword}>
+                      Reset
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
           <div className='inforofadmin__context__button'>
             {isEditing ? (
               <>
@@ -254,7 +301,9 @@ const InforOfAdmin = () => {
                       {translateStatus(item.status)}
                     </span>
                   </div>
-                  <span onClick={() => navigate(`/admin/users/${userId}/classes/${item.id}`)}>Xem chi tiết</span>
+                  <span onClick={() => navigate(`/admin/users/${userId}/classes/${item.id}`)}>
+                    Xem chi tiết
+                  </span>
                 </div>
               </div>
             ))

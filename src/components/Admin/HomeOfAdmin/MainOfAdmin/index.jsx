@@ -1,70 +1,89 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
-import './style.scss'
 import placeHolderImage from '../../../../assets/img/Ellipse.png'
 import { getDisplayName } from '../../../../utils/formatters'
+import EndOfListMessage from '../../../EndOfListMessage'
+import TextMessage from '../../../TextMessage'
+import LoadMoreButton from '../../../LoadMoreButton'
+import useDebounce from '../../../../hooks/useDebounce'
+import useOnClickOutside from '../../../../hooks/useOnClickOutside'
+import { roleFilterOptions, PAGE_SIZE } from '../../../../constants/commonConstant'
+import './style.scss'
 
-const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 const MainOfAdmin = () => {
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
+  const [totalElements, setTotalElements] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [selectedClass, setSelectedClass] = useState('ALL')
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedRole, setSelectedRole] = useState('Tất cả')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
+  useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
+  const fetchUsers = useCallback(
+    async (page, isLoadMore = false) => {
+      if (isLoadMore) {
+        setLoadingMore(true)
+      } else {
         setLoading(true)
-        const response = await getAllUsers()
-        setUsers(response.data || [])
-      } catch (error) {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message)
-        } else {
-          toast.error('Có lỗi xảy ra khi tải danh sách thành viên.')
-        }
-      } finally {
-        setLoading(false)
       }
-    }
-    fetchUsers()
-  }, [])
 
-  const filteredUsers = useMemo(() => {
-    let filtered = [...users]
-    if (selectedClass !== 'ALL') {
-      filtered = filtered.filter((user) => user.role === selectedClass)
+      try {
+        const params = {
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+          keyword: debouncedSearchQuery || null,
+          role: selectedRole === 'Tất cả' ? null : selectedRole,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+
+        const response = await getAllUsers(filteredParams)
+        const content = response.data
+
+        if (content && content.items) {
+          setUsers((prev) => (isLoadMore ? [...prev, ...content.items] : content.items))
+        }
+        if (content && content.meta) {
+          setTotalElements(content.meta.totalElements)
+          setCurrentPage(content.meta.pageNum)
+          setHasMore(content.meta.pageNum < content.meta.totalPages)
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách thành viên.')
+      } finally {
+        if (isLoadMore) {
+          setLoadingMore(false)
+        } else {
+          setLoading(false)
+        }
+      }
+    },
+    [debouncedSearchQuery, selectedRole],
+  )
+  useEffect(() => {
+    fetchUsers(1, false)
+  }, [fetchUsers])
+
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      fetchUsers(currentPage + 1, true)
     }
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (user) =>
-          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-          user.studentCode?.includes(lowercasedQuery),
-      )
-    }
-    return filtered
-  }, [users, selectedClass, searchQuery])
-  const handleSelect = (item) => {
-    setSelectedClass(item)
-    setIsDropdownOpen(false)
   }
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+  const handleSelectRole = (role) => {
+    setSelectedRole(role)
+    setIsDropdownOpen(false)
+  }
 
   return (
     <div className='main-admin'>
@@ -82,9 +101,7 @@ const MainOfAdmin = () => {
             height='28'
             className='main-admin__title__choose__icon'
           />
-          <div className='main-admin__title__choose__label'>
-            {selectedClass === 'ALL' ? 'Tất cả' : selectedClass}
-          </div>
+          <div className='main-admin__title__choose__label'>{selectedRole}</div>
           <Icon
             icon='mdi:chevron-down'
             width='20'
@@ -93,12 +110,12 @@ const MainOfAdmin = () => {
           />
           {isDropdownOpen && (
             <div className='main-admin__title__choose__dropdown'>
-              {classOptions.map((item, index) => (
+              {roleFilterOptions.map((item, index) => (
                 <div
                   key={index}
                   className='main-admin__title__choose__dropdown__item'
-                  onClick={() => handleSelect(item)}>
-                  {item === 'ALL' ? 'Tất cả' : item}
+                  onClick={() => handleSelectRole(item)}>
+                  {item}
                 </div>
               ))}
             </div>
@@ -121,7 +138,7 @@ const MainOfAdmin = () => {
         </button>
       </div>
       <h2>Danh sách thành viên </h2>
-      <h3>Số lượng thành viên: {loading ? '...' : filteredUsers.length}</h3>
+      <h3>Số lượng thành viên: {loading ? '...' : totalElements}</h3>
       <div className='main-admin__context'>
         <div className='main-admin__context__table__tbody-wrapper'>
           <table className='main-admin__context__table'>
@@ -136,15 +153,12 @@ const MainOfAdmin = () => {
               </tr>
             </thead>
             <tbody className='main-admin__context__table__tbody'>
-              {loading && (
+              {loading ? (
                 <tr>
-                  <td colSpan='6' style={{ textAlign: 'center', padding: '2rem' }}>
-                    Đang tải...
-                  </td>
+                  <td className='loading-message'>Đang tải...</td>
                 </tr>
-              )}
-              {!loading &&
-                filteredUsers.map((user, index) => (
+              ) : users.length > 0 ? (
+                users.map((user, index) => (
                   <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)}>
                     <td className='tbody'>
                       <h4>{index + 1}</h4>
@@ -157,11 +171,25 @@ const MainOfAdmin = () => {
                       <img src={user.imageUrl || placeHolderImage} alt='Profile' />
                     </td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan='6'>
+                    <TextMessage>Không tìm thấy thành viên nào.</TextMessage>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
+      <LoadMoreButton hasMore={hasMore} isLoading={loadingMore} onClick={handleLoadMore} />
+      <EndOfListMessage
+        isLoading={loading}
+        hasMore={hasMore}
+        itemCount={users.length}
+        itemName='thành viên'
+      />
     </div>
   )
 }

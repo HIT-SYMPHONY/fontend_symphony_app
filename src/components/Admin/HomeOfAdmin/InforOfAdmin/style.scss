@@ -6,15 +6,15 @@ $background-light: #ffefe4;
 
 .inforofadmin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 50px);
   gap: 5px;
   overflow-y: auto;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -45,7 +45,8 @@ $background-light: #ffefe4;
     gap: 10px;
     &__list {
       display: flex;
-      justify-content: space-around;
+      padding-inline: 4rem;
+      justify-content: space-between;
       &__box {
         display: flex;
         flex-direction: column;
@@ -56,11 +57,17 @@ $background-light: #ffefe4;
           justify-content: center;
           span {
             color: rgb(166, 165, 165);
+            font-size: 1.125rem;
           }
-          input {
+          h4 {
+            font-size: 1.25rem;
+          }
+          input,
+          select {
             padding: 5px 10px;
-            border: 2px solid #b8b7b7;
-            border-radius: 5px;
+            border: 2px solid #dadada;
+            border-radius: 20px;
+            font-size: 1.125rem;
           }
         }
       }
@@ -180,5 +187,27 @@ $background-light: #ffefe4;
         }
       }
     }
+  }
+  &__horizontal-list {
+    justify-content: flex-start;
+    gap: 15%;
+  }
+
+  &__horizontal-list-box {
+    flex-direction: row;
+  }
+
+  &__reset-wrap {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+  &__reset-button {
+    background-color: #ebebeb;
+    padding: 4px 16px;
+    cursor: pointer;
+    border-radius: 20px;
+    border: none;
+    font-weight: 600;
   }
 }

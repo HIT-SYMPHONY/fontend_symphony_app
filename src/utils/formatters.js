@@ -15,6 +15,7 @@ const genderMap = {
 export const translateGender = (genderKey) => {
   return genderMap[genderKey] || 'N/A'
 }
+
 export const formatDate = (dateString) => {
   if (!dateString) return ''
 

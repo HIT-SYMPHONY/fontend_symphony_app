@@ -5,6 +5,7 @@ import toast from 'react-hot-toast'
 import useFetch from '../../../hooks/useFetch'
 import { ApiConstant } from '../../../constants/api.constant'
 import './style.scss'
+import TextMessage from '../../TextMessage'
 
 const InformationManage = () => {
   const { classId } = useParams()
@@ -16,7 +17,7 @@ const InformationManage = () => {
     loading,
     error,
     refetch,
-  } = useFetch(classId ? `${ApiConstant.classrooms.getById}${classId}` : null)
+  } = useFetch(classId ? `${ApiConstant.classrooms.getById(classId)}` : null)
 
   useEffect(() => {
     if (error) {
@@ -31,7 +32,7 @@ const InformationManage = () => {
     if (path.includes('/lessons')) return 'lessons'
     if (path.includes('/tests')) return 'tests'
     if (path.includes('/members')) return 'members'
-    return '' 
+    return ''
   }, [location.pathname])
 
   const createPath = useMemo(() => {
@@ -60,7 +61,7 @@ const InformationManage = () => {
   }
 
   if (loading) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải thông tin lớp học...</div>
+    return <TextMessage>Đang tải thông tin lớp học...</TextMessage>
   }
 
   if (!classroomResponse?.data) {
