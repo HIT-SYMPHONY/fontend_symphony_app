@@ -6,7 +6,8 @@ import Logout from '../../components/Logout'
 import icon from '../../assets/img/Ellipse.png'
 import logo from '../../assets/img/logo.png'
 import './style.scss'
-import { getDisplayName } from '../../utils/formatters'
+import { getDisplayName, getDisplayNameForUser } from '../../utils/formatters'
+import TextMessage from '../../components/TextMessage'
 
 const AdminPage = () => {
   const { user } = useAuth()
@@ -23,7 +24,7 @@ const AdminPage = () => {
   }, [isManageSectionActive])
 
   if (!user) {
-    return <div>Loading...</div>
+    return <TextMessage></TextMessage>
   }
   const userRole = user.authorities?.[0]?.authority
 
@@ -41,7 +42,7 @@ const AdminPage = () => {
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user)}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayNameForUser(user)}!</h3>
 
         <NavLink to='/admin/home' className='homepage__choose__click' end>
           <i className='fa-solid fa-house'></i>
@@ -58,14 +59,14 @@ const AdminPage = () => {
 
         {isManageMenuOpen && (
           <div className='admin-sidebar-submenu'>
-            <NavLink to='/admin/classes' className='homepage__choose__clickone' end>
+            <NavLink to='/admin/classes' className='homepage__choose__clickone' >
               <Icon
                 icon='fluent:book-star-24-regular'
                 className='homepage__choose__clickone__Icon'
               />
               <span>Lớp học</span>
             </NavLink>
-            <NavLink to='/admin/competitions' className='homepage__choose__clickone' end>
+            <NavLink to='/admin/competitions' className='homepage__choose__clickone' >
               <Icon
                 icon='streamline-ultimate:ranking-stars-ribbon-bold'
                 className='homepage__choose__clickone__Icon'

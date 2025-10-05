@@ -40,18 +40,6 @@ $background-light: #ffefe4;
       transition: color 0.2s ease;
     }
 
-    &__select {
-      padding: 10px;
-      border: 1px solid $secondary-color;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: border-color 0.2s ease;
-
-      &:focus {
-        border-color: $primary-color;
-      }
-    }
-
     &__container {
       display: flex;
       align-items: center;
@@ -87,14 +75,20 @@ $background-light: #ffefe4;
     }
 
     &__button {
-      padding: 0.5rem 1.5rem;
-      background-color: $primary-color;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
+      padding: 0.25rem 1rem;
+      background-color: #ffefe4;
+      color: #f06c25;
+      border: 2px solid #f06c25;
+      border-radius: 32px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 1.125rem;
       transition: background-color 0.2s ease;
+      &.not-creatable {
+        cursor: not-allowed;
+        color: #a2a2a2;
+        border: 2px solid #a2a2a2;
+        background-color: #fff;
+      }
     }
   }
 

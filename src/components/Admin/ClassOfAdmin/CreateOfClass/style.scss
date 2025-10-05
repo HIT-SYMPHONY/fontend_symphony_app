@@ -157,7 +157,10 @@ $background-light: #ffefe4;
         &-item {
           display: flex;
           gap: 2rem;
-          & div {
+          &.image-container {
+            justify-self: flex-start;
+          }
+          & > div {
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -167,7 +170,6 @@ $background-light: #ffefe4;
               padding: 5px 20px;
               border: 2px solid #ccc;
               border-radius: 30px;
-              width: 350px;
             }
 
             select {
@@ -189,16 +191,15 @@ $background-light: #ffefe4;
           flex-direction: row !important;
           & > div {
             flex: 1;
-          }
-          & div {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            > div {
+              display: flex;
+              flex-direction: column;
+              gap: 5px;
+            }
             input {
               padding: 5px 20px;
               border: 2px solid #ccc;
               border-radius: 30px;
-              width: 350px;
             }
           }
         }
@@ -273,6 +274,7 @@ $background-light: #ffefe4;
   background: #d9d9d9;
   border-radius: 20px;
   max-width: 200px;
+  flex: 1;
 }
 .image-input-container {
   max-width: 200px;

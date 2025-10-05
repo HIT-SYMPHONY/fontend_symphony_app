@@ -173,6 +173,9 @@ $background-light: #ffefe4;
         border-radius: 5px;
         border: 2px solid #cfcfcf;
       }
+      .tiptap-editor {
+        max-height: calc(100vh - 500px);
+      }
     }
 
     &-button {

@@ -1,25 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, Suspense } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import { Select, DatePicker } from 'antd'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { classroomCreationSchema } from '../../../../utils/classroomValidate.js'
 import { createClassroom } from '../../../../apis/classroom.api'
 import { getLeaderList } from '../../../../apis/user.api'
-import './style.scss'
 
+import './style.scss'
+import { getDisplayName } from 'utils/formatters.js'
+import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from 'constants/commonConstant.js'
+import EditorPlaceholder from 'components/EditorPlaceHolder/index.jsx'
+const TiptapEditor = React.lazy(() => import('../../../TiptapEditor'))
 const CreateOfClassAdmin = () => {
   const navigate = useNavigate()
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(classroomCreationSchema),
+    mode: 'onTouched',
   })
 
-  const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [leaders, setLeaders] = useState([])
@@ -37,6 +43,13 @@ const CreateOfClassAdmin = () => {
     fetchLeaders()
   }, [])
 
+  const leaderOptions = useMemo(() => {
+    return leaders.map((leader) => ({
+      value: leader.id,
+      label: `${getDisplayName(leader) || leader.username} (${leader.studentCode})`,
+    }))
+  }, [leaders])
+
   const handleFileChange = (event) => {
     const file = event.target.files[0]
     if (file) {
@@ -45,7 +58,6 @@ const CreateOfClassAdmin = () => {
         return
       }
       setImageFile(file)
-      // Clean up the previous preview URL to prevent memory leaks
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview)
       }
@@ -54,12 +66,15 @@ const CreateOfClassAdmin = () => {
   }
 
   const onSubmit = async (data) => {
-    setLoading(true)
     const createToast = toast.loading('Đang tạo lớp học...')
-
     const payload = {
-      ...data,
+      name: data.name,
+      leaderId: data.leaderId,
       duration: parseInt(data.duration),
+      timeSlot: data.timeSlot,
+      startTime: data.startTime ? data.startTime.format(API_DATE_FORMAT) : null,
+      endTime: data.endTime ? data.endTime.format(API_DATE_FORMAT) : null,
+      description: data.description ? JSON.stringify(data.description) : '',
     }
 
     const formDataToSend = new FormData()
@@ -71,17 +86,15 @@ const CreateOfClassAdmin = () => {
     try {
       await createClassroom(formDataToSend)
       toast.success('Tạo lớp học thành công!', { id: createToast })
+      navigate('/admin/classes')
     } catch (err) {
       const message = err.response?.data?.message || 'Tạo lớp học thất bại.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
         id: createToast,
       })
-    } finally {
-      setLoading(false)
     }
   }
 
-  // Cleanup effect for the image preview URL when the component unmounts
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -116,30 +129,64 @@ const CreateOfClassAdmin = () => {
                 </div>
                 <div>
                   <label>Leader</label>
-                  <select {...register('leaderId')}>
-                    <option value=''>Chọn leader</option>
-                    {leaders.map((leader) => (
-                      <option key={leader.id} value={leader.id}>
-                        {leader.fullName || leader.username}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.leaderId && <p className='error-message'>{errors.leaderId.message}</p>}
+                  <Controller
+                    name='leaderId'
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <Select
+                          {...field}
+                          placeholder='Chọn leader'
+                          options={leaderOptions}
+                          listHeight={150}
+                          status={error ? 'error' : ''}
+                          className='ant-select-custom'
+                        />
+                        {error && <p className='error-message'>{error.message}</p>}
+                      </>
+                    )}
+                  />
                 </div>
               </div>
               <div className='create-class-admin__content-body__form-table'>
                 <div>
                   <div>
                     <label>Ngày bắt đầu</label>
-                    <input type='date' {...register('startTime')} />
-                    {errors.startTime && (
-                      <p className='error-message'>{errors.startTime.message}</p>
-                    )}
+                    <Controller
+                      name='startTime'
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <>
+                          <DatePicker
+                            {...field}
+                            format={DISPLAY_DATE_FORMAT}
+                            placeholder='Chọn ngày bắt đầu'
+                            className='ant-picker-custom'
+                            status={error ? 'error' : ''}
+                          />
+                          {error && <p className='error-message'>{error.message}</p>}
+                        </>
+                      )}
+                    />
                   </div>
                   <div>
                     <label>Ngày kết thúc</label>
-                    <input type='date' {...register('endTime')} />
-                    {errors.endTime && <p className='error-message'>{errors.endTime.message}</p>}
+                    <Controller
+                      name='endTime'
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <>
+                          <DatePicker
+                            {...field}
+                            format={DISPLAY_DATE_FORMAT}
+                            placeholder='Chọn ngày kết thúc'
+                            className='ant-picker-custom'
+                            status={error ? 'error' : ''}
+                          />
+                          {error && <p className='error-message'>{error.message}</p>}
+                        </>
+                      )}
+                    />
                   </div>
                 </div>
                 <div>
@@ -156,8 +203,7 @@ const CreateOfClassAdmin = () => {
                 </div>
               </div>
 
-              <div className='create-class-admin__content-body__form-item'>
-                {/* --- THE FIX IS HERE --- */}
+              <div className='create-class-admin__content-body__form-item image-container'>
                 <div className='image-input-container'>
                   <input
                     type='file'
@@ -176,19 +222,27 @@ const CreateOfClassAdmin = () => {
                       src={imagePreview}
                       alt='Preview'
                       className='create-class-admin__content-body__preview mt-2'
-                      onClick={() => fileInputRef.current.click()} // The image itself is now clickable
+                      onClick={() => fileInputRef.current.click()}
                     />
                   )}
                 </div>
                 <div>
                   <label>Mô tả</label>
-                  <textarea {...register('description')}></textarea>
+                  <Suspense fallback={<EditorPlaceholder />}>
+                    <Controller
+                      name='description'
+                      control={control}
+                      render={({ field, fieldState: { error } }) => (
+                        <TiptapEditor value={field.value} onChange={field.onChange} error={error} />
+                      )}
+                    />
+                  </Suspense>
                 </div>
               </div>
             </div>
             <div className='create-class-admin__content-button'>
-              <button type='submit' disabled={loading}>
-                {loading ? 'Đang tạo...' : 'Tạo'}
+              <button type='submit' disabled={isSubmitting}>
+                {isSubmitting ? 'Đang tạo...' : 'Tạo'}
               </button>
             </div>
           </form>

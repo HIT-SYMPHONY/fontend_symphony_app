@@ -44,7 +44,6 @@ const LoginPage = () => {
   }
 
   const onFinishFailed = (errorInfo) => {
-    console.log('Form validation failed:', errorInfo)
     toast.error('Vui lòng điền đầy đủ thông tin!')
   }
 

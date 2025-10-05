@@ -1,30 +1,41 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllCompetitions } from '../../../../apis/competition.api'
 import { translateStatus, formatDate } from '../../../../utils/formatters'
 import LoadMoreButton from '../../../../components/LoadMoreButton'
 import EndOfListMessage from '../../../../components/EndOfListMessage'
-import './style.scss'
 import { yearFilterOptions, PAGE_SIZE } from '../../../../constants/commonConstant'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
 import useDebounce from '../../../../hooks/useDebounce'
 import TextMessage from '../../../TextMessage'
+import './style.scss'
+
 const MainOfCompet = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedYear, setSelectedYear] = useState(() => searchParams.get('year') || 'Tất cả')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [competitions, setCompetitions] = useState([])
   const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
-  const [selectedYear, setSelectedYear] = useState('Tất cả')
 
   useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
-
+  useEffect(() => {
+    const newParams = new URLSearchParams()
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
+    }
+    if (selectedYear && selectedYear !== 'Tất cả') {
+      newParams.set('year', selectedYear)
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [selectedYear, debouncedSearchQuery, setSearchParams])
   const fetchCompetitions = useCallback(
     async (page, isLoadMore = false) => {
       isLoadMore ? setLoadingMore(true) : setLoading(true)
@@ -32,8 +43,8 @@ const MainOfCompet = () => {
         const params = {
           pageNum: page,
           pageSize: PAGE_SIZE,
-          keyword: debouncedSearchQuery || null,
-          startYear: selectedYear === 'Tất cả' ? null : selectedYear,
+          keyword: searchParams.get('keyword') || null,
+          startYear: searchParams.get('year') || null,
         }
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([, v]) => v != null),
@@ -41,11 +52,7 @@ const MainOfCompet = () => {
         const response = await getAllCompetitions(filteredParams)
         const content = response.data
         if (content && content.items) {
-          if (isLoadMore) {
-            setCompetitions((prev) => [...prev, ...content.items])
-          } else {
-            setCompetitions(content.items)
-          }
+          setCompetitions((prev) => (isLoadMore ? [...prev, ...content.items] : content.items))
         }
         if (content && content.meta) {
           setPagination({
@@ -55,15 +62,13 @@ const MainOfCompet = () => {
           })
         }
       } catch (error) {
-        if (error.response?.data?.message) toast.error(error.response.data.message)
-        else toast.error('Có lỗi bất thường đã xảy ra.')
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách cuộc thi.')
       } finally {
         isLoadMore ? setLoadingMore(false) : setLoading(false)
       }
     },
-    [debouncedSearchQuery, selectedYear],
+    [searchParams],
   )
-
   useEffect(() => {
     fetchCompetitions(1)
   }, [fetchCompetitions])
@@ -72,7 +77,6 @@ const MainOfCompet = () => {
     const nextPage = pagination.pageNum + 1
     fetchCompetitions(nextPage, true)
   }
-
   const handleSelectYear = (year) => {
     setSelectedYear(year)
     setIsDropdownOpen(false)
@@ -137,7 +141,7 @@ const MainOfCompet = () => {
       <h3>Danh sách cuộc thi ({loading ? '...' : pagination.totalElements})</h3>
       <div className='mainofcompet__table'>
         {loading ? (
-          <TextMessage></TextMessage>
+          <TextMessage />
         ) : competitions.length > 0 ? (
           competitions.map((item) => (
             <div
@@ -145,7 +149,7 @@ const MainOfCompet = () => {
               key={item.id}
               onClick={() => navigate(`/admin/competitions/${item.id}`)}>
               <div className='mainofcompet__table-box__img'>
-                {item.image && <img src={item.image} alt={item.name}/>}
+                {item.image && <img src={item.image} alt={item.name} />}
               </div>
               <div className='mainofcompet__table-box__item'>
                 <div className='mainofcompet__table-box__item-start'>
@@ -158,7 +162,7 @@ const MainOfCompet = () => {
             </div>
           ))
         ) : (
-          <TextMessage text={'Không có cuộc thi nào.'}></TextMessage>
+          <TextMessage text={'Không có cuộc thi nào.'} />
         )}
       </div>
 

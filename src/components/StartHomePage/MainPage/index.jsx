@@ -1,45 +1,56 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-
-// Import the specific API functions
 import { getNotificationsForCurrentUser } from '../../../apis/notification.api'
 import { getMyClasses } from '../../../apis/user.api'
-
 import { formatDate } from '../../../utils/formatters'
 import AdvList from '../ClassAgo/index'
-import './style.scss'
 import TextMessage from '../../TextMessage'
+import './style.scss'
 
 const Main = () => {
   const navigate = useNavigate()
-
+  const [searchParams] = useSearchParams()
   const [announcements, setAnnouncements] = useState([])
   const [recentClasses, setRecentClasses] = useState([])
-  const [loading, setLoading] = useState(true)
-
+  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
+  const [loadingClasses, setLoadingClasses] = useState(true)
+  const globalSearch = searchParams.get('q') || ''
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const fetchAnnouncements = async () => {
       try {
-        setLoading(true)
-        const [notificationsResponse, classesResponse] = await Promise.all([
-          getNotificationsForCurrentUser({ pageNum: 1, pageSize: 15 }),
-          getMyClasses(),
-        ])
-
-        setAnnouncements(notificationsResponse.data?.items || [])
-        setRecentClasses(classesResponse.data || [])
+        setLoadingAnnouncements(true)
+        const response = await getNotificationsForCurrentUser({ pageNum: 1, pageSize: 15 })
+        setAnnouncements(response.data?.items || [])
       } catch (error) {
-        toast.error('Không thể tải dữ liệu trang chủ.')
-        console.error('Dashboard fetch error:', error)
+        toast.error('Không thể tải thông báo.')
       } finally {
-        setLoading(false)
+        setLoadingAnnouncements(false)
       }
     }
-
-    fetchDashboardData()
-  }, [])
+    fetchAnnouncements()
+  }, []) 
+  useEffect(() => {
+    const fetchMyClasses = async () => {
+      try {
+        setLoadingClasses(true)
+        const params = {
+          keyword: globalSearch || null,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+        const response = await getMyClasses(filteredParams)
+        setRecentClasses(response.data || [])
+      } catch (error) {
+        toast.error('Không thể tải danh sách lớp học.')
+      } finally {
+        setLoadingClasses(false)
+      }
+    }
+    fetchMyClasses()
+  }, [globalSearch]) 
 
   return (
     <div className='flex-one'>
@@ -53,7 +64,7 @@ const Main = () => {
           />
           <h2>Thông báo</h2>
         </div>
-        <AdvList announcements={announcements} isLoading={loading} />
+        <AdvList announcements={announcements} isLoading={loadingAnnouncements} />
       </div>
       <div className='flex-one__plus'>
         <div className='plus'>
@@ -61,8 +72,8 @@ const Main = () => {
           <h2>Lớp học gần đây</h2>
         </div>
         <div className='class-ago thay2'>
-          {loading ? (
-            <TextMessage text='Đang tải lớp học...'></TextMessage>
+          {loadingClasses ? (
+            <TextMessage text='Đang tải lớp học...' />
           ) : recentClasses.length > 0 ? (
             recentClasses.map((item) => (
               <div className='class-ago__box' key={item.id}>
@@ -94,7 +105,13 @@ const Main = () => {
               </div>
             ))
           ) : (
-            <p>Bạn chưa tham gia lớp học nào.</p>
+            <TextMessage
+              text={
+                globalSearch
+                  ? 'Không tìm thấy lớp học nào phù hợp.'
+                  : 'Bạn chưa tham gia lớp học nào.'
+              }
+            />
           )}
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { Outlet, useNavigate } from 'react-router-dom'
+// --- NEW: Import useSearchParams ---
+import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllClassrooms } from '../../../../apis/classroom.api'
 import { translateStatus } from '../../../../utils/formatters'
@@ -13,34 +14,40 @@ import { yearFilterOptions, PAGE_SIZE } from '../../../../constants/commonConsta
 import './style.scss'
 
 const MainOfClassAdmin = () => {
-  // All state and hooks remain the same...
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedYear, setSelectedYear] = useState(() => searchParams.get('year') || 'Tất cả')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [classrooms, setClassrooms] = useState([])
   const [totalElements, setTotalElements] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedYear, setSelectedYear] = useState('Tất cả')
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
-
   useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
+  useEffect(() => {
+    const newParams = new URLSearchParams()
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
+    }
+    if (selectedYear && selectedYear !== 'Tất cả') {
+      newParams.set('year', selectedYear)
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [selectedYear, debouncedSearchQuery, setSearchParams])
   const fetchClasses = useCallback(
     async (page, isLoadMore = false) => {
-      if (isLoadMore) {
-        setLoadingMore(true)
-      } else {
-        setLoading(true)
-      }
+      if (isLoadMore) setLoadingMore(true)
+      else setLoading(true)
       try {
         const params = {
           pageNum: page,
           pageSize: PAGE_SIZE,
-          keyword: debouncedSearchQuery || null,
-          startYear: selectedYear === 'Tất cả' ? null : selectedYear,
+          keyword: searchParams.get('keyword') || null,
+          startYear: searchParams.get('year') || null,
         }
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([, v]) => v != null),
@@ -52,7 +59,6 @@ const MainOfClassAdmin = () => {
         if (content && content.items) {
           setClassrooms((prev) => (isLoadMore ? [...prev, ...content.items] : content.items))
         }
-
         if (meta) {
           setTotalElements(meta.totalElements)
           setCurrentPage(meta.pageNum)
@@ -61,16 +67,12 @@ const MainOfClassAdmin = () => {
       } catch (error) {
         toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách lớp học.')
       } finally {
-        if (isLoadMore) {
-          setLoadingMore(false)
-        } else {
-          setLoading(false)
-        }
+        if (isLoadMore) setLoadingMore(false)
+        else setLoading(false)
       }
     },
-    [debouncedSearchQuery, selectedYear],
+    [searchParams], 
   )
-
   useEffect(() => {
     fetchClasses(1, false)
   }, [fetchClasses])
@@ -80,12 +82,10 @@ const MainOfClassAdmin = () => {
       fetchClasses(currentPage + 1, true)
     }
   }
-
   const handleSelectYear = (yearOption) => {
     setSelectedYear(yearOption)
     setIsDropdownOpen(false)
   }
-
 
   return (
     <div className='main-class-admin'>
@@ -145,7 +145,7 @@ const MainOfClassAdmin = () => {
         <h3>Danh sách lớp học ({loading ? '...' : totalElements})</h3>
         <div className='main-class-admin__content-body'>
           {loading ? (
-            <TextMessage></TextMessage>
+            <TextMessage />
           ) : classrooms.length > 0 ? (
             classrooms.map((item) => (
               <div
@@ -171,7 +171,7 @@ const MainOfClassAdmin = () => {
               </div>
             ))
           ) : (
-            <TextMessage text={'Không tìm thấy lớp học nào.'}></TextMessage>
+            <TextMessage text='Không tìm thấy lớp học nào phù hợp.' /> 
           )}
         </div>
       </div>

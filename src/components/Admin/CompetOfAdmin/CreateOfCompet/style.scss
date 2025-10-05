@@ -113,9 +113,10 @@ $background-light: #ffefe4;
         &-time {
           display: flex;
           gap: 4rem;
-          div {
+          > div {
             display: flex;
             flex-direction: column;
+            flex: 1;
 
             input {
               padding: 5px 15px;
@@ -136,7 +137,6 @@ $background-light: #ffefe4;
           border-radius: 20px;
         }
         &-upload {
-          width: 100%;
           min-height: 150px;
           background-color: #bcbaba;
           color: #5d5c5c;
@@ -153,6 +153,8 @@ $background-light: #ffefe4;
           &-preview {
             width: 100%;
             background-repeat: no-repeat;
+            height: 100%;
+            object-fit: cover;
           }
         }
 
@@ -172,11 +174,24 @@ $background-light: #ffefe4;
         flex-direction: column;
         gap: 10px;
         width: 45%;
-
         span {
           color: #989898;
         }
 
+        & > div:nth-of-type(2) {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          >div:nth-of-type(2) {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            .tiptap-editor {
+              max-height: 500px;
+              flex: 1;
+            }
+          }
+        }
         input,
         select {
           padding: 5px 15px;
@@ -209,6 +224,9 @@ $background-light: #ffefe4;
       label {
         color: #989898;
       }
+      .tiptap-editor {
+        max-height: 400px;
+      }
       #content {
         width: 100%;
         min-height: 120px;
@@ -240,4 +258,5 @@ $background-light: #ffefe4;
       }
     }
   }
+
 }

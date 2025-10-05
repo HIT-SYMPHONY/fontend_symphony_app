@@ -1,42 +1,74 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState, useMemo } from 'react'
+import { NavLink, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import toast from 'react-hot-toast'
 import useAuth from '../../hooks/useAuth'
-import useFetch from '../../hooks/useFetch'
-import { ApiConstant } from '../../constants/api.constant'
 import Logout from '../../components/Logout'
 import Schedule from '../SchedulePage'
 import Homework from '../Homework'
 import icon from '../../assets/img/Ellipse.png'
-import { Outlet } from 'react-router-dom'
 import logo from '../../assets/img/logo.png'
+import { getDisplayNameForUser } from '../../utils/formatters'
+import useDebounce from '../../hooks/useDebounce'
+import { NON_SEARCHABLE_PATHS } from 'constants/commonConstant'
 import './style.scss'
-import { getDisplayName } from '../../utils/formatters'
-
 const DashboardOfMain = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const [liveSearch, setLiveSearch] = useState(searchParams.get('q') || '')
+  const debouncedSearch = useDebounce(liveSearch, 500)
 
   const [showLogoutPopup, setShowLogoutPopup] = useState(false)
   const [showMain, setShowMain] = useState(false)
   const [showSchedule, setShowSchedule] = useState(false)
   const [showHomework, setShowHomework] = useState(false)
-  const [isManageMenuOpen, setIsManageMenuOpen] = useState(false)
 
   const isMyClassroomActive =
     location.pathname.startsWith('/my-classes') || location.pathname.startsWith('/my-results')
+  const isManageMenuActive = location.pathname.startsWith('/manage')
+  const [isManageMenuOpen, setIsManageMenuOpen] = useState(isManageMenuActive)
   const [isClassroomMenuOpen, setClassroomMenuOpen] = useState(isMyClassroomActive)
+  const isSearchDisabled = useMemo(() => {
+    return NON_SEARCHABLE_PATHS.some((path) => location.pathname.startsWith(path))
+  }, [location.pathname])
 
   useEffect(() => {
     setClassroomMenuOpen(isMyClassroomActive)
-  },[isClassroomMenuOpen])
+  }, [isMyClassroomActive])
 
-  const handleManageClick = () => {
+  useEffect(() => {
+    setIsManageMenuOpen(isManageMenuActive)
+  }, [isManageMenuActive])
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams)
+    if (!isSearchDisabled && debouncedSearch) {
+      newParams.set('q', debouncedSearch)
+    } else {
+      newParams.delete('q')
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [debouncedSearch, isSearchDisabled, setSearchParams])
+  useEffect(() => {
+    if (isSearchDisabled) {
+      setLiveSearch('')
+    }
+  }, [isSearchDisabled])
+
+  const handleClassroomClick = () => {
     if (isMyClassroomActive) {
       setClassroomMenuOpen((prevState) => !prevState)
     } else {
       navigate('/my-classes')
+    }
+  }
+
+  const handleManageClick = () => {
+    if (isManageMenuActive) {
+      setIsManageMenuOpen((prevState) => !prevState)
+    } else {
+      navigate('/manage/classes')
     }
   }
 
@@ -50,34 +82,29 @@ const DashboardOfMain = () => {
     setShowHomework(!showHomework)
   }
 
-  if (!user) {
-    return <div>Loading user information...</div>
-  }
-
   return (
     <div className='homepage'>
-      <div className='homepage__choose'>
+      <aside className='homepage__choose'>
         <div className='homepage__choose__img'>
           <img src={user.imageUrl || icon} alt='Profile' />
         </div>
-        <h3 className='homepage__choose__h3'>Chào {getDisplayName(user)}!</h3>
+        <h3 className='homepage__choose__h3'>Chào {getDisplayNameForUser(user)}!</h3>
 
-        <NavLink to='/home' className='homepage__choose__click'>
+        <NavLink to='/home' className='homepage__choose__click' end>
           <i className='fa-solid fa-house'></i>
           <span>Trang chủ</span>
         </NavLink>
 
-        <NavLink
-          to='my-classes'
+        <div
           className={
             isMyClassroomActive ? 'homepage__choose__click origin' : 'homepage__choose__click'
           }
-          onClick={handleManageClick}>
+          onClick={handleClassroomClick}>
           <i className='fa-solid fa-book'></i>
           <span>Lớp học</span>
-        </NavLink>
+        </div>
 
-        {isMyClassroomActive && (
+        {isClassroomMenuOpen && (
           <div>
             <NavLink to='/my-classes' className='homepage__choose__clickone'>
               <Icon
@@ -103,13 +130,14 @@ const DashboardOfMain = () => {
 
         {user.authorities?.[0]?.authority === 'LEADER' && (
           <>
-            <NavLink
-              to='/manage'
-              className='homepage__choose__click'
-              onClick={() => setIsManageMenuOpen(!isManageMenuOpen)}>
+            <div
+              className={
+                isManageMenuActive ? 'homepage__choose__click origin' : 'homepage__choose__click'
+              }
+              onClick={handleManageClick}>
               <Icon icon='mdi:book-account' className='homepage__choose__click__Icon' />
               <span>Quản lý</span>
-            </NavLink>
+            </div>
             {isManageMenuOpen && (
               <div>
                 <NavLink to='/manage/classes' className='homepage__choose__clickone'>
@@ -128,7 +156,7 @@ const DashboardOfMain = () => {
           </>
         )}
 
-        <NavLink to='account' className='homepage__choose__click'>
+        <NavLink to='account' className='homepage__choose__click' end>
           <i className='fa-solid fa-circle-user'></i>
           <span>Tài khoản</span>
         </NavLink>
@@ -137,15 +165,24 @@ const DashboardOfMain = () => {
           <Icon icon='mage:shut-down-fill' className='homepage__choose__click__Icon' />
           <span>Đăng xuất</span>
         </div>
-      </div>
+      </aside>
 
-      <div className='homepage__main'>
+      <main className='homepage__main'>
         <div className='homepage__main__search'>
           <div className='search'>
             <div className='search__icon'>
               <img src={logo} alt='Logo' width='50px' height='50px' />
-              <div className='search__icon__box'>
-                <input type='text' placeholder='Tìm kiếm...' />
+              <div
+                className={`search__icon__box ${
+                  isSearchDisabled ? 'search__icon__box--disabled' : ''
+                }`}>
+                <input
+                  type='text'
+                  placeholder={isSearchDisabled ? 'Tìm kiếm không áp dụng' : 'Tìm kiếm...'}
+                  value={liveSearch}
+                  onChange={(e) => setLiveSearch(e.target.value)}
+                  disabled={isSearchDisabled}
+                />
                 <i className='fa-solid fa-magnifying-glass'></i>
               </div>
             </div>
@@ -197,7 +234,7 @@ const DashboardOfMain = () => {
             {showHomework && showMain && <Homework />}
           </div>
         </div>
-      </div>
+      </main>
 
       {showLogoutPopup && <Logout onSetFrame={setShowLogoutPopup} />}
     </div>

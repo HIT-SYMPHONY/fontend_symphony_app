@@ -1,26 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import { Select, DatePicker } from 'antd'
+import dayjs from 'dayjs'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { competitionCreationSchema } from '../../../../utils/competitionValidate.js'
 import { createCompetition } from '../../../../apis/competition.api'
-import { getLeaderList } from '../../../../apis/user.api' 
+import { getLeaderList } from '../../../../apis/user.api'
+import { getDisplayName } from '../../../../utils/formatters.js'
+import TiptapEditor from '../../../TiptapEditor'
+import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../../constants/commonConstant.js'
 import './style.scss'
+
 
 const CreateOfCompetAdmin = () => {
   const navigate = useNavigate()
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    control, 
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(competitionCreationSchema),
     mode: 'onTouched',
   })
 
-  const [loading, setLoading] = useState(false)
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
@@ -37,12 +43,18 @@ const CreateOfCompetAdmin = () => {
     }
     fetchLeaders()
   }, [])
+  const leaderOptions = useMemo(() => {
+    return leaders.map((leader) => ({
+      value: leader.id,
+      label: `${getDisplayName(leader)} (${leader.studentCode})`,
+    }))
+  }, [leaders])
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Chỉ cho phép tệp hình ảnh (PNG, JPG, WEBP, GIF).')
+        toast.error('Chỉ cho phép tệp hình ảnh.')
         e.target.value = null
         return
       }
@@ -53,16 +65,15 @@ const CreateOfCompetAdmin = () => {
   }
 
   const onSubmit = async (data) => {
-    setLoading(true)
     const creationToast = toast.loading('Đang tạo cuộc thi...')
     const submissionPayload = {
       name: data.name,
-      description: data.description,
-      rule: data.rule,
-      content: data.content,
       competitionLeaderId: data.competitionLeaderId,
-      startTime: new Date(data.startTime).toISOString(),
-      endTime: new Date(data.endTime).toISOString(),
+      startTime: data.startTime ? data.startTime.format(API_DATETIME_FORMAT) : null,
+      endTime: data.endTime ? data.endTime.format(API_DATETIME_FORMAT) : null,
+      description: data.description ? JSON.stringify(data.description) : '',
+      rule: data.rule ? JSON.stringify(data.rule) : '',
+      content: data.content ? JSON.stringify(data.content) : '',
     }
 
     const submissionData = new FormData()
@@ -70,7 +81,6 @@ const CreateOfCompetAdmin = () => {
       'data',
       new Blob([JSON.stringify(submissionPayload)], { type: 'application/json' }),
     )
-
     if (imageFile) {
       submissionData.append('image', imageFile)
     }
@@ -78,17 +88,15 @@ const CreateOfCompetAdmin = () => {
     try {
       await createCompetition(submissionData)
       toast.success('Tạo cuộc thi thành công!', { id: creationToast })
+      navigate('/admin/competitions')
     } catch (error) {
       const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo cuộc thi.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
         id: creationToast,
       })
-    } finally {
-      setLoading(false)
     }
   }
 
-  // Cleanup effect for the image preview URL
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl)
@@ -119,13 +127,43 @@ const CreateOfCompetAdmin = () => {
               <div className='create-compet-admin__context-enter__left-time'>
                 <div>
                   <span>Ngày bắt đầu</span>
-                  <input type='datetime-local' {...register('startTime')} />
-                  {errors.startTime && <p className='error-message'>{errors.startTime.message}</p>}
+                  <Controller
+                    name='startTime'
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <DatePicker
+                          {...field}
+                          showTime
+                          format={DISPLAY_DATETIME_FORMAT}
+                          placeholder='Chọn ngày giờ'
+                          className='ant-picker-custom'
+                          status={error ? 'error' : ''}
+                        />
+                        {error && <p className='error-message'>{error.message}</p>}
+                      </>
+                    )}
+                  />
                 </div>
                 <div>
                   <span>Ngày kết thúc</span>
-                  <input type='datetime-local' {...register('endTime')} />
-                  {errors.endTime && <p className='error-message'>{errors.endTime.message}</p>}
+                  <Controller
+                    name='endTime'
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <DatePicker
+                          {...field}
+                          showTime
+                          format={DISPLAY_DATETIME_FORMAT}
+                          placeholder='Chọn ngày giờ'
+                          className='ant-picker-custom'
+                          status={error ? 'error' : ''}
+                        />
+                        {error && <p className='error-message'>{error.message}</p>}
+                      </>
+                    )}
+                  />
                 </div>
               </div>
 
@@ -154,45 +192,61 @@ const CreateOfCompetAdmin = () => {
               />
 
               <span>Giới thiệu</span>
-              <textarea
-                placeholder='Nhập giới thiệu'
-                className='create-compet-admin__context-enter__left-textarea'
-                {...register('description')}></textarea>
+              <Controller
+                name='description'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TiptapEditor value={field.value} onChange={field.onChange} error={error} />
+                )}
+              />
             </div>
 
             <div className='create-compet-admin__context-enter__right'>
               <span>Leader (Phụ trách)</span>
-              {/* --- THE FIX IS HERE (Part 1) --- */}
-              <select {...register('competitionLeaderId')}>
-                <option value=''>-- Chọn người phụ trách --</option>
-                {leaders.map((leader) => (
-                  <option key={leader.id} value={leader.id}>
-                    {leader.fullName} ({leader.username})
-                  </option>
-                ))}
-              </select>
-              {errors.competitionLeaderId && (
-                <p className='error-message'>{errors.competitionLeaderId.message}</p>
-              )}
+              <Controller
+                name='competitionLeaderId'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <Select
+                      {...field}
+                      placeholder='-- Chọn người phụ trách --'
+                      options={leaderOptions}
+                      listHeight={200}
+                      status={error ? 'error' : ''}
+                      className='ant-select-custom'
+                    />
+                    {error && <p className='error-message'>{error.message}</p>}
+                  </>
+                )}
+              />
 
               <span>Thể lệ</span>
-              <textarea
-                placeholder='Nhập thể lệ'
-                className='create-compet-admin__context-enter__right-textarea'
-                {...register('rule')}></textarea>
+              <Controller
+                name='rule'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <TiptapEditor value={field.value} onChange={field.onChange} error={error} />
+                )}
+              />
             </div>
           </div>
 
           <div className='create-compet-admin__context-content'>
             <label htmlFor='content'>Đề thi</label>
             <br />
-            <textarea id='content' placeholder='Nhập đề thi' {...register('content')}></textarea>
-            {errors.content && <p className='error-message'>{errors.content.message}</p>}
+            <Controller
+              name='content'
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <TiptapEditor value={field.value} onChange={field.onChange} error={error} />
+              )}
+            />
           </div>
 
           <div className='create-compet-admin__context-button'>
-            <button type='submit' disabled={loading || !isValid}>
-              {loading ? 'Đang tạo...' : 'Tạo cuộc thi'}
+            <button type='submit' disabled={isSubmitting}>
+              {isSubmitting ? 'Đang tạo...' : 'Tạo cuộc thi'}
             </button>
           </div>
         </div>

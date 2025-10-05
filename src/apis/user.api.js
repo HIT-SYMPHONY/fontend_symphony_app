@@ -2,18 +2,13 @@ import { api, apiDefaultUpload } from '.'
 import { ApiConstant } from '../constants/api.constant'
 
 const userApi = () => ({
-  getAllUsers: async (params) => api.get(ApiConstant.users.base, {params}),
+  getAllUsers: async (params) => api.get(ApiConstant.users.base, { params }),
 
   getUserById: async (userId) => {
     return api.get(ApiConstant.users.getById(userId))
   },
 
   getCurrentUser: async () => api.get(ApiConstant.users.getCurrentUser),
-
-  getMyClassrooms: async (status) => {
-    const params = status ? { status } : {}
-    return api.get(ApiConstant.users.getMyClassrooms, { params })
-  },
 
   updateUser: async (userId, formDataPayload) => {
     return apiDefaultUpload.patch(ApiConstant.users.getById(userId), formDataPayload)
@@ -33,7 +28,7 @@ const userApi = () => ({
     return api.get(ApiConstant.users.getUserClasses(userId))
   },
 
-  getMyClasses: async () => api.get(ApiConstant.users.getMyClassrooms),
+  getMyClasses: async (params) => api.get(ApiConstant.users.getMyClassrooms, {params}),
 
   getMyCompetitions: async () => api.get(ApiConstant.users.getMyCompetitions),
 
@@ -45,7 +40,6 @@ const userApi = () => ({
 export const {
   getAllUsers,
   getUserById,
-  getMyClassrooms,
   updateUser,
   createUser,
   getLeaderList,

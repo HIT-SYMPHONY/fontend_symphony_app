@@ -90,7 +90,7 @@ const ClientRoutes = (
           <Route path='tests/:testId/grade' element={<VeiwsLesson />} />
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
-          <Route path='lessons/create'  element={<CreateLessonID />} />
+          <Route path='lessons/create' element={<CreateLessonID />} />
           <Route path='tests' element={<TestContent />} />
           <Route path='lessons/:lessonId' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonId/edit' element={<EditLesson />}></Route>

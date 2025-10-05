@@ -4,8 +4,9 @@ import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'r
 import toast from 'react-hot-toast'
 import useFetch from '../../../hooks/useFetch'
 import { ApiConstant } from '../../../constants/api.constant'
-import './style.scss'
+import NavigationDropdown from '../../NavigationDropdown'
 import TextMessage from '../../TextMessage'
+import './style.scss'
 
 const InformationManage = () => {
   const { classId } = useParams()
@@ -18,6 +19,17 @@ const InformationManage = () => {
     error,
     refetch,
   } = useFetch(classId ? `${ApiConstant.classrooms.getById(classId)}` : null)
+  const linkOptions = useMemo(() => {
+    if (!classId) return []
+    const basePath = `/manage/classes/${classId}`
+    return [
+      { option: 'Thông tin lớp học', link: basePath },
+      { option: 'Thông báo', link: `${basePath}/notifications` },
+      { option: 'Bài học', link: `${basePath}/lessons` },
+      { option: 'Kiểm Tra', link: `${basePath}/tests` },
+      { option: 'Danh sách sinh viên', link: `${basePath}/members` },
+    ]
+  }, [classId])
 
   useEffect(() => {
     if (error) {
@@ -25,35 +37,16 @@ const InformationManage = () => {
       navigate('/manage/classes')
     }
   }, [error, navigate])
-
-  const getCurrentSection = useMemo(() => {
-    const path = location.pathname
-    if (path.includes('/notifications')) return 'notifications'
-    if (path.includes('/lessons')) return 'lessons'
-    if (path.includes('/tests')) return 'tests'
-    if (path.includes('/members')) return 'members'
-    return ''
-  }, [location.pathname])
-
   const createPath = useMemo(() => {
-    switch (getCurrentSection) {
-      case 'notifications':
-        return `/manage/classes/${classId}/notifications/create`
-      case 'lessons':
-        return `/manage/classes/${classId}/lessons/create`
-      case 'tests':
-        return `/manage/classes/${classId}/tests/create`
-      default:
-        return null
-    }
-  }, [getCurrentSection, classId])
-
-  const handleNavigation = (e) => {
-    const sectionPath = e.target.value
-    const basePath = `/manage/classes/${classId}`
-    navigate(sectionPath ? `${basePath}/${sectionPath}` : basePath)
-  }
-
+    const path = location.pathname
+    if (path.includes('/notifications/create')) return null
+    if (path.includes('/notifications')) return `/manage/classes/${classId}/notifications/create`
+    if (path.includes('/lessons/create')) return null
+    if (path.includes('/lessons')) return `/manage/classes/${classId}/lessons/create`
+    if (path.includes('/tests/create')) return null
+    if (path.includes('/tests')) return `/manage/classes/${classId}/tests/create`
+    return null
+  }, [location.pathname, classId])
   const handleCreateClick = () => {
     if (createPath) {
       navigate(createPath)
@@ -61,7 +54,7 @@ const InformationManage = () => {
   }
 
   if (loading) {
-    return <TextMessage>Đang tải thông tin lớp học...</TextMessage>
+    return <TextMessage text='Đang tải thông tin lớp học...'></TextMessage>
   }
 
   if (!classroomResponse?.data) {
@@ -84,17 +77,12 @@ const InformationManage = () => {
 
       <div className='manage-infor__search'>
         <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)} />
-        <select
+        <NavigationDropdown
+          options={linkOptions}
+          placeholder='Thông tin lớp học'
           className='manage-infor__search__select'
-          name='category'
-          value={getCurrentSection}
-          onChange={handleNavigation}>
-          <option value=''>Thông tin lớp học</option>
-          <option value='notifications'>Thông báo</option>
-          <option value='lessons'>Bài học</option>
-          <option value='tests'>Kiểm Tra</option>
-          <option value='members'>Danh sách sinh viên</option>
-        </select>
+        />
+
         <div className='manage-infor__search__container'>
           <input
             type='text'
@@ -105,7 +93,7 @@ const InformationManage = () => {
         </div>
 
         <button
-          className='manage-infor__search__button'
+          className={`manage-infor__search__button ${!createPath ? 'not-creatable' : ''}`}
           onClick={handleCreateClick}
           disabled={!createPath}>
           <i className='fa-solid fa-plus'></i> <span>Tạo mới</span>
@@ -116,7 +104,6 @@ const InformationManage = () => {
     </div>
   )
 }
-
 export function useClassroomContext() {
   return useOutletContext()
 }

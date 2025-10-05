@@ -15,6 +15,7 @@ import { intakeOptions, roleFilterOptions , PAGE_SIZE} from '../../../../constan
 import EndOfListMessage from '../../../EndOfListMessage'
 import './style.scss'
 import TextMessage from '../../../TextMessage'
+import { getDisplayName } from 'utils/formatters'
 
 const MemberOfCompetAdmin = () => {
   const navigate = useNavigate()
@@ -240,10 +241,10 @@ const MemberOfCompetAdmin = () => {
                     </h5>
                   </div>
                   <div className='member-compet-admin__left-context__list-item-box'>
-                    <h5>{item.fullName}</h5>
+                    <h5>{getDisplayName(item)}</h5>
                   </div>
                   <h5>{item.studentCode}</h5>
-                  <div className='member-compet-admin__left-context__list-item-box'>
+                  <div className='member-compet-admin__l eft-context__list-item-box'>
                     <h5>{item.intake}</h5>
                   </div>
                   <div className='member-compet-admin__left-context__list-item-box'>

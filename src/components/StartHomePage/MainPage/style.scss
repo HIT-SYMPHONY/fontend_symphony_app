@@ -21,7 +21,7 @@ $class-ago-width: 180px;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
     &__Icon {
       color: $button-color;
     }
@@ -34,19 +34,20 @@ $class-ago-width: 180px;
     grid-template-columns: repeat(3, minmax(120px, 1fr));
   }
   .thay2 {
-    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    grid-template-columns: repeat(4, minmax(250px, 1fr));
   }
   .class-ago {
     padding-left: 20px;
     padding-right: 20px;
     display: grid;
-    gap: 40px;
+    gap: 20px 40px;
     overflow-y: auto;
     max-height: 450px;
     position: relative;
     font-family: 'Baloo 2', sans-serif;
     box-sizing: border-box;
     max-width: 100%;
+    align-items: stretch;
 
     &::-webkit-scrollbar {
       display: none;
@@ -55,16 +56,16 @@ $class-ago-width: 180px;
     -ms-overflow-style: none;
 
     &__box {
-      flex: 0 0 auto;
       background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       overflow: hidden;
-      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
     }
 
     &__thumbnail {
-      height: 100px;
+      height: 150px;
       background-color: #d9d9d9;
       border-top-left-radius: 12px;
       border-top-right-radius: 12px;
@@ -72,6 +73,7 @@ $class-ago-width: 180px;
         height: 100%;
         width: 100%;
         object-fit: cover;
+        object-position: top;
       }
     }
 
@@ -80,14 +82,14 @@ $class-ago-width: 180px;
       position: relative;
       border-top: #d9d9d9 1px solid;
       &__title {
-        font-size: 12px;
+        font-size: 1.25rem;
         font-weight: 700;
         color: $button-color;
         max-width: 65%;
       }
 
       &__info {
-        font-size: 13px;
+        font-size: 1rem;
         color: gray;
         display: flex;
         align-items: center;

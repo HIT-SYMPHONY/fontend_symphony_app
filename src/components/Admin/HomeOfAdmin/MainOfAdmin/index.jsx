@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+// --- NEW: Import useSearchParams ---
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
 import placeHolderImage from '../../../../assets/img/Ellipse.png'
@@ -15,71 +16,77 @@ import './style.scss'
 
 const MainOfAdmin = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedRole, setSelectedRole] = useState(() => searchParams.get('role') || 'Tất cả')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [users, setUsers] = useState([])
   const [totalElements, setTotalElements] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedRole, setSelectedRole] = useState('Tất cả')
-  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
   useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
+  useEffect(() => {
+    const newParams = new URLSearchParams()
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
+    }
+    if (selectedRole && selectedRole !== 'Tất cả') {
+      newParams.set('role', selectedRole)
+    }
+    // Update the URL without adding to browser history for a smoother UX
+    setSearchParams(newParams, { replace: true })
+  }, [selectedRole, debouncedSearchQuery, setSearchParams])
 
+  // --- 4. Data fetching function is now simpler ---
   const fetchUsers = useCallback(
     async (page, isLoadMore = false) => {
-      if (isLoadMore) {
-        setLoadingMore(true)
-      } else {
-        setLoading(true)
-      }
+      if (isLoadMore) setLoadingMore(true)
+      else setLoading(true)
 
       try {
         const params = {
           pageNum: page,
           pageSize: PAGE_SIZE,
-          keyword: debouncedSearchQuery || null,
-          role: selectedRole === 'Tất cả' ? null : selectedRole,
+          keyword: searchParams.get('keyword') || null,
+          role: searchParams.get('role') || null,
         }
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([, v]) => v != null),
         )
 
         const response = await getAllUsers(filteredParams)
-        const content = response.data
+        const { items = [], meta } = response.data || {}
 
-        if (content && content.items) {
-          setUsers((prev) => (isLoadMore ? [...prev, ...content.items] : content.items))
-        }
-        if (content && content.meta) {
-          setTotalElements(content.meta.totalElements)
-          setCurrentPage(content.meta.pageNum)
-          setHasMore(content.meta.pageNum < content.meta.totalPages)
+        setUsers((prev) => (isLoadMore ? [...prev, ...items] : items))
+        if (meta) {
+          setTotalElements(meta.totalElements)
+          setCurrentPage(meta.pageNum)
+          setHasMore(meta.pageNum < meta.totalPages)
         }
       } catch (error) {
         toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách thành viên.')
       } finally {
-        if (isLoadMore) {
-          setLoadingMore(false)
-        } else {
-          setLoading(false)
-        }
+        if (isLoadMore) setLoadingMore(false)
+        else setLoading(false)
       }
     },
-    [debouncedSearchQuery, selectedRole],
+    [searchParams],
   )
   useEffect(() => {
+    setCurrentPage(1)
     fetchUsers(1, false)
-  }, [fetchUsers])
+  }, [fetchUsers]) 
 
   const handleLoadMore = () => {
     if (hasMore && !loadingMore) {
-      fetchUsers(currentPage + 1, true)
+      const nextPage = currentPage + 1
+      fetchUsers(nextPage, true)
     }
   }
-
   const handleSelectRole = (role) => {
     setSelectedRole(role)
     setIsDropdownOpen(false)
@@ -155,13 +162,15 @@ const MainOfAdmin = () => {
             <tbody className='main-admin__context__table__tbody'>
               {loading ? (
                 <tr>
-                  <td className='loading-message'>Đang tải...</td>
+                  <td colSpan='6' className='loading-message'>
+                    Đang tải...
+                  </td> 
                 </tr>
               ) : users.length > 0 ? (
                 users.map((user, index) => (
                   <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)}>
                     <td className='tbody'>
-                      <h4>{index + 1}</h4>
+                      <h4>{index+1}</h4>
                     </td>
                     <td>{getDisplayName(user)}</td>
                     <td>{user.role}</td>
@@ -175,7 +184,7 @@ const MainOfAdmin = () => {
               ) : (
                 <tr>
                   <td colSpan='6'>
-                    <TextMessage>Không tìm thấy thành viên nào.</TextMessage>
+                    <TextMessage text='Không tìm thấy thành viên nào.'></TextMessage>
                   </td>
                 </tr>
               )}

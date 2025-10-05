@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import {
   getMembersInClassroom,
@@ -10,127 +10,155 @@ import {
 } from '../../../../apis/classroom.api'
 import LoadMoreButton from '../../../../components/LoadMoreButton'
 import useOnClickOutside from '../../../../hooks/useOnClickOutside'
-import './style.scss'
 import useDebounce from '../../../../hooks/useDebounce'
 import { intakeOptions, roleFilterOptions } from '../../../../constants/commonConstant'
 import EndOfListMessage from '../../../EndOfListMessage'
+import './style.scss'
+import TextMessage from '../../../TextMessage'
+import { getDisplayName } from 'utils/formatters'
+import { get } from 'react-hook-form'
 
 const PAGE_SIZE = 10
 
 const MemberOfClassAdmin = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [nonMembers, setNonMembers] = useState([])
   const [membersInClass, setMembersInClass] = useState([])
   const [loadingLeft, setLoadingLeft] = useState(true)
   const [loadingRight, setLoadingRight] = useState(true)
   const [selectedUserIds, setSelectedUserIds] = useState([])
   const [refetchTrigger, setRefetchTrigger] = useState(0)
-  // Pagination State
   const [currentPageLeft, setCurrentPageLeft] = useState(1)
   const [hasMoreLeft, setHasMoreLeft] = useState(false)
   const [loadingMoreLeft, setLoadingMoreLeft] = useState(false)
   const [currentPageRight, setCurrentPageRight] = useState(1)
   const [hasMoreRight, setHasMoreRight] = useState(false)
   const [loadingMoreRight, setLoadingMoreRight] = useState(false)
-
-  // Left panel state (non-members)
-  const [searchQueryLeft, setSearchQueryLeft] = useState('')
-  const [selectedIntakeLeft, setSelectedIntakeLeft] = useState('Tất cả')
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState('Tất cả')
+  const [searchQueryLeft, setSearchQueryLeft] = useState(
+    () => searchParams.get('keywordLeft') || '',
+  )
+  const [selectedIntakeLeft, setSelectedIntakeLeft] = useState(
+    () => searchParams.get('intakeLeft') || 'Tất cả',
+  )
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState(
+    () => searchParams.get('roleLeft') || 'Tất cả',
+  )
+  const [searchQueryRight, setSearchQueryRight] = useState(
+    () => searchParams.get('keywordRight') || '',
+  )
+  const [selectedIntakeRight, setSelectedIntakeRight] = useState(
+    () => searchParams.get('intakeRight') || 'Tất cả',
+  )
   const [isDropdownOpenLeft, setIsDropdownOpenLeft] = useState(false)
   const dropdownRefLeft = useRef(null)
-
-  // Right panel state (class members)
-  const [searchQueryRight, setSearchQueryRight] = useState('')
-  const [selectedIntakeRight, setSelectedIntakeRight] = useState('Tất cả')
   const [isDropdownOpenRight, setIsDropdownOpenRight] = useState(false)
   const dropdownRefRight = useRef(null)
-  // Debounce search queries
+
   const debouncedSearchLeft = useDebounce(searchQueryLeft, 500)
   const debouncedSearchRight = useDebounce(searchQueryRight, 500)
 
-  // Custom hook to handle clicks outside of dropdowns
   const closeDropdowns = useCallback(() => {
     setIsDropdownOpenLeft(false)
     setIsDropdownOpenRight(false)
   }, [])
   useOnClickOutside([dropdownRefLeft, dropdownRefRight], closeDropdowns)
-
-  // Data Fetching Logic
-  const fetchNonMembers = async (page) => {
-    if (page === 1) setLoadingLeft(true)
-    else setLoadingMoreLeft(true)
-
-    try {
-      const params = {
-        keyword: debouncedSearchLeft || null,
-        intake: selectedIntakeLeft === 'Tất cả' ? null : selectedIntakeLeft,
-        role: selectedRoleFilter === 'Tất cả' ? null : selectedRoleFilter,
-        pageNum: page,
-        pageSize: PAGE_SIZE,
+  useEffect(() => {
+    const newParams = new URLSearchParams()
+    const setParam = (key, value, defaultValue) => {
+      if (value && value !== defaultValue) {
+        newParams.set(key, value)
       }
-      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
-
-      const response = await getMembersNotInClassroom(classId, filteredParams)
-      const newItems = response.data?.items || []
-      const meta = response.data?.meta
-
-      setNonMembers((prev) => (page === 1 ? newItems : [...prev, ...newItems]))
-      setCurrentPageLeft(meta?.pageNum || 1)
-      setHasMoreLeft(meta ? meta.pageNum < meta.totalPages : false)
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Lỗi khi tải danh sách người dùng.')
-    } finally {
-      if (page === 1) setLoadingLeft(false)
-      else setLoadingMoreLeft(false)
     }
-  }
+    setParam('keywordLeft', debouncedSearchLeft, '')
+    setParam('intakeLeft', selectedIntakeLeft, 'Tất cả')
+    setParam('roleLeft', selectedRoleFilter, 'Tất cả')
+    setParam('keywordRight', debouncedSearchRight, '')
+    setParam('intakeRight', selectedIntakeRight, 'Tất cả')
 
-  const fetchMembers = async (page) => {
-    if (page === 1) setLoadingRight(true)
-    else setLoadingMoreRight(true)
+    setSearchParams(newParams, { replace: true })
+  }, [
+    debouncedSearchLeft,
+    selectedIntakeLeft,
+    selectedRoleFilter,
+    debouncedSearchRight,
+    selectedIntakeRight,
+    setSearchParams,
+  ])
+  const fetchNonMembers = useCallback(
+    async (page, isLoadMore = false) => {
+      if (!isLoadMore) setLoadingLeft(true)
+      else setLoadingMoreLeft(true)
+      try {
+        const params = {
+          keyword: searchParams.get('keywordLeft') || null,
+          intake: searchParams.get('intakeLeft') || null,
+          role: searchParams.get('roleLeft') || null,
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+        const response = await getMembersNotInClassroom(classId, filteredParams)
+        const { items = [], meta } = response.data || {}
 
-    try {
-      const params = {
-        keyword: debouncedSearchRight || null,
-        intake: selectedIntakeRight === 'Tất cả' ? null : selectedIntakeRight,
-        pageNum: page,
-        pageSize: PAGE_SIZE,
+        setNonMembers((prev) => (!isLoadMore ? items : [...prev, ...items]))
+        setCurrentPageLeft(meta?.pageNum || 1)
+        setHasMoreLeft(meta ? meta.pageNum < meta.totalPages : false)
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Lỗi khi tải danh sách người dùng.')
+      } finally {
+        if (!isLoadMore) setLoadingLeft(false)
+        else setLoadingMoreLeft(false)
       }
-      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+    },
+    [classId, searchParams],
+  )
 
-      const response = await getMembersInClassroom(classId, filteredParams)
-      const newItems = response.data?.items || []
-      const meta = response.data?.meta
+  const fetchMembers = useCallback(
+    async (page, isLoadMore = false) => {
+      if (!isLoadMore) setLoadingRight(true)
+      else setLoadingMoreRight(true)
+      try {
+        const params = {
+          keyword: searchParams.get('keywordRight') || null,
+          intake: searchParams.get('intakeRight') || null,
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+        const response = await getMembersInClassroom(classId, filteredParams)
+        const { items = [], meta } = response.data || {}
 
-      setMembersInClass((prev) => (page === 1 ? newItems : [...prev, ...newItems]))
-      setCurrentPageRight(meta?.pageNum || 1)
-      setHasMoreRight(meta ? meta.pageNum < meta.totalPages : false)
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Lỗi khi tải thành viên lớp.')
-    } finally {
-      if (page === 1) setLoadingRight(false)
-      else setLoadingMoreRight(false)
-    }
-  }
-
-  // Effect for fetching non-members on filter change
+        setMembersInClass((prev) => (!isLoadMore ? items : [...prev, ...items]))
+        setCurrentPageRight(meta?.pageNum || 1)
+        setHasMoreRight(meta ? meta.pageNum < meta.totalPages : false)
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Lỗi khi tải thành viên lớp.')
+      } finally {
+        if (!isLoadMore) setLoadingRight(false)
+        else setLoadingMoreRight(false)
+      }
+    },
+    [classId, searchParams],
+  )
   useEffect(() => {
     if (classId) {
       fetchNonMembers(1)
     }
-  }, [classId, debouncedSearchLeft, selectedIntakeLeft, selectedRoleFilter, refetchTrigger])
+  }, [fetchNonMembers, refetchTrigger])
 
-  // Effect for fetching members on filter change
   useEffect(() => {
     if (classId) {
       fetchMembers(1)
     }
-  }, [classId, debouncedSearchRight, selectedIntakeRight, refetchTrigger])
-
-  const handleLoadMoreLeft = () => fetchNonMembers(currentPageLeft + 1)
-  const handleLoadMoreRight = () => fetchMembers(currentPageRight + 1)
+  }, [fetchMembers, refetchTrigger])
+  const handleLoadMoreLeft = () => fetchNonMembers(currentPageLeft + 1, true)
+  const handleLoadMoreRight = () => fetchMembers(currentPageRight + 1, true)
 
   const handleAddMembers = async () => {
     if (selectedUserIds.length === 0) return toast.error('Vui lòng chọn thành viên để thêm.')
@@ -167,10 +195,9 @@ const MemberOfClassAdmin = () => {
   const handleSelectAll = (list) => {
     const listIds = list.map((item) => item.id)
     if (listIds.length === 0) return
-    const listIdSet = new Set(listIds)
-    const areAllInThisListSelected = listIds.every((id) => selectedUserIds.includes(id))
-    if (areAllInThisListSelected) {
-      setSelectedUserIds((prev) => prev.filter((id) => !listIdSet.has(id)))
+    const allSelected = listIds.every((id) => selectedUserIds.includes(id))
+    if (allSelected) {
+      setSelectedUserIds((prev) => prev.filter((id) => !listIds.includes(id)))
     } else {
       setSelectedUserIds((prev) => [...new Set([...prev, ...listIds])])
     }
@@ -252,7 +279,7 @@ const MemberOfClassAdmin = () => {
           </div>
           <div className='member-compet-admin__left-context__list'>
             {loadingLeft ? (
-              <p>Đang tải...</p>
+              <TextMessage></TextMessage>
             ) : (
               nonMembers.map((item, index) => (
                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
@@ -262,7 +289,7 @@ const MemberOfClassAdmin = () => {
                     </h5>
                   </div>
                   <div className='member-compet-admin__left-context__list-item-box'>
-                    <h5>{item.fullName}</h5>
+                    <h5>{getDisplayName(item)}</h5>
                   </div>
                   <h5>{item.studentCode}</h5>
                   <div className='member-compet-admin__left-context__list-item-box'>
@@ -367,7 +394,7 @@ const MemberOfClassAdmin = () => {
           </div>
           <div className='member-compet-admin__left-context__list'>
             {loadingRight ? (
-              <p>Đang tải...</p>
+              <TextMessage></TextMessage>
             ) : (
               membersInClass.map((item, index) => (
                 <div className='member-compet-admin__left-context__list-item' key={item.id}>
@@ -377,7 +404,7 @@ const MemberOfClassAdmin = () => {
                     </h5>
                   </div>
                   <div className='member-compet-admin__left-context__list-item-box'>
-                    <h5>{item.fullName}</h5>
+                    <h5>{getDisplayName(item)}</h5>
                   </div>
                   <h5>{item.studentCode}</h5>
                   <div className='member-compet-admin__left-context__list-item-box'>

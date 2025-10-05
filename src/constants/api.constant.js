@@ -1,4 +1,4 @@
-import { getPostsByClassroomId } from "../apis/post.api";
+import { getPostsByClassroomId } from '../apis/post.api'
 
 export const ApiConstant = {
   auth: {
@@ -58,5 +58,8 @@ export const ApiConstant = {
   commentPosts: {
     base: '/comment-posts',
     getById: (commentId) => `/comment-posts/${commentId}`,
+  },
+  images: {
+    base: '/images',
   },
 }
