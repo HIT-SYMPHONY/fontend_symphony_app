@@ -17,7 +17,7 @@ const Homework = () => {
       try {
         setLoading(true)
         const response = await getMyPosts()
-        setAllPosts(response.data || [])
+        setAllPosts(response.data.items || [])
       } catch (error) {
         toast.error('Không thể tải danh sách bài tập.')
       } finally {

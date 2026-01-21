@@ -46,13 +46,14 @@ $background-light: #ffefe4;
   }
 
   &-img {
-    width: 40px;
     height: 40px;
+    width: 40px;
     object-fit: cover;
     border-radius: 50%;
   }
 
   &-header {
+    padding-right: 6px;
     @extend %grid-row-styles;
     font-weight: 600;
     color: #333;
@@ -61,15 +62,7 @@ $background-light: #ffefe4;
     h5 {
       font-size: 1.125rem;
     }
-    h5:nth-of-type(1) {
-      grid-column: 2;
-    }
-    h5:nth-of-type(2) {
-      grid-column: 3;
-    }
-    h5:nth-of-type(3) {
-      grid-column: 4;
-    }
+
   }
   &-body {
     font-size: 1.125rem;
@@ -91,11 +84,8 @@ $background-light: #ffefe4;
     border-radius: 8px;
     margin-bottom: 8px;
     border-radius: 8px;
-    h5 {
-      margin: 0;
-      font-weight: 500;
-    }
-
+    border: 1px solid #F27B36;
+    font-weight: 600;
     &__number {
       background-color: #f48a4c;
       color: #fff;

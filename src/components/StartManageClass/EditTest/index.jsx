@@ -1,53 +1,74 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useForm, Controller } from 'react-hook-form'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { DatePicker } from 'antd'
+import dayjs from 'dayjs'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { postCreationSchema } from '../../../utils/postValidate'
-import { createPost } from '../../../apis/post.api'
+import { postCreationSchema } from '../../../utils/postValidate.js'
+import { getPostById, updatePost } from '../../../apis/post.api'
+import { safeParse } from '../../../utils/formatters.js'
 import TiptapEditor from '../../TiptapEditor'
+import TextMessage from '../../TextMessage'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../constants/commonConstant'
-import './style.scss'
+import '../../StartManageClass/CreateTest/style.scss'
 
-const CreateTest = () => {
+const EditTest = () => {
   const navigate = useNavigate()
-  const { classId } = useParams()
+  const { classId, testId } = useParams()
   const queryClient = useQueryClient()
 
-  const [currentDate, setCurrentDate] = useState('')
-
   const {
-    register,
-    handleSubmit,
     control,
-    formState: { errors },
+    handleSubmit,
+    register,
+    reset,
+    formState: { errors, isDirty },
   } = useForm({
     resolver: yupResolver(postCreationSchema),
-    defaultValues: {
-      classRoomId: classId,
-    },
     mode: 'onTouched',
   })
+  const { data: test, isLoading: isPageLoading } = useQuery({
+    queryKey: ['test', testId],
+    queryFn: async () => {
+      if (!testId) return null
+      const response = await getPostById(testId)
+      return response.data
+    },
+    enabled: !!testId,
+    onError: () => {
+      toast.error('Không thể tải thông tin bài kiểm tra.')
+    },
+  })
 
+  // This effect populates the form once the data is fetched
   useEffect(() => {
-    const today = new Date()
-    const formattedDate = today.toLocaleDateString('vi-VN')
-    setCurrentDate(formattedDate)
-  }, [])
+    if (test) {
+      reset({
+        title: test.title || '',
+        // Convert API datetime strings to dayjs objects
+        deadline: test.deadline ? dayjs(test.deadline) : null,
+        // Parse the JSON string from the API for the Tiptap editor
+        content: safeParse(test.content),
+      })
+    }
+  }, [test, reset])
 
-  const createPostMutation = useMutation({
-    mutationFn: createPost,
-    onMutate: () => toast.loading('Đang tạo bài tập...'),
-    onSuccess: (data, variables, context) => {
-      toast.success('Tạo bài tập thành công!', { id: context })
+  // --- REFACTORED: useMutation for handling the update ---
+  const updateTestMutation = useMutation({
+    mutationFn: (payload) => updatePost(testId, payload),
+    onMutate: () => toast.loading('Đang cập nhật bài kiểm tra...'),
+    onSuccess: (updatedData, variables, context) => {
+      toast.success('Cập nhật thành công!', { id: context })
+      // Invalidate queries to trigger automatic refetches
+      queryClient.invalidateQueries({ queryKey: ['test', testId] })
       queryClient.invalidateQueries({ queryKey: ['tests', classId] })
       navigate(`/manage/classes/${classId}/tests`)
     },
     onError: (error, variables, context) => {
-      const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo bài tập.'
+      const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
         id: context,
       })
@@ -55,19 +76,19 @@ const CreateTest = () => {
   })
 
   const onSubmit = (data) => {
-    // --- THIS IS THE FIX ---
-    // Explicitly build the payload with only the required fields for the createPost API.
-    // This is a safer and clearer pattern than spreading `...data`.
     const payload = {
-      title: data.title,
-      classRoomId: data.classRoomId,
+      ...data,
       deadline: data.deadline ? data.deadline.format(API_DATETIME_FORMAT) : null,
       content: data.content ? JSON.stringify(data.content) : '',
     }
-    createPostMutation.mutate(payload)
+    updateTestMutation.mutate(payload)
   }
 
-  const { isPending: isSubmitting } = createPostMutation
+  if (isPageLoading) {
+    return <TextMessage text='Đang tải bài kiểm tra...' />
+  }
+
+  const { isPending: isSubmitting } = updateTestMutation
 
   return (
     <div className='createtest'>
@@ -81,10 +102,10 @@ const CreateTest = () => {
           height='30'
           className='createtest__start__icon'
         />
-        <h3>Kiểm tra / Bài tập</h3>
+        <h3>Chỉnh sửa bài kiểm tra</h3>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className='createtest__form'>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className='createtest__context'>
           <h4>Tiêu đề</h4>
           <input
@@ -98,7 +119,10 @@ const CreateTest = () => {
           <div className='createtest__context__time'>
             <div className='createtest__context__time__box'>
               <h4>Ngày giao</h4>
-              <span>{currentDate}</span>
+              {/* Display the created date from the fetched data */}
+              <span>
+                {test?.createdAt ? new Date(test.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
+              </span>
             </div>
             <div className='createtest__context__time__box'>
               <h4>Deadline</h4>
@@ -132,8 +156,11 @@ const CreateTest = () => {
         </div>
 
         <div className='createtest__end'>
-          <button type='submit' className='createtest__end__submit' disabled={isSubmitting}>
-            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
+          <button
+            type='submit'
+            className='createtest__end__submit'
+            disabled={!isDirty || isSubmitting}>
+            {isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
         </div>
       </form>
@@ -141,4 +168,4 @@ const CreateTest = () => {
   )
 }
 
-export default CreateTest
+export default EditTest

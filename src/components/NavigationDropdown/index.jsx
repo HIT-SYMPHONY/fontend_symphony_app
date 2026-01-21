@@ -9,9 +9,9 @@ const NavigationDropdown = ({ options, placeholder = '--- Danh mục ---', class
   const dropdownRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
-
+  const reversedOptions = [...options].reverse()
   useOnClickOutside([dropdownRef], () => setIsOpen(false))
-  const currentOption = options.find((opt) => opt.link === location.pathname)
+  const currentOption = reversedOptions.find((opt) => location.pathname.startsWith(opt.link))
   const displayLabel = currentOption ? currentOption.option : placeholder
 
   const handleNavigate = (link) => {
@@ -23,7 +23,7 @@ const NavigationDropdown = ({ options, placeholder = '--- Danh mục ---', class
 
   return (
     <div className={containerClasses} onClick={() => setIsOpen(!isOpen)} ref={dropdownRef}>
-      <FaListUl className={styles.icon}/>
+      <FaListUl className={styles.icon} />
       <div className={styles.label}>{displayLabel}</div>
       <Icon icon='mdi:chevron-down' width='20' height='20' className={styles.arrow} />
       {isOpen && (

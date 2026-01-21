@@ -1,81 +1,76 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import { getMembersInClassroom } from '../../../apis/classroom.api'
 import LoadMoreButton from '../../LoadMoreButton'
 import EndOfListMessage from '../../EndOfListMessage'
+import TextMessage from '../../TextMessage'
 import placeholderImage from '../../../assets/img/Ellipse.png'
-import './style.scss'
 import { getDisplayName } from '../../../utils/formatters'
+import { PAGE_SIZE } from 'constants/commonConstant'
+import './style.scss'
+import useDebounce from 'hooks/useDebounce'
 
 const AllMember = () => {
   const { classId } = useParams()
-  const [members, setMembers] = useState([])
-  const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const fetchMembers = useCallback(
-    async (page = 1, isLoadMore = false) => {
-      if (!classId) return
-      isLoadMore ? setLoadingMore(true) : setLoading(true)
-      try {
-        const params = { pageNum: page, pageSize: 10 }
-        const response = await getMembersInClassroom(classId, params)
-        const content = response.data
+  const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearch = useDebounce(searchQuery, 500)
 
-        if (content && content.items) {
-          if (isLoadMore) {
-            setMembers((prev) => [...prev, ...content.items])
-          } else {
-            setMembers(content.items)
-          }
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ['classroomMembers', classId, debouncedSearch],
+      queryFn: async ({ pageParam = 1 }) => {
+        if (!classId) return { items: [], meta: {} }
+        const params = {
+          pageNum: pageParam,
+          pageSize: PAGE_SIZE,
+          keyword: debouncedSearch || null,
         }
-        if (content && content.meta) {
-          setPagination({
-            pageNum: content.meta.pageNum,
-            totalPages: content.meta.totalPages,
-            totalElements: content.meta.totalElements,
-          })
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+        const response = await getMembersInClassroom(classId, filteredParams)
+        return response.data
+      },
+      initialPageParam: 1,
+      getNextPageParam: (lastPage) => {
+        const meta = lastPage?.meta
+        if (meta && meta.pageNum < meta.totalPages) {
+          return meta.pageNum + 1
         }
-      } catch (error) {
+        return undefined
+      },
+      enabled: !!classId,
+      onError: () => {
         toast.error('Không thể tải danh sách thành viên.')
-      } finally {
-        isLoadMore ? setLoadingMore(false) : setLoading(false)
-      }
-    },
-    [classId],
-  )
-
-  useEffect(() => {
-    fetchMembers(1)
-  }, [fetchMembers])
-
-  const handleLoadMore = () => {
-    const nextPage = pagination.pageNum + 1
-    fetchMembers(nextPage, true)
-  }
-
-  const hasMore = pagination.pageNum < pagination.totalPages
+      },
+    })
+  const members = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data])
+  const totalElements = data?.pages?.[0]?.meta?.totalElements || 0
 
   return (
     <div className='all-member-container'>
       <h3>Danh sách thành viên</h3>
       <div className='all-member-container__summary'>
         <h4>Số lượng thành viên:</h4>
-        <span>{loading ? '...' : pagination.totalElements}</span>
+        <span>{isLoading ? '...' : totalElements}</span>
       </div>
 
       <div className='all-member__grid'>
         <div className='all-member__grid-header'>
+          <h5>STT</h5>
           <h5>Tên thành viên</h5>
           <h5>Mã sinh viên</h5>
           <h5 className='all-member__grid-header__intake'>Khóa</h5>
-          <span></span>
+          <h5>Avatar</h5>
         </div>
         <div className='all-member__grid-body'>
-          {loading ? (
-            <p style={{ textAlign: 'center', padding: '1rem' }}>Đang tải...</p>
-          ) : (
+          {isLoading ? (
+            <TextMessage text='Đang tải...' />
+          ) : isError ? (
+            <TextMessage text='Lỗi tải dữ liệu.' />
+          ) : members.length > 0 ? (
             members.map((item, index) => (
               <div className='all-member__grid-row' key={item.id}>
                 <h5 className='all-member__grid-row__number'>{index + 1}</h5>
@@ -89,12 +84,18 @@ const AllMember = () => {
                 />
               </div>
             ))
+          ) : (
+            <TextMessage text='Lớp học này chưa có thành viên nào.' />
           )}
         </div>
-        <LoadMoreButton isLoading={loadingMore} hasMore={hasMore} onClick={handleLoadMore} />
+        <LoadMoreButton
+          isLoading={isFetchingNextPage}
+          hasMore={hasNextPage}
+          onClick={() => fetchNextPage()}
+        />
         <EndOfListMessage
-          isLoading={loading}
-          hasMore={hasMore}
+          isLoading={isLoading}
+          hasMore={hasNextPage}
           itemCount={members.length}
           itemName='thành viên'
         />

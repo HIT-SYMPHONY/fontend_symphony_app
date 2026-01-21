@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import {
-  getNotificationsForCurrentUser,
+  getMyNotifications,
   deleteNotification,
 } from '../../../../apis/notification.api'
 import { formatDate } from '../../../../utils/formatters'
@@ -31,7 +31,7 @@ const ListOfGroup = () => {
     try {
       setLoading(true)
       // Fetches notifications for the logged-in user, no ID needed.
-      const res = await getNotificationsForCurrentUser({ pageNum: 1, pageSize: 100 }) // Fetch up to 100
+      const res = await getMyNotifications({ pageNum: 1, pageSize: 100 }) // Fetch up to 100
       setItems(res.data?.items || [])
     } catch (err) {
       if (err.response?.data?.message) {

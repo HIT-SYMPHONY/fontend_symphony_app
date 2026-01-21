@@ -1,169 +1,247 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useOutletContext, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+// --- NEW: Import TanStack Query hooks ---
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useForm, Controller } from 'react-hook-form'
+import { DatePicker } from 'antd'
+import dayjs from 'dayjs'
 import { updateClassroom } from '../../../apis/classroom.api'
-import { getAllUsers } from '../../../apis/user.api'
-import { formatDate } from '../../../utils/formatters'
+import { formatDate, safeParse } from '../../../utils/formatters'
+import { useClassroomContext } from '../Information'
+import TiptapEditor from '../../TiptapEditor'
+import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../../constants/commonConstant'
 import './style.scss'
-const Communication = () => {
-  const { classroom, refetchClassroom } = useOutletContext()
-  const { classId } = useParams()
 
+const Communication = () => {
+  const { classId } = useParams()
+  const { classroom } = useClassroomContext()
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState(null)
-  const [imageFile, setImageFile] = useState(null)
+  const queryClient = useQueryClient()
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isDirty },
+  } = useForm()
 
   useEffect(() => {
     if (classroom) {
-      setFormData({
+      const formData = {
         name: classroom.name || '',
         leaderId: classroom.leaderId || '',
-        startTime: classroom.startTime || '',
+        startTime: classroom.startTime ? dayjs(classroom.startTime) : null,
+        endTime: classroom.endTime ? dayjs(classroom.endTime) : null,
         duration: classroom.duration || '',
-        description: classroom.description || '',
-      })
+        timeSlot: classroom.timeSlot || '',
+        description: safeParse(classroom.description),
+      }
+      reset(formData)
     }
-  }, [classroom])
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  }, [classroom, reset])
+  const updateClassroomMutation = useMutation({
+    mutationFn: (formData) => updateClassroom(classId, formData),
+    onMutate: () => {
+      const toastId = toast.loading('Đang cập nhật...')
+      return toastId
+    },
+    onSuccess: (updatedData, variables, context) => {
+      toast.success('Cập nhật thành công!', { id: context })
+      setIsEditing(false)
+      queryClient.invalidateQueries({ queryKey: ['classroom', classId] })
+    },
+    onError: (error, variables, context) => {
+      const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
+      const errorMessage = typeof message === 'object' ? Object.values(message).join('; ') : message
+      toast.error(errorMessage, { id: context })
+    },
+  })
 
   const handleEdit = () => {
     setIsEditing(true)
   }
 
   const handleCancel = () => {
-    setFormData(classroom)
+    const formData = {
+      name: classroom.name || '',
+      leaderId: classroom.leaderId || '',
+      startTime: classroom.startTime ? dayjs(classroom.startTime) : null,
+      endTime: classroom.endTime ? dayjs(classroom.endTime) : null,
+      duration: classroom.duration || '',
+      timeSlot: classroom.timeSlot || '',
+      description: safeParse(classroom.description),
+    }
+    reset(formData)
     setIsEditing(false)
   }
-
-  const handleSave = async () => {
-    const saveToast = toast.loading('Đang lưu...')
-
+  const onSubmit = (data) => {
     const updatePayload = {
-      name: formData.name,
-      startTime: formData.startTime,
-      duration: parseInt(formData.duration),
-      leaderId: formData.leaderId,
-      description: formData.description,
+      ...classroom,
+      name: data.name,
+      startTime: data.startTime ? data.startTime.format(API_DATE_FORMAT) : null,
+      endTime: data.endTime ? data.endTime.format(API_DATE_FORMAT) : null,
+      duration: parseInt(data.duration),
+      leaderId: data.leaderId,
+      timeSlot: data.timeSlot,
+      description: data.description ? JSON.stringify(data.description) : '',
     }
+
+    delete updatePayload.id
+    delete updatePayload.status
+    delete updatePayload.createdAt
+    delete updatePayload.leaderName
 
     const submissionData = new FormData()
     submissionData.append(
       'data',
       new Blob([JSON.stringify(updatePayload)], { type: 'application/json' }),
     )
-    if (imageFile) {
-      submissionData.append('image', imageFile)
-    }
 
-    try {
-      await updateClassroom(classId, submissionData)
-      setIsEditing(false)
-      toast.success('Cập nhật thành công!', { id: saveToast })
-      if (refetchClassroom) {
-        refetchClassroom()
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
-      toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
-        id: saveToast,
-      })
-    }
+    updateClassroomMutation.mutate(submissionData)
   }
 
-  if (!formData) {
+  if (!classroom) {
     return <div>Đang tải thông tin...</div>
   }
 
+  const { isPending: isSubmitting } = updateClassroomMutation
+
   return (
     <div className='manage-infor__context-infor'>
-      <div className='manage-infor__context-infor__title'>
-        <div className='title-com'>
-          <i className='fa-solid fa-circle-info title-com__i'></i>
-          <h3>Thông tin lớp học</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className='manage-infor__context-infor-form'>
+        <div className='manage-infor__context-infor__title'>
+          <div className='title-com'>
+            <i className='fa-solid fa-circle-info title-com__i'></i>
+            <h3>Thông tin lớp học</h3>
+          </div>
+        </div>
+        <div className='manage-infor__context-infor__context'>
+          <div className='manage-infor__context-infor__context__box'>
+            <div className='box'>
+              <h5>Tên lớp học</h5>
+              {isEditing ? (
+                <Controller
+                  name='name'
+                  control={control}
+                  render={({ field }) => <input type='text' {...field} />}
+                />
+              ) : (
+                <span>{classroom.name}</span>
+              )}
+            </div>
+            <div className='box'>
+              <h5>Tên Leader</h5>
+              <span>{classroom.leaderName}</span>
+            </div>
+          </div>
+          <div className='manage-infor__context-infor__context__box'>
+            <div className='box'>
+              <h5>Ngày bắt đầu</h5>
+              {isEditing ? (
+                <Controller
+                  name='startTime'
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      {...field}
+                      format={DISPLAY_DATE_FORMAT}
+                      placeholder='Chọn ngày bắt đầu'
+                      className='ant-picker-custom'
+                    />
+                  )}
+                />
+              ) : (
+                <span>{formatDate(classroom.startTime)}</span>
+              )}
+            </div>
+            <div className='box'>
+              <h5>Ngày kết thúc</h5>
+              {isEditing ? (
+                <Controller
+                  name='endTime'
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      {...field}
+                      format={DISPLAY_DATE_FORMAT}
+                      placeholder='Chọn ngày kết thúc'
+                      className='ant-picker-custom'
+                    />
+                  )}
+                />
+              ) : (
+                <span>{formatDate(classroom.endTime)}</span>
+              )}
+            </div>
+            <div className='box'>
+              <h5>Độ dài lớp học (tuần)</h5>
+              {isEditing ? (
+                <Controller
+                  name='duration'
+                  control={control}
+                  render={({ field }) => <input type='number' {...field} />}
+                />
+              ) : (
+                <span>{classroom.duration}</span>
+              )}
+            </div>
+            <div className='box'>
+              <h5>Lịch học</h5>
+              {isEditing ? (
+                <Controller
+                  name='timeSlot'
+                  control={control}
+                  render={({ field }) => <input type='text' {...field} />}
+                />
+              ) : (
+                <span>{classroom.timeSlot || 'N/A'}</span>
+              )}
+            </div>
+          </div>
+          <h5>Mô tả:</h5>
+          <div className='manage-infor__context-infor__context__item'>
+            {isEditing ? (
+              <Controller
+                name='description'
+                control={control}
+                render={({ field }) => (
+                  <TiptapEditor value={field.value} onChange={field.onChange} />
+                )}
+              />
+            ) : (
+              <div className='description-display'>
+                <TiptapEditor value={classroom.description} editable={false} />
+              </div>
+            )}
+          </div>
         </div>
         {isEditing ? (
           <div className='edit-actions'>
-            <button className='button button-save' onClick={handleSave}>
-              <Icon icon='material-symbols:save' width='15' height='15' /> Lưu
+            <button
+              type='submit'
+              className='manage-infor__context-save-btn manage-infor__context-btn'
+              disabled={!isDirty || isSubmitting}>
+              <Icon icon='material-symbols:save' width='15' height='15' />{' '}
+              {isSubmitting ? 'Đang lưu...' : 'Lưu'}
             </button>
-            <button className='button button-cancel' onClick={handleCancel}>
+            <button
+              type='button'
+              className='manage-infor__context-cancel-btn manage-infor__context-btn'
+              onClick={handleCancel}>
               <Icon icon='material-symbols:cancel-outline' width='15' height='15' /> Hủy
             </button>
           </div>
         ) : (
-          <button className='button' onClick={handleEdit}>
+          <button
+            type='button'
+            className='manage-infor__context-edit-btn manage-infor__context-btn'
+            onClick={handleEdit}>
             <Icon icon='iconamoon:edit-fill' width='15' height='15' /> Chỉnh sửa
           </button>
         )}
-      </div>
-      <div className='manage-infor__context-infor__context'>
-        <div className='manage-infor__context-infor__context__box'>
-          <div className='box'>
-            <h5>Tên lớp học</h5>
-            {isEditing ? (
-              <input type='text' name='name' value={formData.name} onChange={handleInputChange} />
-            ) : (
-              <span>{classroom.name}</span>
-            )}
-          </div>
-          <div className='box'>
-            <h5>Tên Leader</h5>
-            <span>{classroom.leaderName}</span>
-          </div>
-        </div>
-        <div className='manage-infor__context-infor__context__box'>
-          <div className='box'>
-            <h5>Ngày bắt đầu</h5>
-            {isEditing ? (
-              <input
-                type='date'
-                name='startTime'
-                value={formatDate(formData.startTime, 'yyyy-MM-dd')}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <span>{formatDate(classroom.startTime)}</span>
-            )}
-          </div>
-          <div className='box'>
-            <h5>Ngày kết thúc</h5>
-            {/* Derived field, should be read-only */}
-            <span>{formatDate(classroom.endTime)}</span>
-          </div>
-          <div className='box'>
-            <h5>Độ dài lớp học (tuần)</h5>
-            {isEditing ? (
-              <input
-                type='number'
-                name='duration'
-                value={formData.duration}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <span>{classroom.duration}</span>
-            )}
-          </div>
-        </div>
-        <h5>Mô tả:</h5>
-        <div className='manage-infor__context-infor__context__item'>
-          {isEditing ? (
-            <textarea
-              name='description'
-              value={formData.description}
-              onChange={handleInputChange}
-              rows='5'
-              className='manage-infor__context-infor__context__item__textarea'
-            />
-          ) : (
-            <p>{classroom.description}</p>
-          )}
-        </div>
-      </div>
+      </form>
     </div>
   )
 }

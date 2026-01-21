@@ -40,6 +40,8 @@ import {
 } from '../components/StartCompetition/InformationPage'
 import AccountPage from '../pages/AccountPage'
 import CreateTest from '../components/StartManageClass/CreateTest'
+import ManageTest from 'components/StartManageClass/ManageTest'
+import EditTest from 'components/StartManageClass/EditTest'
 const ClientRoutes = (
   <>
     <Route
@@ -64,7 +66,7 @@ const ClientRoutes = (
       {/* trang cuộc thi công khai */}
       <Route path='competitions'>
         <Route index element={<MainCompetition />} />
-        <Route path=':competitionsId' element={<InformationCompetition />}>
+        <Route path=':competitionId' element={<InformationCompetition />}>
           <Route index element={<Introduction />} /> {/* Default tab */}
           <Route path='rules' element={<Rules />} />
           <Route path='rating' element={<Rating />} />
@@ -91,10 +93,12 @@ const ClientRoutes = (
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
-          <Route path='tests' element={<TestContent />} />
           <Route path='lessons/:lessonId' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonId/edit' element={<EditLesson />}></Route>
+          <Route path='tests' element={<ManageTest />} />
+          {/* <Route path='tests' element={<TestContent />} /> */}
           <Route path='tests/create' element={<CreateTest />}></Route>
+          <Route path='tests/:testId/edit' element={<EditTest></EditTest>}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
         <Route path='competitions/:competitionId' element={<InformationOfCompet />} />

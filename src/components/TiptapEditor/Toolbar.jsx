@@ -37,6 +37,13 @@ const Toolbar = ({ editor, onImageUploadClick }) => {
 
       <button
         type='button'
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}>
+        <FaHeading />3
+      </button>
+
+      <button
+        type='button'
         onClick={() => editor.chain().focus().toggleBold().run()}
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={editor.isActive('bold') ? 'is-active' : ''}>

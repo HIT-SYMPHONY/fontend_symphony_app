@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { createNotification } from '../../../../apis/notification.api'
+import { createNotification } from 'apis/classroom.api'
 import './style.scss'
 
 const CreateOfMess = () => {
@@ -24,6 +24,7 @@ const CreateOfMess = () => {
     { option: 'Quản lý cuộc thi', link: `/admin/competitions/${competitionId}/members` },
     { option: 'Thông báo', link: `/admin/competitions/${competitionId}/notifications` },
   ]
+  
 
   // Effect for closing the dropdown
   useEffect(() => {

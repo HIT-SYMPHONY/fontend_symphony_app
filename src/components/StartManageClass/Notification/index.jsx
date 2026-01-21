@@ -1,10 +1,10 @@
-
-
 import React, { useState, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getNotificationsByClassId, deleteNotification } from '../../../apis/notification.api'
+import { Table, Button, Modal, Tooltip } from 'antd'
+import { deleteNotification } from '../../../apis/notification.api'
+import { getNotificationsOfClassroom } from 'apis/classroom.api'
 import { formatDate } from '../../../utils/formatters'
 import './style.scss'
 
@@ -15,110 +15,152 @@ const Notification = () => {
   const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
   const [loading, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
   const fetchNotifications = useCallback(
-    async (page = 1) => {
+    async (page, size) => {
       if (!classId) return
+      setLoading(true)
       try {
-        setLoading(true)
-        const params = { pageNum: page, pageSize: pagination.pageSize }
-        const response = await getNotificationsByClassId(classId, params)
+        const params = { pageNum: page, pageSize: size }
+        const response = await getNotificationsOfClassroom(classId, params)
         const content = response.data
-        if (content?.items) setNotifications(content.items)
-        if (content?.meta) setPagination((prev) => ({ ...prev, ...content.meta }))
+        setNotifications(content?.items || [])
+        setPagination(content?.meta || { pageNum: page, pageSize: size, totalElements: 0 })
       } catch (error) {
         toast.error(error.response?.data?.message || 'Không thể tải danh sách thông báo.')
       } finally {
         setLoading(false)
       }
     },
-    [classId, pagination.pageSize],
+    [classId],
   )
 
   useEffect(() => {
-    fetchNotifications(pagination.pageNum)
-  }, [fetchNotifications, pagination.pageNum])
+    fetchNotifications(1, 10)
+  }, [fetchNotifications])
 
-  const toggleExpand = (id) => {
-    setExpandedId((prevId) => (prevId === id ? null : id))
-  }
-
-  const handleDelete = async (notificationId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa thông báo này không?')) {
-      return
-    }
-
+  const handleDelete = async () => {
+    if (!deleteId) return
+    setIsModalOpen(false)
     const deleteToast = toast.loading('Đang xóa...')
     try {
-      await deleteNotification(notificationId)
-      setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+      await deleteNotification(deleteId)
       toast.success('Xóa thông báo thành công!', { id: deleteToast })
+
+      const isLastItemOnPage = notifications.length === 1 && pagination.pageNum > 1
+      const pageToFetch = isLastItemOnPage ? pagination.pageNum - 1 : pagination.pageNum
+      fetchNotifications(pageToFetch, pagination.pageSize)
     } catch (error) {
       toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: deleteToast })
     }
   }
 
+  const openDeleteModal = (id) => {
+    setDeleteId(id)
+    setIsModalOpen(true)
+  }
+
+  const handleTableChange = (paginationConfig) => {
+    fetchNotifications(paginationConfig.current, paginationConfig.pageSize)
+  }
+
+  const columns = [
+    {
+      title: 'STT',
+      key: 'stt',
+      width: '5%',
+      align: 'center',
+      render: (_, __, index) => (pagination.pageNum - 1) * pagination.pageSize + index + 1,
+    },
+    {
+      title: 'Lớp',
+      dataIndex: 'classRoomName',
+      key: 'classRoomName',
+      width: '15%',
+    },
+    {
+      title: 'Nội dung',
+      dataIndex: 'content',
+      key: 'content',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (content) => (
+        <Tooltip placement="topLeft" title={content}>
+          {content}
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '15%',
+      align: 'center',
+      render: (text) => formatDate(text),
+    },
+    {
+      title: 'Người tạo',
+      dataIndex: 'createdByName',
+      key: 'createdByName',
+      width: '15%',
+      ellipsis: true,
+    },
+    {
+      title: '',
+      key: 'action',
+      width: '10%',
+      align: 'center',
+      render: (_, record) => (
+        <Button type="text" danger icon={<Icon icon="fa-solid:trash" />} onClick={() => openDeleteModal(record.id)} />
+      ),
+    },
+  ]
+
   return (
     <div className='notification'>
       <h3>Tất cả thông báo</h3>
       <div className='notification__sum'>
-        <table className='notification__sum__table'>
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Lớp</th>
-              <th>Nội dung</th>
-              <th>Ngày tạo</th>
-              <th>Người tạo</th>
-              <th></th>
-            </tr>
-          </thead>
-        </table>
-        <div className='notification__sum__list'>
-          {loading && <p style={{ textAlign: 'center', padding: '1rem' }}>Đang tải...</p>}
-          {!loading &&
-            notifications.map((item, index) => (
-              <div className='notification__sum__list__box' key={item.id}>
-                <div className='notification__sum__list__box__item'>
-                  <h5>{index + 1}</h5>
-                  <h5>{item.classRoomName}</h5>
-                  <h5>
-                    {item.content.substring(0, 40)}
-                    {item.content.length > 40 ? '...' : ''}
-                  </h5>
-                  <h5>{formatDate(item.createdAt)}</h5>
-                  <h5>{item.createdBy.substring(0, 8)}...</h5>
-                  <div className='notification-actions'>
-                    <i className='fa-solid fa-trash' onClick={() => handleDelete(item.id)}></i>
-                    <Icon
-                      icon={expandedId === item.id ? 'mingcute:up-fill' : 'mingcute:down-fill'}
-                      width='24'
-                      height='24'
-                      className='notification__sum__list__box__item__icon'
-                      onClick={() => toggleExpand(item.id)}
-                    />
-                  </div>
-                </div>
-                {expandedId === item.id && (
-                  <>
-                    <hr />
-                    <div className='notification__sum__list__box__para'>
-                      <div className='notification__sum__list__box__para__begin'>
-                        <h4>Nội dung: </h4>
-                      </div>
-                      <div className='notification__sum__list__box__para__end'>
-                        <p>{item.content}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          {!loading && notifications.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '1rem' }}>Không có thông báo nào.</div>
-          )}
-        </div>
+        <Table
+          columns={columns}
+          dataSource={notifications}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            current: pagination.pageNum,
+            pageSize: pagination.pageSize,
+            total: pagination.totalElements,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50'],
+          }}
+          onChange={handleTableChange}
+          expandable={{
+            expandedRowRender: (record) => <p style={{ margin: 0 }}>{record.content}</p>,
+            rowExpandable: (record) => !!record.content,
+            expandedRowKeys: expandedId ? [expandedId] : [],
+            onExpand: (expanded, record) => {
+              setExpandedId(expanded ? record.id : null)
+            },
+          }}
+          locale={{
+            emptyText: 'Không có thông báo nào.',
+          }}
+        />
       </div>
+      <Modal
+        title="Xóa thông báo?"
+        open={isModalOpen}
+        onOk={handleDelete}
+        onCancel={() => setIsModalOpen(false)}
+        okText="Xóa"
+        cancelText="Hủy"
+        okButtonProps={{ danger: true }}
+        centered= {true}
+      >
+        <p>Bạn có chắc chắn muốn xóa thông báo này không?</p>
+      </Modal>
     </div>
   )
 }

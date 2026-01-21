@@ -1,5 +1,3 @@
-import { getPostsByClassroomId } from '../apis/post.api'
-
 export const ApiConstant = {
   auth: {
     login: '/auth/login',
@@ -27,6 +25,8 @@ export const ApiConstant = {
     members: (classroomId) => `/classrooms/${classroomId}/members`,
     nonMembers: (classroomId) => `/classrooms/${classroomId}/non-members`,
     getManaged: '/classrooms/by-leader',
+    createNotification: (classroomId) => `/classrooms/${classroomId}/notifications`,
+    getNotificationsOfClassroom: (classroomId) => `/classrooms/${classroomId}/notifications`, 
   },
   lessons: {
     base: '/lesson',
@@ -37,7 +37,7 @@ export const ApiConstant = {
   notifications: {
     base: '/notifications',
     getById: (notificationId) => `/notifications/${notificationId}`,
-    getByClassroomId: (classroomId) => `/notifications/classrooms/${classroomId}`,
+    getMyNotifications: '/notifications/me',
   },
   posts: {
     base: '/posts',

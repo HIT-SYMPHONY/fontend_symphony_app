@@ -37,11 +37,9 @@ const MainOfAdmin = () => {
     if (selectedRole && selectedRole !== 'Tất cả') {
       newParams.set('role', selectedRole)
     }
-    // Update the URL without adding to browser history for a smoother UX
     setSearchParams(newParams, { replace: true })
   }, [selectedRole, debouncedSearchQuery, setSearchParams])
 
-  // --- 4. Data fetching function is now simpler ---
   const fetchUsers = useCallback(
     async (page, isLoadMore = false) => {
       if (isLoadMore) setLoadingMore(true)

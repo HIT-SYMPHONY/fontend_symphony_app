@@ -16,6 +16,8 @@ const DISPLAY_DATE_FORMAT = 'DD/MM/YYYY'
 const API_DATE_FORMAT = 'YYYY-MM-DD'
 const DISPLAY_DATETIME_FORMAT = 'DD/MM/YYYY HH:mm'
 const API_DATETIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss'
+const DISPLAY_TIME_FORMAT = 'HH:mm'
+const API_TIME_FORMAT = 'HH:mm:ss'
 export {
   intakeOptions,
   roleFilterOptions,
@@ -28,4 +30,6 @@ export {
   classStatuses,
   classStatusDropdownOptions,
   NON_SEARCHABLE_PATHS,
+  DISPLAY_TIME_FORMAT,
+  API_TIME_FORMAT,
 }

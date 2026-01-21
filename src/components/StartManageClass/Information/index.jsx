@@ -2,8 +2,8 @@ import React, { useEffect, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import useFetch from '../../../hooks/useFetch'
-import { ApiConstant } from '../../../constants/api.constant'
+import { useQuery } from '@tanstack/react-query'
+import { getClassroomById } from '../../../apis/classroom.api'
 import NavigationDropdown from '../../NavigationDropdown'
 import TextMessage from '../../TextMessage'
 import './style.scss'
@@ -14,11 +14,21 @@ const InformationManage = () => {
   const location = useLocation()
 
   const {
-    data: classroomResponse,
-    loading,
+    data: classroom,
+    isLoading,
+    isError,
     error,
-    refetch,
-  } = useFetch(classId ? `${ApiConstant.classrooms.getById(classId)}` : null)
+  } = useQuery({
+    queryKey: ['classroom', classId],
+    queryFn: async () => {
+      if (!classId) return null
+      const response = await getClassroomById(classId)
+      return response.data
+    },
+    enabled: !!classId,
+    refetchOnWindowFocus: false,
+  })
+
   const linkOptions = useMemo(() => {
     if (!classId) return []
     const basePath = `/manage/classes/${classId}`
@@ -26,42 +36,47 @@ const InformationManage = () => {
       { option: 'Thông tin lớp học', link: basePath },
       { option: 'Thông báo', link: `${basePath}/notifications` },
       { option: 'Bài học', link: `${basePath}/lessons` },
-      { option: 'Kiểm Tra', link: `${basePath}/tests` },
+      { option: 'Bài tập / Kiểm Tra', link: `${basePath}/tests` },
       { option: 'Danh sách sinh viên', link: `${basePath}/members` },
     ]
   }, [classId])
 
   useEffect(() => {
-    if (error) {
+    if (isError) {
       toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
       navigate('/manage/classes')
     }
-  }, [error, navigate])
+  }, [isError, error, navigate])
+
   const createPath = useMemo(() => {
     const path = location.pathname
-    if (path.includes('/notifications/create')) return null
+    if (path.endsWith('/create')) return null
     if (path.includes('/notifications')) return `/manage/classes/${classId}/notifications/create`
-    if (path.includes('/lessons/create')) return null
     if (path.includes('/lessons')) return `/manage/classes/${classId}/lessons/create`
-    if (path.includes('/tests/create')) return null
     if (path.includes('/tests')) return `/manage/classes/${classId}/tests/create`
     return null
   }, [location.pathname, classId])
+
   const handleCreateClick = () => {
     if (createPath) {
       navigate(createPath)
     }
   }
 
-  if (loading) {
-    return <TextMessage text='Đang tải thông tin lớp học...'></TextMessage>
+  const outletContext = useMemo(
+    () => ({
+      classroom,
+    }),
+    [classroom],
+  )
+
+  if (isLoading) {
+    return <TextMessage text='Đang tải thông tin lớp học...' />
   }
 
-  if (!classroomResponse?.data) {
-    return null
+  if (isError || !classroom) {
+    return <TextMessage text='Không tìm thấy dữ liệu lớp học.' />
   }
-
-  const classroom = classroomResponse.data
 
   return (
     <div className='manage-infor'>
@@ -82,7 +97,6 @@ const InformationManage = () => {
           placeholder='Thông tin lớp học'
           className='manage-infor__search__select'
         />
-
         <div className='manage-infor__search__container'>
           <input
             type='text'
@@ -91,7 +105,6 @@ const InformationManage = () => {
           />
           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
         </div>
-
         <button
           className={`manage-infor__search__button ${!createPath ? 'not-creatable' : ''}`}
           onClick={handleCreateClick}
@@ -100,10 +113,11 @@ const InformationManage = () => {
         </button>
       </div>
 
-      <Outlet context={{ classroom, refetchClassroom: refetch }} />
+      <Outlet context={outletContext} />
     </div>
   )
 }
+
 export function useClassroomContext() {
   return useOutletContext()
 }

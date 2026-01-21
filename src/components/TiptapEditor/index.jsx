@@ -90,7 +90,7 @@ const TiptapEditor = ({ value, onChange, error, editable = true }) => {
   }, [])
 
   return (
-    <div>
+    <div className='tiptap-container'>
       {editable && <Toolbar editor={editor} onImageUploadClick={handleImageButtonClick} />}
       <input
         type='file'

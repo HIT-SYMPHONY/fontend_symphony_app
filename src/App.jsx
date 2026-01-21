@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import './scss/style.scss'
 
@@ -18,6 +17,7 @@ const App = () => (
     <AuthListener />
     <Routes>
       <Route path='/' element={<LoginPage />} />
+      <Route path='/' element={<Navigate to="/login" replace />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/forgot-password' element={<Confirm />} />
       <Route path='/unauthorized' element={<UnauthorizedPage />} />

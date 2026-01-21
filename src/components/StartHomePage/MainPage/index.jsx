@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getNotificationsForCurrentUser } from '../../../apis/notification.api'
+import { getMyNotifications } from '../../../apis/notification.api'
 import { getMyClasses } from '../../../apis/user.api'
+import { Client } from '@stomp/stompjs'
 import { formatDate } from '../../../utils/formatters'
 import AdvList from '../ClassAgo/index'
 import TextMessage from '../../TextMessage'
@@ -14,14 +15,16 @@ const Main = () => {
   const [searchParams] = useSearchParams()
   const [announcements, setAnnouncements] = useState([])
   const [recentClasses, setRecentClasses] = useState([])
+  const [allClasses, setAllClasses] = useState([])
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [loadingClasses, setLoadingClasses] = useState(true)
+  const [stompClient, setStompClient] = useState(null)
   const globalSearch = searchParams.get('q') || ''
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
         setLoadingAnnouncements(true)
-        const response = await getNotificationsForCurrentUser({ pageNum: 1, pageSize: 15 })
+        const response = await getMyNotifications({ pageNum: 1, pageSize: 15 })
         setAnnouncements(response.data?.items || [])
       } catch (error) {
         toast.error('Không thể tải thông báo.')
@@ -51,6 +54,52 @@ const Main = () => {
     }
     fetchMyClasses()
   }, [globalSearch]) 
+
+  // Fetch all classes for real-time subscription
+  useEffect(() => {
+    const fetchAllClasses = async () => {
+      try {
+        const response = await getMyClasses({ pageSize: 1000 })
+        setAllClasses(response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch classes for subscription', error)
+      }
+    }
+    fetchAllClasses()
+  }, [])
+
+  // Initialize WebSocket connection
+  useEffect(() => {
+    const client = new Client({
+      brokerURL: 'ws://localhost:8080/ws',
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      onConnect: () => {
+        setStompClient(client)
+      },
+      onStompError: (frame) => {
+        console.error('Broker reported error: ' + frame.headers['message'])
+        console.error('Additional details: ' + frame.body)
+      },
+    })
+    client.activate()
+    return () => client.deactivate()
+  }, [])
+
+  // Subscribe to topics
+  useEffect(() => {
+    if (!stompClient || !stompClient.connected || allClasses.length === 0) return
+
+    const subscriptions = allClasses.map((item) => {
+      return stompClient.subscribe(`/topic/classrooms/${item.id}/notifications`, (message) => {
+        const notification = JSON.parse(message.body)
+        setAnnouncements((prev) => [notification, ...prev])
+        toast.success(notification.title)
+      })
+    })
+    return () => subscriptions.forEach((sub) => sub.unsubscribe())
+  }, [stompClient, allClasses])
 
   return (
     <div className='flex-one'>

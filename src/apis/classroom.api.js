@@ -1,3 +1,4 @@
+import { get } from 'react-hook-form'
 import { api, apiDefaultUpload } from '.'
 import { ApiConstant } from '../constants/api.constant'
 
@@ -32,6 +33,17 @@ const classroomApi = () => ({
     const url = ApiConstant.classrooms.members(classroomId)
     return api.get(url, { params })
   },
+
+  createNotification: async (classroomId, payload) => {
+    const url = ApiConstant.classrooms.createNotification(classroomId)
+    console.log(url);
+    return api.post(url, payload)
+  },
+
+  getNotificationsOfClassroom: async (classroomId, params) => {
+    const url = ApiConstant.classrooms.getNotificationsOfClassroom(classroomId)
+    return api.get(url, { params })
+  }
 })
 
 export const {
@@ -45,4 +57,6 @@ export const {
   getClassroomMembers,
   getManagedClasses,
   getMembersNotInClassroom,
+  createNotification,
+  getNotificationsOfClassroom
 } = classroomApi()
