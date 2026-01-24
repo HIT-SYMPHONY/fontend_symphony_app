@@ -1,0 +1,20 @@
+.notifications-swiper {
+  .notification-card {
+    background: #ffefe4;
+    border-radius: 24px;
+    padding: 1.25rem 1rem;
+    &__content {
+      font-size: 1.25rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
+      color: #F05F11;
+    }
+    &__time {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+    }
+  }
+}

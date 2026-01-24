@@ -1,105 +1,51 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React from 'react'
 import { Icon } from '@iconify/react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getMyNotifications } from '../../../apis/notification.api'
 import { getMyClasses } from '../../../apis/user.api'
-import { Client } from '@stomp/stompjs'
 import { formatDate } from '../../../utils/formatters'
-import AdvList from '../ClassAgo/index'
 import TextMessage from '../../TextMessage'
+import NotificationsSwiper from '../NotificationsSwiper'
 import './style.scss'
 
 const Main = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [announcements, setAnnouncements] = useState([])
-  const [recentClasses, setRecentClasses] = useState([])
-  const [allClasses, setAllClasses] = useState([])
-  const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
-  const [loadingClasses, setLoadingClasses] = useState(true)
-  const [stompClient, setStompClient] = useState(null)
   const globalSearch = searchParams.get('q') || ''
-  useEffect(() => {
-    const fetchAnnouncements = async () => {
+
+  // 1. Fetch Dashboard Data (Notifications)
+  const { data: notifications = [], isLoading: isLoadingNotifications } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
       try {
-        setLoadingAnnouncements(true)
         const response = await getMyNotifications({ pageNum: 1, pageSize: 15 })
-        setAnnouncements(response.data?.items || [])
+        return response.data?.items || []
       } catch (error) {
         toast.error('Không thể tải thông báo.')
-      } finally {
-        setLoadingAnnouncements(false)
+        return []
       }
-    }
-    fetchAnnouncements()
-  }, []) 
-  useEffect(() => {
-    const fetchMyClasses = async () => {
+    },
+  })
+
+  // 2. Fetch Classes for Display
+  const { data: recentClasses = [], isLoading: isLoadingClasses } = useQuery({
+    queryKey: ['my-classes', globalSearch],
+    queryFn: async () => {
       try {
-        setLoadingClasses(true)
-        const params = {
-          keyword: globalSearch || null,
-        }
+        const params = { keyword: globalSearch || null }
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([, v]) => v != null),
         )
         const response = await getMyClasses(filteredParams)
-        setRecentClasses(response.data || [])
+        return response.data || []
       } catch (error) {
         toast.error('Không thể tải danh sách lớp học.')
-      } finally {
-        setLoadingClasses(false)
+        return []
       }
-    }
-    fetchMyClasses()
-  }, [globalSearch]) 
-
-  // Fetch all classes for real-time subscription
-  useEffect(() => {
-    const fetchAllClasses = async () => {
-      try {
-        const response = await getMyClasses({ pageSize: 1000 })
-        setAllClasses(response.data || [])
-      } catch (error) {
-        console.error('Failed to fetch classes for subscription', error)
-      }
-    }
-    fetchAllClasses()
-  }, [])
-
-  // Initialize WebSocket connection
-  useEffect(() => {
-    const client = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
-      connectHeaders: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-      onConnect: () => {
-        setStompClient(client)
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message'])
-        console.error('Additional details: ' + frame.body)
-      },
-    })
-    client.activate()
-    return () => client.deactivate()
-  }, [])
-
-  // Subscribe to topics
-  useEffect(() => {
-    if (!stompClient || !stompClient.connected || allClasses.length === 0) return
-
-    const subscriptions = allClasses.map((item) => {
-      return stompClient.subscribe(`/topic/classrooms/${item.id}/notifications`, (message) => {
-        const notification = JSON.parse(message.body)
-        setAnnouncements((prev) => [notification, ...prev])
-        toast.success(notification.title)
-      })
-    })
-    return () => subscriptions.forEach((sub) => sub.unsubscribe())
-  }, [stompClient, allClasses])
+    },
+  })
 
   return (
     <div className='flex-one'>
@@ -113,7 +59,7 @@ const Main = () => {
           />
           <h2>Thông báo</h2>
         </div>
-        <AdvList announcements={announcements} isLoading={loadingAnnouncements} />
+        <NotificationsSwiper notifications={notifications} isLoading={isLoadingNotifications} />
       </div>
       <div className='flex-one__plus'>
         <div className='plus'>
@@ -121,7 +67,7 @@ const Main = () => {
           <h2>Lớp học gần đây</h2>
         </div>
         <div className='class-ago thay2'>
-          {loadingClasses ? (
+          {isLoadingClasses ? (
             <TextMessage text='Đang tải lớp học...' />
           ) : recentClasses.length > 0 ? (
             recentClasses.map((item) => (

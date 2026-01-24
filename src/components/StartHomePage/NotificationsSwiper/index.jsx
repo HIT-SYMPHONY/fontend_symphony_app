@@ -6,30 +6,30 @@ import { Autoplay, Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/autoplay'
 import './style.scss'
-
-const AdvList = ({ announcements, isLoading }) => {
+  
+const NotificationsSwiper = ({ notifications, isLoading }) => {
   if (isLoading) {
     return (
-      <div className='dukien-slider'>
-        <div className='dukien'>
-          <div className='dukien__box--loading'>Đang tải thông báo...</div>
+      <div className='notifications-swiper-wrapper'>
+        <div className='notifications-status'>
+          <div className='notifications-status__text'>Đang tải thông báo...</div>
         </div>
       </div>
     )
   }
 
-  if (!announcements || announcements.length === 0) {
+  if (!notifications || notifications.length === 0) {
     return (
-      <div className='dukien-slider'>
-        <div className='dukien'>
-          <div className='dukien__box--loading'>Chưa có thông báo nào.</div>
+      <div className='notifications-swiper-wrapper'>
+        <div className='notifications-status'>
+          <div className='notifications-status__text'>Chưa có thông báo nào.</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className='dukien-slider'>
+    <div className='notifications-swiper-wrapper'>
       <Swiper
         modules={[Autoplay, Navigation]}
         spaceBetween={20}
@@ -44,6 +44,7 @@ const AdvList = ({ announcements, isLoading }) => {
           320: {
             slidesPerView: 1,
             spaceBetween: 10,
+            
           },
           768: {
             slidesPerView: 2,
@@ -54,13 +55,13 @@ const AdvList = ({ announcements, isLoading }) => {
             spaceBetween: 20,
           },
         }}
-        className='my-announcements-swiper'>
-        {announcements.map((item) => (
+        className='notifications-swiper'>
+        {notifications.map((item) => (
           <SwiperSlide key={item.id}>
-            <div className='dukien__box'>
-              <strong>THÔNG BÁO: {item.content || 'N/A'}</strong>
-              <p>Từ: {item.classRoomName}</p>
-              <p className='dukien__time'>
+            <div className='notification-card'>
+              <p className='notification-card__content'>{item.content ? `Thông báo: ${item.content}` : 'N/A'}</p>
+              <p>Từ: {item.classRoomName ? item.classRoomName : item.competitionName}</p>
+              <p className='notification-card__time'>
                 <Icon icon='mingcute:time-line' /> {formatDate(item.createdAt)}
               </p>
             </div>
@@ -71,4 +72,4 @@ const AdvList = ({ announcements, isLoading }) => {
   )
 }
 
-export default AdvList
+export default NotificationsSwiper
