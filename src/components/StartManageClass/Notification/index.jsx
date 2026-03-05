@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Icon } from '@iconify/react'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Table, Button, Modal, Tooltip } from 'antd'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { deleteNotification } from '../../../apis/notification.api'
 import { getNotificationsOfClassroom } from 'apis/classroom.api'
 import { formatDate } from '../../../utils/formatters'
@@ -10,51 +11,50 @@ import './style.scss'
 
 const Notification = () => {
   const { classId } = useParams()
+  const queryClient = useQueryClient()
 
-  const [notifications, setNotifications] = useState([])
-  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
-  const [loading, setLoading] = useState(true)
+  const [pageNum, setPageNum] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [expandedId, setExpandedId] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
 
-  const fetchNotifications = useCallback(
-    async (page, size) => {
-      if (!classId) return
-      setLoading(true)
-      try {
-        const params = { pageNum: page, pageSize: size }
-        const response = await getNotificationsOfClassroom(classId, params)
-        const content = response.data
-        setNotifications(content?.items || [])
-        setPagination(content?.meta || { pageNum: page, pageSize: size, totalElements: 0 })
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Không thể tải danh sách thông báo.')
-      } finally {
-        setLoading(false)
-      }
+  const {
+    data: notificationData,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ['notifications', classId, pageNum, pageSize],
+    queryFn: async () => {
+      if (!classId) return { items: [], meta: { totalElements: 0 } }
+      const response = await getNotificationsOfClassroom(classId, { pageNum, pageSize })
+      return response.data
     },
-    [classId],
-  )
+    placeholderData: keepPreviousData,
+  })
 
-  useEffect(() => {
-    fetchNotifications(1, 10)
-  }, [fetchNotifications])
+  const notifications = notificationData?.items || []
+  const totalElements = notificationData?.meta?.totalElements || 0
 
-  const handleDelete = async () => {
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteNotification(id),
+    onMutate: () => toast.loading('Đang xóa...'),
+    onSuccess: (_, __, toastId) => {
+      toast.success('Xóa thông báo thành công!', { id: toastId })
+      if (notifications.length === 1 && pageNum > 1) {
+        setPageNum((prev) => prev - 1)
+      }
+      queryClient.invalidateQueries({ queryKey: ['notifications', classId] })
+    },
+    onError: (error, _, toastId) => {
+      toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: toastId })
+    },
+  })
+
+  const handleDelete = () => {
     if (!deleteId) return
     setIsModalOpen(false)
-    const deleteToast = toast.loading('Đang xóa...')
-    try {
-      await deleteNotification(deleteId)
-      toast.success('Xóa thông báo thành công!', { id: deleteToast })
-
-      const isLastItemOnPage = notifications.length === 1 && pagination.pageNum > 1
-      const pageToFetch = isLastItemOnPage ? pagination.pageNum - 1 : pagination.pageNum
-      fetchNotifications(pageToFetch, pagination.pageSize)
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: deleteToast })
-    }
+    deleteMutation.mutate(deleteId)
   }
 
   const openDeleteModal = (id) => {
@@ -63,7 +63,8 @@ const Notification = () => {
   }
 
   const handleTableChange = (paginationConfig) => {
-    fetchNotifications(paginationConfig.current, paginationConfig.pageSize)
+    setPageNum(paginationConfig.current)
+    setPageSize(paginationConfig.pageSize)
   }
 
   const columns = [
@@ -72,7 +73,7 @@ const Notification = () => {
       key: 'stt',
       width: '5%',
       align: 'center',
-      render: (_, __, index) => (pagination.pageNum - 1) * pagination.pageSize + index + 1,
+      render: (_, __, index) => (pageNum - 1) * pageSize + index + 1,
     },
     {
       title: 'Lớp',
@@ -81,15 +82,15 @@ const Notification = () => {
       width: '15%',
     },
     {
-      title: 'Nội dung',
-      dataIndex: 'content',
-      key: 'content',
+      title: 'Tên thông báo',
+      dataIndex: 'title',
+      key: 'title',
       ellipsis: {
         showTitle: false,
       },
-      render: (content) => (
-        <Tooltip placement="topLeft" title={content}>
-          {content}
+      render: (title) => (
+        <Tooltip placement="topLeft" title={title}>
+          {title}
         </Tooltip>
       ),
     },
@@ -114,7 +115,15 @@ const Notification = () => {
       width: '10%',
       align: 'center',
       render: (_, record) => (
-        <Button type="text" danger icon={<Icon icon="fa-solid:trash" />} onClick={() => openDeleteModal(record.id)} />
+        <div className='notification__actions'>
+          <Button
+            type="text"
+            icon={<Icon color="#F27B36" icon={expandedId === record.id ? 'fa-solid:chevron-up' : 'fa-solid:chevron-down'} />}
+            onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
+            disabled={!record.content}
+          />
+          <Button type="text" danger icon={<Icon icon="fa-solid:trash" />} onClick={() => openDeleteModal(record.id)} />
+        </div>
       ),
     },
   ]
@@ -125,24 +134,23 @@ const Notification = () => {
       <div className='notification__sum'>
         <Table
           columns={columns}
+          scroll={{y: 400}}
           dataSource={notifications}
           rowKey="id"
-          loading={loading}
+          loading={isLoading || isFetching}
           pagination={{
-            current: pagination.pageNum,
-            pageSize: pagination.pageSize,
-            total: pagination.totalElements,
+            current: pageNum,
+            pageSize: pageSize,
+            total: totalElements,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
           }}
           onChange={handleTableChange}
           expandable={{
-            expandedRowRender: (record) => <p style={{ margin: 0 }}>{record.content}</p>,
+            expandedRowRender: (record) => <p>{record.content}</p>,
             rowExpandable: (record) => !!record.content,
             expandedRowKeys: expandedId ? [expandedId] : [],
-            onExpand: (expanded, record) => {
-              setExpandedId(expanded ? record.id : null)
-            },
+            showExpandColumn: false,
           }}
           locale={{
             emptyText: 'Không có thông báo nào.',

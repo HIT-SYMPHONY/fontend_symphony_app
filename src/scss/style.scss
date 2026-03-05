@@ -79,11 +79,9 @@ $class-ago-width: 210px;
       i,
       .iconify {
         color: #979797;
-        padding-right: 10px;
       }
       &__Icon {
         color: #979797;
-        padding-right: 10px;
         font-size: 20px;
       }
       &__replace {
@@ -111,10 +109,6 @@ $class-ago-width: 210px;
       text-decoration: none;
       border-radius: 20px;
       transition: background-color 0.2s, color 0.2s;
-
-      &__Icon {
-        padding-right: 10px;
-      }
     }
     &__clickone:hover {
       background-color: #ffefe4;

@@ -13,7 +13,7 @@ import UnauthorizedPage from './pages/UnauthorizedPage'
 
 const App = () => (
   <>
-    <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
+    <Toaster position='top-right' toastOptions={{ duration: 3000 }} containerStyle={{top: 50}} />
     <AuthListener />
     <Routes>
       <Route path='/' element={<LoginPage />} />

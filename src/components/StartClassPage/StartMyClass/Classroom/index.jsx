@@ -99,8 +99,7 @@ const Classroom = () => {
                   <button className='class-tap__button' onClick={() => navigate(item.id)}>
                     VÀO HỌC
                   </button>
-                  <h2 className='class-tap__content__title'>Private</h2>
-                  <h2 className='class-tap__content__title'>{item.name}</h2>
+                  <h2 className='text-primary'>{item.name}</h2>
                   <p className='class-tap__content__info'>
                     <span className='icon'>
                       <Icon icon='mdi:badge-account' />

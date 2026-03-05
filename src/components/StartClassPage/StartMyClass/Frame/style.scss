@@ -16,36 +16,33 @@ $secondary-color: #ff6911;
   left: 0;
   &__pos {
     padding: 40px;
-    max-width: 350px;
-    max-height: 350px;
     background-color: #fff;
     text-align: center;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    border-radius: 20px;
+    border-radius: 32px;
+    aspect-ratio: 600/450;
     display: flex;
     flex-direction: column;
     gap: 40px;
     &__h1 {
       color: $secondary-color;
+      text-align: center;
     }
     &__i {
       position: absolute;
-      right: 10px;
-      top: 10px;
+      right: 25px;
+      top: 20px;
       color: $secondary-color;
       font-size: 24px;
       cursor: pointer;
     }
     &__button {
       display: flex;
-      gap: 40px;
       justify-content: center;
-
-      & button {
-        padding: 10px;
-        padding-left: 20px;
-        padding-right: 20px;
-        border-radius: 30px;
+      button {
+        padding: 4px 20px;
         border: 2px solid $secondary-color;
         color: #fff;
         background-color: $secondary-color;

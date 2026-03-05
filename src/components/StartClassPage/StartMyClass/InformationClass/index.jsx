@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, Suspense } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
 
 import { getClassroomById } from '../../../../apis/classroom.api'
 import { getLessonsByClassroomId } from '../../../../apis/lesson.api.js'
@@ -11,64 +13,76 @@ import {
   formatDateTime,
   translateStatus,
   getPostStatus,
+  safeParse,
+  formatDateForBox,
 } from '../../../../utils/formatters'
+import EditorPlaceholder from 'components/EditorPlaceHolder/index.jsx'
 
 import './style.scss'
+
+const TiptapEditor = React.lazy(() => import('../../../TiptapEditor'))
 
 const HomeInformation = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
 
-  const [classroom, setClassroom] = useState(null)
-  const [lessons, setLessons] = useState([])
-  const [posts, setPosts] = useState([])
-  const [loading, setLoading] = useState(true)
   const [showHomework, setShowHomework] = useState(false)
   const [expandedLessons, setExpandedLessons] = useState({})
 
-  const fetchClassroomData = useCallback(async () => {
-    if (!classId) {
-      toast.error('Không tìm thấy ID lớp học.')
+  const {
+    data: classroom,
+    isLoading: isLoadingClassroom,
+    isError: isErrorClassroom,
+  } = useQuery({
+    queryKey: ['classroom', classId],
+    queryFn: () => getClassroomById(classId).then((res) => res.data),
+    enabled: !!classId,
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải thông tin lớp học.')
       navigate(-1)
-      return
-    }
+    },
+  })
 
-    const loadingToast = toast.loading('Đang tải thông tin lớp học...')
-    try {
-      setLoading(true)
-      const [classroomResponse, lessonsResponse, postsResponse] = await Promise.all([
-        getClassroomById(classId),
-        getLessonsByClassroomId(classId),
-        getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }),
-      ])
+  const { data: lessons = [], isLoading: isLoadingLessons } = useQuery({
+    queryKey: ['lessons', classId],
+    queryFn: () => getLessonsByClassroomId(classId).then((res) => res.data || []),
+    enabled: !!classId,
+  })
 
-      setClassroom(classroomResponse.data)
-      setLessons(lessonsResponse.data || [])
-      setPosts(postsResponse.data?.items || [])
-      toast.dismiss(loadingToast)
-    } catch (error) {
-      toast.dismiss(loadingToast)
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error('Có lỗi xảy ra khi tải thông tin lớp học.')
-      }
-      navigate(-1)
-    } finally {
-      setLoading(false)
-    }
-  }, [classId, navigate])
-
-  useEffect(() => {
-    fetchClassroomData()
-  }, [fetchClassroomData])
+  const { data: posts = [], isLoading: isLoadingPosts } = useQuery({
+    queryKey: ['posts', classId],
+    queryFn: () =>
+      getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }).then(
+        (res) => res.data?.items || [],
+      ),
+    enabled: !!classId,
+  })
 
   const toggleLessonBox = (lessonId) => {
     setExpandedLessons((prev) => ({ ...prev, [lessonId]: !prev[lessonId] }))
   }
 
-  if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải...</div>
-  if (!classroom)
+  const isLoading = isLoadingClassroom || isLoadingLessons || isLoadingPosts
+  const descriptionContent = safeParse(classroom?.description)
+
+  if (isLoading) {
+    return (
+      <div className='informationclass' style={{ padding: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '2rem' }}>
+          <div style={{ flex: 3 }}>
+            <Skeleton.Input active style={{ width: '70%', height: 32, marginBottom: '1rem' }} />
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <Skeleton.Image style={{ width: 200, height: 150, borderRadius: 10 }} />
+          </div>
+        </div>
+        <Skeleton active paragraph={{ rows: 10 }} style={{ marginTop: '2rem' }} />
+      </div>
+    )
+  }
+
+  if (isErrorClassroom || !classroom)
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>Không tìm thấy dữ liệu lớp học.</div>
     )
@@ -78,7 +92,7 @@ const HomeInformation = () => {
       <div className='informationclass__gioithieu'>
         <div className='informationclass__gioithieu__context'>
           <div className='informationclass__gioithieu__context__name'>
-            <h1>{classroom.name}</h1>
+            <h1 className='text-4xl font-bold'>{classroom.name}</h1>
             <span>{translateStatus(classroom.status)}</span>
           </div>
           <div className='informationclass__gioithieu__context__error'>
@@ -87,7 +101,13 @@ const HomeInformation = () => {
           </div>
           <div className='informationclass__gioithieu__context__noidung'>
             <strong>Mô tả: </strong>
-            <p>{classroom.description || 'Chưa có mô tả.'}</p>
+            {classroom.description ? (
+              <Suspense fallback={<EditorPlaceholder />}>
+                <TiptapEditor value={descriptionContent} editable={false} />
+              </Suspense>
+            ) : (
+              <p>Chưa có mô tả.</p>
+            )}
             <div className='informationclass__gioithieu__context__noidung__row'>
               <strong>Leader: {classroom.leaderName}</strong>
               <strong>Lịch học: {lessons[0]?.timeSlot || 'Chưa cập nhật'}</strong>
@@ -98,9 +118,14 @@ const HomeInformation = () => {
             </div>
           </div>
         </div>
-        {/* --- FIX #1: Removed the "Chat room" icon and its container --- */}
         <div className='informationclass__gioithieu__image'>
-          {/* The image div is preserved for layout, but the chat icon is gone */}
+          {classroom.image && (
+            <img
+              src={classroom.image}
+              alt={classroom.name}
+              style={{ width: '200px', height: '150px', borderRadius: '10px', objectFit: 'cover' }}
+            />
+          )}
         </div>
       </div>
       <div className='informationclass__lesson'>
@@ -113,9 +138,6 @@ const HomeInformation = () => {
               </div>
             </div>
             <div className='informationclass__lesson__left__begin__pair'>
-              <div className='informationclass__lesson__left__begin__pair__tap'>
-                <button>Sắp xếp theo</button>
-              </div>
               <Icon
                 icon='material-symbols:menu-book-rounded'
                 width='26'
@@ -128,6 +150,10 @@ const HomeInformation = () => {
             </div>
           </div>
           <div className='informationclass__lesson__left__end'>
+            <div className="informationclass__lesson-table-header">
+              <h1>Tên bài học</h1>
+              <h1>Ngày tạo</h1>
+            </div>
             {lessons.length > 0 ? (
               lessons.map((lesson, index) => (
                 <div className='end' key={lesson.id}>
@@ -139,7 +165,7 @@ const HomeInformation = () => {
                       </p>
                     </div>
                     <div className='lesson-date' onClick={() => toggleLessonBox(lesson.id)}>
-                      <p>{formatDate(lesson.createdAt)}</p>
+                      <p>{formatDateTime(lesson.createdAt)}</p>
                       <i
                         className={`fa-solid ${
                           expandedLessons[lesson.id] ? 'fa-caret-down' : 'fa-caret-up'
@@ -152,7 +178,6 @@ const HomeInformation = () => {
                     <p onClick={() => navigate(`/my-classes/${classId}/lessons/${lesson.id}`)}>
                       Đề cương bài học
                     </p>
-                    {/* --- FIX #2: Removed the static "Bài Tập" link --- */}
                   </div>
                 </div>
               ))
@@ -171,21 +196,21 @@ const HomeInformation = () => {
                 posts.map((post) => {
                   const status = getPostStatus(post.deadline)
                   return (
-                    // --- FIX #3: Added the correct onClick handler to the post card ---
                     <div
                       className='right'
                       key={post.id}
                       onClick={() => navigate(`/my-classes/${classId}/exams/${post.id}`)}>
                       <div className='right__tap'>
                         <div className='right__tap__tinhtrang'>
-                          <span className={`ngay back-one`}>{formatDateTime(post.deadline)}</span>
-                          <div className={`color-one`}>
+                          <span className={`ngay ${status.backgroundClass}`}>
+                            {formatDateForBox(post.deadline)}
+                          </span>
+                          <div className={`${status.colorClass}`}>
                             <h4>{status.text}</h4>
-                            <p>Tình trạng: {status.text}</p>
                           </div>
                         </div>
                         <div className='right__tap__noidung'>
-                          <div className={`right__tap__noidung__colum back-one`}></div>
+                          <div className={`right__tap__noidung__colum ${status.backgroundClass}`}></div>
                           <div className='right__tap__noidung__contextclass'>
                             <h4>{classroom.name}</h4>
                             <div className='contextclass'>

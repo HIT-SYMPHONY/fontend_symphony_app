@@ -11,7 +11,7 @@ $background-light: #ffefe4;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  height: 500px;
+  min-height: 500px;
   gap: 10px;
   &__table {
     // display: flex;
@@ -80,9 +80,10 @@ $background-light: #ffefe4;
       }
     }
   }
-}
-.notification-actions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  .notification__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+  }
 }

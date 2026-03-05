@@ -25,7 +25,7 @@ createRoot(document.getElementById('root')).render(
       <ConfigProvider
         theme={{
           token: {
-            colorPrimary: '#f06c25',
+            colorPrimary: '#F27B36',
           },
         }}>
         <QueryClientProvider client={queryClient}>

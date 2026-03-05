@@ -9,7 +9,7 @@ import Link from '@tiptap/extension-link'
 
 import './style.scss'
 
-const TiptapEditor = ({ value, onChange, error, editable = true }) => {
+const TiptapEditor = ({ value, onChange, error, editable = true, className = "", editorClassName = "" }) => {
   const fileInputRef = useRef(null)
 
   const editor = useEditor({
@@ -29,7 +29,7 @@ const TiptapEditor = ({ value, onChange, error, editable = true }) => {
     content: typeof value === 'string' && value ? JSON.parse(value) : value || '',
     editorProps: {
       attributes: {
-        class: `tiptap-editor ${error ? 'tiptap-error' : ''}`,
+        class: `tiptap-editor ${error ? 'tiptap-error' : ''} ${editorClassName}`,
       },
       handleDrop: (view, event, slice, moved) => {
         if (!editable || moved || !event.dataTransfer || !event.dataTransfer.files.length) {
@@ -90,7 +90,7 @@ const TiptapEditor = ({ value, onChange, error, editable = true }) => {
   }, [])
 
   return (
-    <div className='tiptap-container'>
+    <div className={`tiptap-container ${className}`}>
       {editable && <Toolbar editor={editor} onImageUploadClick={handleImageButtonClick} />}
       <input
         type='file'

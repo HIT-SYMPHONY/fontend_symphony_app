@@ -224,6 +224,7 @@ const DashboardOfMain = () => {
                 width='26'
                 height='26'
                 className='search__then__Icon'
+                onClick={() => navigate('/notifications')}
               />
             </div>
           </div>

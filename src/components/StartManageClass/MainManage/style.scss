@@ -78,6 +78,10 @@ $background-light: #ffefe4;
       padding: 10px;
       align-items: center;
       border-radius: 10px;
+      transition: all 0.25s;
+      &:hover {
+        border: 2px solid #F48A4C;
+      }
       &__img {
         width: 80px;
         aspect-ratio: 1;

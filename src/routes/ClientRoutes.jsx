@@ -42,6 +42,7 @@ import AccountPage from '../pages/AccountPage'
 import CreateTest from '../components/StartManageClass/CreateTest'
 import ManageTest from 'components/StartManageClass/ManageTest'
 import EditTest from 'components/StartManageClass/EditTest'
+import MyNotificationsPage from 'pages/MyNotificationsPage'
 const ClientRoutes = (
   <>
     <Route
@@ -75,6 +76,7 @@ const ClientRoutes = (
         <Route path=':competitionsId/test' element={<Assignment />} />
         <Route path=':competitionsId/comment' element={<Complete />} />
       </Route>
+      <Route path='notifications' element={<MyNotificationsPage></MyNotificationsPage>}></Route>
       {/* các trang quản lý của leader */}
       <Route
         path='manage'

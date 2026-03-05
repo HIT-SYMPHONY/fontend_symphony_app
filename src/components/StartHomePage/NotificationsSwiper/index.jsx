@@ -59,7 +59,7 @@ const NotificationsSwiper = ({ notifications, isLoading }) => {
         {notifications.map((item) => (
           <SwiperSlide key={item.id}>
             <div className='notification-card'>
-              <p className='notification-card__content'>{item.content ? `Thông báo: ${item.content}` : 'N/A'}</p>
+              <p className='notification-card__content'>{item.title ? `Thông báo: ${item.title}` : 'N/A'}</p>
               <p>Từ: {item.classRoomName ? item.classRoomName : item.competitionName}</p>
               <p className='notification-card__time'>
                 <Icon icon='mingcute:time-line' /> {formatDate(item.createdAt)}

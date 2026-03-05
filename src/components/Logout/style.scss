@@ -17,8 +17,6 @@ $secondary-color: #ff6911;
   left: 0;
   &__pos {
     padding: 40px;
-    max-width: 350px;
-    max-height: 350px;
     background-color: #fff;
     text-align: center;
     position: relative;
@@ -28,6 +26,11 @@ $secondary-color: #ff6911;
     gap: 40px;
     &__h1 {
       color: $secondary-color;
+      font-weight: 700;
+      font-style: Bold;
+      font-size: 48px;
+      text-align: center;
+      max-width: 475px;
     }
     &__i {
       position: absolute;
@@ -43,9 +46,6 @@ $secondary-color: #ff6911;
       justify-content: center;
 
       & button {
-        padding: 10px;
-        padding-left: 20px;
-        padding-right: 20px;
         border-radius: 30px;
         border: 2px solid $secondary-color;
         color: #fff;
