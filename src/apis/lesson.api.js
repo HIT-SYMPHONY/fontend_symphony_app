@@ -6,8 +6,8 @@ const lessonApi = () => ({
 
   createLesson: async (payload) => api.post(ApiConstant.lessons.base, payload),
 
-  getLessonsByClassId: async (classId) =>
-    api.get(ApiConstant.lessons.getByClassroomId(classId)),
+  getLessonsByClassId: async (classId, params) =>
+    api.get(ApiConstant.lessons.getByClassroomId(classId), {params}),
 
   getLessonsByClassroomId: async (classroomId) => {
     if (!classroomId) return Promise.reject(new Error('Classroom ID is required.'))

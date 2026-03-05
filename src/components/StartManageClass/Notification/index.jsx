@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Table, Button, Modal, Tooltip } from 'antd'
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
@@ -12,7 +12,8 @@ import './style.scss'
 const Notification = () => {
   const { classId } = useParams()
   const queryClient = useQueryClient()
-
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
   const [pageNum, setPageNum] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [expandedId, setExpandedId] = useState(null)
@@ -24,10 +25,10 @@ const Notification = () => {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['notifications', classId, pageNum, pageSize],
+    queryKey: ['notifications', classId, pageNum, pageSize, keyword],
     queryFn: async () => {
       if (!classId) return { items: [], meta: { totalElements: 0 } }
-      const response = await getNotificationsOfClassroom(classId, { pageNum, pageSize })
+      const response = await getNotificationsOfClassroom(classId, { pageNum, pageSize, keyword })
       return response.data
     },
     placeholderData: keepPreviousData,
@@ -89,7 +90,7 @@ const Notification = () => {
         showTitle: false,
       },
       render: (title) => (
-        <Tooltip placement="topLeft" title={title}>
+        <Tooltip placement='topLeft' title={title}>
           {title}
         </Tooltip>
       ),
@@ -117,12 +118,22 @@ const Notification = () => {
       render: (_, record) => (
         <div className='notification__actions'>
           <Button
-            type="text"
-            icon={<Icon color="#F27B36" icon={expandedId === record.id ? 'fa-solid:chevron-up' : 'fa-solid:chevron-down'} />}
+            type='text'
+            icon={
+              <Icon
+                color='#F27B36'
+                icon={expandedId === record.id ? 'fa-solid:chevron-up' : 'fa-solid:chevron-down'}
+              />
+            }
             onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
             disabled={!record.content}
           />
-          <Button type="text" danger icon={<Icon icon="fa-solid:trash" />} onClick={() => openDeleteModal(record.id)} />
+          <Button
+            type='text'
+            danger
+            icon={<Icon icon='fa-solid:trash' />}
+            onClick={() => openDeleteModal(record.id)}
+          />
         </div>
       ),
     },
@@ -134,9 +145,9 @@ const Notification = () => {
       <div className='notification__sum'>
         <Table
           columns={columns}
-          scroll={{y: 400}}
+          scroll={{ y: 400 }}
           dataSource={notifications}
-          rowKey="id"
+          rowKey='id'
           loading={isLoading || isFetching}
           pagination={{
             current: pageNum,
@@ -158,15 +169,14 @@ const Notification = () => {
         />
       </div>
       <Modal
-        title="Xóa thông báo?"
+        title='Xóa thông báo?'
         open={isModalOpen}
         onOk={handleDelete}
         onCancel={() => setIsModalOpen(false)}
-        okText="Xóa"
-        cancelText="Hủy"
+        okText='Xóa'
+        cancelText='Hủy'
         okButtonProps={{ danger: true }}
-        centered= {true}
-      >
+        centered={true}>
         <p>Bạn có chắc chắn muốn xóa thông báo này không?</p>
       </Modal>
     </div>

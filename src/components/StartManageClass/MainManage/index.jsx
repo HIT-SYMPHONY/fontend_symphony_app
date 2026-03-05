@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
 import { getManagedClasses } from '../../../apis/classroom.api'
 import { translateStatus } from '../../../utils/formatters'
 import TextMessage from '../../TextMessage/'
@@ -10,29 +12,37 @@ import './style.scss'
 
 const MainManage = () => {
   const navigate = useNavigate()
-  const [managedClasses, setManagedClasses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('name') || '')
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
-  const fetchManagedClasses = useCallback(async () => {
-    try {
-      setLoading(true)
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams)
+    if (debouncedSearchQuery) {
+      newParams.set('name', debouncedSearchQuery)
+    }
+    else {
+      newParams.delete('name')
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [debouncedSearchQuery, setSearchParams])
+
+  const keyword = searchParams.get('name')
+
+  const { data: managedClasses, isLoading } = useQuery({
+    queryKey: ['managedClasses', { keyword }],
+    queryFn: async () => {
       const params = {
-        keyword: debouncedSearchQuery || null,
+        keyword: keyword || null,
       }
       const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
       const response = await getManagedClasses(filteredParams)
-      setManagedClasses(response.data || [])
-    } catch (error) {
+      return response.data || []
+    },
+    onError: (error) => {
       toast.error(error.response?.data?.message || 'Không thể tải danh sách lớp học quản lý.')
-    } finally {
-      setLoading(false)
-    }
-  }, [debouncedSearchQuery])
-
-  useEffect(() => {
-    fetchManagedClasses()
-  }, [fetchManagedClasses])
+    },
+  })
 
   return (
     <div className='manage'>
@@ -51,11 +61,24 @@ const MainManage = () => {
           <i className='fa-solid fa-magnifying-glass'></i>
         </div>
       </div>
-      <h3>Danh sách lớp quản lý ({loading ? '...' : managedClasses.length})</h3>
+      <h3>Danh sách lớp quản lý ({isLoading ? '...' : managedClasses?.length || 0})</h3>
       <div className='manage__table'>
-        {loading ? (
-          <TextMessage text='Đang tải...' />
-        ) : managedClasses.length > 0 ? (
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div className='manage-table' key={index}>
+              <div className='manage-table__img'>
+                <Skeleton.Image active style={{ width: 80, height: 80, borderRadius: 10 }} />
+              </div>
+              <div className='manage-table__context'>
+                <div className='manage-table__context__pair'>
+                  <Skeleton.Input active style={{ width: 200, height: 24, marginBottom: 8 }} />
+                  <Skeleton.Input active style={{ width: 100, height: 20 }} />
+                </div>
+                <Skeleton.Input active style={{ width: 100, height: 24 }} />
+              </div>
+            </div>
+          ))
+        ) : managedClasses?.length > 0 ? (
           managedClasses.map((item) => (
             <div
               className='manage-table'
@@ -80,7 +103,7 @@ const MainManage = () => {
         ) : (
           <TextMessage
             text={
-              searchQuery ? 'Không tìm thấy lớp học nào phù hợp.' : 'Bạn không quản lý lớp học nào.'
+              keyword ? 'Không tìm thấy lớp học nào phù hợp.' : 'Bạn không quản lý lớp học nào.'
             }
           />
         )}

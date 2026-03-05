@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { getMembersInClassroom } from '../../../apis/classroom.api'
@@ -14,18 +14,18 @@ import useDebounce from 'hooks/useDebounce'
 
 const AllMember = () => {
   const { classId } = useParams()
-  const [searchQuery, setSearchQuery] = useState('')
-  const debouncedSearch = useDebounce(searchQuery, 500)
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['classroomMembers', classId, debouncedSearch],
+      queryKey: ['classroomMembers', classId, keyword],
       queryFn: async ({ pageParam = 1 }) => {
         if (!classId) return { items: [], meta: {} }
         const params = {
           pageNum: pageParam,
           pageSize: PAGE_SIZE,
-          keyword: debouncedSearch || null,
+          keyword: keyword || null,
         }
         const filteredParams = Object.fromEntries(
           Object.entries(params).filter(([, v]) => v != null),

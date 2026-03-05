@@ -1,18 +1,40 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
+import {
+  Outlet,
+  useParams,
+  useNavigate,
+  useLocation,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useQuery } from '@tanstack/react-query'
 import { getClassroomById } from '../../../apis/classroom.api'
 import NavigationDropdown from '../../NavigationDropdown'
 import TextMessage from '../../TextMessage'
 import './style.scss'
+import useDebounce from 'hooks/useDebounce'
 
 const InformationManage = () => {
   const { classId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams)
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
+    } else {
+      newParams.delete('keyword')
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [debouncedSearchQuery, setSearchParams])
+  useEffect(() => {
+    setSearchQuery(searchParams.get('keyword') || '')
+  }, [searchParams.get('keyword') || ''])
   const {
     data: classroom,
     isLoading,
@@ -102,6 +124,8 @@ const InformationManage = () => {
             type='text'
             placeholder='Nhập tìm kiếm...'
             className='manage-infor__search__input'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
         </div>

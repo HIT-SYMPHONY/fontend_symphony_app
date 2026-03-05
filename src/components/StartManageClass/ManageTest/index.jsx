@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getPostsByClassroomId, deletePost } from '../../../apis/post.api'
@@ -11,18 +11,23 @@ const ManageTest = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
   const queryClient = useQueryClient()
-
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
   const [expandedItems, setExpandedItems] = useState({})
   const {
     data: tests = [],
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['tests', classId],
+    queryKey: ['tests', classId, keyword],
     queryFn: async () => {
       if (!classId) return []
-      const response = await getPostsByClassroomId(classId)
-      return response.data.items || []
+      const params = {
+        keyword: keyword || null,
+      }
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+      const response = await getPostsByClassroomId(classId, filteredParams)
+      return response.data || []
     },
     enabled: !!classId,
     onError: () => {
@@ -92,7 +97,7 @@ const ManageTest = () => {
         </div>
         {expandedItems[item.id] && (
           <div className='managelesson__grid-details-row'>
-            <span>Nội dung chi tiết</span>
+            <span className='cursor-pointer' onClick={() => navigate(`/manage/classes/${classId}/tests/${item.id}/edit`)}>Nội dung chi tiết</span>
             <span>{formatDateTime(item.createdAt)}</span>
           </div>
         )}

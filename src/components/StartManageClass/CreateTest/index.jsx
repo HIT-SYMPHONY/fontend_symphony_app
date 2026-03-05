@@ -55,9 +55,6 @@ const CreateTest = () => {
   })
 
   const onSubmit = (data) => {
-    // --- THIS IS THE FIX ---
-    // Explicitly build the payload with only the required fields for the createPost API.
-    // This is a safer and clearer pattern than spreading `...data`.
     const payload = {
       title: data.title,
       classRoomId: data.classRoomId,

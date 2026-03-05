@@ -103,7 +103,7 @@ const HomeInformation = () => {
             <strong>Mô tả: </strong>
             {classroom.description ? (
               <Suspense fallback={<EditorPlaceholder />}>
-                <TiptapEditor value={descriptionContent} editable={false} />
+                <TiptapEditor value={descriptionContent} editable={false} editorClassName='!max-h-[150px]' />
               </Suspense>
             ) : (
               <p>Chưa có mô tả.</p>
@@ -151,29 +151,29 @@ const HomeInformation = () => {
           </div>
           <div className='informationclass__lesson__left__end'>
             <div className="informationclass__lesson-table-header">
-              <h1>Tên bài học</h1>
-              <h1>Ngày tạo</h1>
+              <h1 className='text-lg'>Tên bài học</h1>
+              <h1 className='text-lg'>Ngày tạo</h1>
             </div>
             {lessons.length > 0 ? (
               lessons.map((lesson, index) => (
                 <div className='end' key={lesson.id}>
                   <div className='lesson-item'>
-                    <span>{index + 1}</span>
+                    <span className='text-2xl'>{index + 1}</span>
                     <div className='lesson-details'>
-                      <p>
+                      <p className='text-xl !text-[#000000] font-semibold'>
                         Bài {index + 1}: {lesson.title}
                       </p>
                     </div>
                     <div className='lesson-date' onClick={() => toggleLessonBox(lesson.id)}>
-                      <p>{formatDateTime(lesson.createdAt)}</p>
+                      <p  className='text-xl !text-[#000000] font-semibold'>{formatDateTime(lesson.createdAt)}</p>
                       <i
                         className={`fa-solid ${
-                          expandedLessons[lesson.id] ? 'fa-caret-down' : 'fa-caret-up'
+                          expandedLessons[lesson.id] ? 'fa-caret-up' : 'fa-caret-down'
                         }`}></i>
                     </div>
                   </div>
                   <div
-                    className='lesson-box'
+                    className='lesson-box text-xl'
                     style={{ display: expandedLessons[lesson.id] ? 'block' : 'none' }}>
                     <p onClick={() => navigate(`/my-classes/${classId}/lessons/${lesson.id}`)}>
                       Đề cương bài học

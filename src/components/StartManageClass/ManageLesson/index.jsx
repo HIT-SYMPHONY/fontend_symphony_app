@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getLessonsByClassId, deleteLesson } from '../../../apis/lesson.api'
@@ -10,6 +10,8 @@ import './style.scss'
 const ManageLesson = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
   const queryClient = useQueryClient()
   const [expandedItems, setExpandedItems] = useState({})
   const {
@@ -17,10 +19,15 @@ const ManageLesson = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['lessons', classId],
+    queryKey: ['lessons', classId, keyword],
     queryFn: async () => {
       if (!classId) return []
-      const response = await getLessonsByClassId(classId)
+      const params = {
+        keyword: keyword || null,
+      }
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+      console.log(filteredParams)
+      const response = await getLessonsByClassId(classId, filteredParams)
       return response.data || []
     },
     enabled: !!classId,
@@ -91,7 +98,7 @@ const ManageLesson = () => {
         </div>
         {expandedItems[item.id] && (
           <div className='managelesson__grid-details-row'>
-            <span>Tài liệu tham khảo</span>
+            <span className='cursor-pointer' onClick={() => navigate(`/manage/classes/${classId}/lessons/${item.id}/edit`)}>Tài liệu tham khảo</span>
             <span>{formatDateTime(item.createdAt)}</span>
           </div>
         )}
