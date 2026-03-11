@@ -56,8 +56,10 @@ export const ApiConstant = {
     getNonMembers: (competitionId) => `/competition-users/${competitionId}/non-members`,
   },
   commentPosts: {
-    base: '/comment-posts',
-    getById: (commentId) => `/comment-posts/${commentId}`,
+    base: '/post-comments',
+    getById: (commentId) => `/post-comments/${commentId}`,
+    getCommentsByPostId: (postId) => `/posts/${postId}/comments`,
+    getMyCommentInPost: (postId) => `/posts/${postId}/comments/me`,
   },
   images: {
     base: '/images',

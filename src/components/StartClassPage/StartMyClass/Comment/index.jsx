@@ -1,50 +1,73 @@
-import React, { useState, useEffect, useRef, useContext } from 'react'
+import React from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
-import Frame from '../Frame'
+import { useNavigate, useParams } from 'react-router-dom'
+import TiptapEditor from 'components/TiptapEditor'
 import './style.scss'
+import { useQuery } from '@tanstack/react-query'
+import { getPostById } from 'apis/post.api'
+import { getMyCommentInPost } from 'apis/commentPost.api'
 
-const Comment = ({ setSubmit }) => {
+const Comment = () => {
   const navigate = useNavigate()
-  const [sub, setSub] = useState(false)
-
+  const { examId } = useParams()
+  const { data: postData, isLoading: loadingPost } = useQuery({
+    queryKey: ['post', examId],
+    queryFn: () => getPostById(examId),
+    enabled: !!examId,
+    select: (response) => response?.data || response,
+  })
+  const { data: myComment, isLoading: loadingComment } = useQuery({
+    queryKey: ['myComment', examId],
+    queryFn: () => getMyCommentInPost(examId),
+    enabled: !!examId,
+    retry: false,
+    select: (response) => response?.data || response,
+  })
+  console.log(myComment)
+  if (loadingPost || loadingComment) {
+    return <div>Đang tải dữ liệu...</div>
+  }
   return (
     <>
       <div className='comment'>
         <div className='comment__left'>
           <div className='comment__left-title'>
             <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
-            <h2>PRIVATE: Đồ họa - 2025</h2>
+            <h2>{postData?.classRoomName || 'Tên lớp học'}</h2>
           </div>
           <div className='comment__left__one'>
             <strong className='comment__left__one__than'>1</strong>
             <strong className='comment__left__one__more'>
-              <i class='fa-solid fa-angles-right'></i>
+              <i className='fa-solid fa-angles-right'></i>
             </strong>
-            <strong>Buổi 8: Kiểm tra</strong>
+            <strong>{postData?.title || 'Bài kiểm tra'}</strong>
           </div>
+
           <div className='comment__left__two'>
             <strong>Nội dung: </strong>
+            <div className='mt-2'>
+              <TiptapEditor value={postData?.content} editable={false} />
+            </div>
           </div>
-          <div className='comment__left__three'>
-            {sub && <strong>Nhận xét: </strong>}
-            {!sub && <strong>Trả lời: </strong>}
+          <div className='comment__left__three' style={{ marginTop: '20px' }}>
+            <strong>Nhận xét: </strong>
+            <div className='mt-2'>
+              <TiptapEditor value={myComment?.feedback} editable={false} />
+            </div>
           </div>
         </div>
+
         <div className='comment__right'>
-          <Icon
-            icon='duo-icons:message-3'
-            width='35'
-            height='35'
-            style={{ cursor: 'pointer' }}
-            className={!sub ? '' : 'comment__right__icon'}
-            onClick={() => setSub(!sub)}
-          />
           <div className='comment__right__diem'>
             <span>Điểm</span>
-            <h2>80</h2>
+            <h2>
+              {myComment?.score !== undefined && myComment?.score !== null ? myComment.score : '-'}
+            </h2>
           </div>
-          <h3 className='comment__right__nop'>Đã nộp </h3>
+          <h3 className='comment__right__nop'>
+            <span>ĐÃ</span>
+            <span>NỘP</span>
+          </h3>
         </div>
       </div>
     </>

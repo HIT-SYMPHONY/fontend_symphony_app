@@ -10,13 +10,13 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#F06C20', 
+          DEFAULT: '#F06C25',
           medium: '#F27B36',
           light: '#F69962',
         },
         secondary: {
           black: '#000000',
-          dark: '#B34708',
+          dark: '#FF6911',
           light: '#F48A4C',
         },
         neutral: {

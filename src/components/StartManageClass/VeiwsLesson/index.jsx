@@ -11,7 +11,7 @@ const VeiwsLesson = () => {
         <strong className='points__one__than'>1 </strong>
         <strong className='than'>
           <i className='fa-solid fa-angles-right'></i>
-        </strong>
+        </strong> 
         <strong>Buổi 1: Làm quen với phần mềm Adobe Photoshop và Adobe...</strong>
         <strong className='than'>
           <i className='fa-solid fa-angles-right'></i>

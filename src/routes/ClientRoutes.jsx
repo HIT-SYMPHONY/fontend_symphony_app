@@ -43,6 +43,9 @@ import CreateTest from '../components/StartManageClass/CreateTest'
 import ManageTest from 'components/StartManageClass/ManageTest'
 import EditTest from 'components/StartManageClass/EditTest'
 import MyNotificationsPage from 'pages/MyNotificationsPage'
+import Comment from 'components/StartClassPage/StartMyClass/Comment'
+import CommentOfTests from 'pages/CommentOfTests'
+import GradeTestPage from 'pages/GradeTestPage'
 const ClientRoutes = (
   <>
     <Route
@@ -60,6 +63,7 @@ const ClientRoutes = (
         <Route path=':classId' element={<HomeInformation />} />
         <Route path=':classId/lessons/:lessonId' element={<Lesson />} />
         <Route path=':classId/exams/:examId' element={<Exam />} />
+        <Route path=':classId/exams/:examId/score' element={<Comment />}></Route>
       </Route>
       {/* trang kết quả của học sinh với lớp học  */}
       <Route path='my-results' element={<ListMember />} />
@@ -101,6 +105,8 @@ const ClientRoutes = (
           {/* <Route path='tests' element={<TestContent />} /> */}
           <Route path='tests/create' element={<CreateTest />}></Route>
           <Route path='tests/:testId/edit' element={<EditTest></EditTest>}></Route>
+          <Route path='tests/:testId/comments' element={<CommentOfTests></CommentOfTests>}></Route>
+          <Route path='tests/:testId/comments/:commentId/grade' element={<GradeTestPage />}></Route>
         </Route>
         <Route path='competitions' element={<ManageCompetitions />} />
         <Route path='competitions/:competitionId' element={<InformationOfCompet />} />

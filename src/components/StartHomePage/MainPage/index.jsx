@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { Skeleton } from 'antd' // <-- Imported Skeleton from antd
 import { getMyNotifications } from '../../../apis/notification.api'
 import { getMyClasses, getMyCompetitions } from '../../../apis/user.api'
 import { formatDate } from '../../../utils/formatters'
@@ -16,6 +17,7 @@ const Main = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const globalSearch = searchParams.get('q') || ''
+
   // 1. Fetch Dashboard Data (Notifications)
   const { data: notifications, isLoading: isLoadingNotifications } = useQuery({
     queryKey: ['notifications', 'swiper'],
@@ -117,7 +119,10 @@ const Main = () => {
           />
           <h2>Thông báo</h2>
         </div>
-        <NotificationsSwiper notifications={notifications || []} isLoading={isLoadingNotifications} />
+        <NotificationsSwiper
+          notifications={notifications || []}
+          isLoading={isLoadingNotifications}
+        />
       </div>
       <div className='flex-one__plus'>
         <div className='plus'>
@@ -126,7 +131,36 @@ const Main = () => {
         </div>
         <div className='class-ago thay2'>
           {isLoadingClasses ? (
-            <TextMessage text='Đang tải lớp học...' />
+            // Render 4 Skeleton cards while loading
+            Array.from({ length: 4 }).map((_, index) => (
+              <div className='class-ago__box' key={`skeleton-${index}`}>
+                <div
+                  className='class-ago__thumbnail'
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#f5f5f5',
+                  }}>
+                  <Skeleton.Image active style={{ width: '100%', height: '100%' }} />
+                </div>
+                <div className='class-ago__content'>
+                  {/* Fake Button */}
+                  <Skeleton.Button
+                    active
+                    size='small'
+                    shape='round'
+                    style={{ width: 80, marginBottom: 16 }}
+                  />
+                  {/* Fake Title and Subtitles */}
+                  <Skeleton
+                    active
+                    paragraph={{ rows: 2, width: ['60%', '80%'] }}
+                    title={{ width: '90%' }}
+                  />
+                </div>
+              </div>
+            ))
           ) : recentClasses && recentClasses.length > 0 ? (
             recentClasses?.map((item) => (
               <div className='class-ago__box' key={item.id}>

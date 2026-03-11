@@ -52,9 +52,7 @@ const HomeInformation = () => {
   const { data: posts = [], isLoading: isLoadingPosts } = useQuery({
     queryKey: ['posts', classId],
     queryFn: () =>
-      getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }).then(
-        (res) => res.data?.items || [],
-      ),
+      getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }).then((res) => res.data || []),
     enabled: !!classId,
   })
 
@@ -103,7 +101,11 @@ const HomeInformation = () => {
             <strong>Mô tả: </strong>
             {classroom.description ? (
               <Suspense fallback={<EditorPlaceholder />}>
-                <TiptapEditor value={descriptionContent} editable={false} editorClassName='!max-h-[150px]' />
+                <TiptapEditor
+                  value={descriptionContent}
+                  editable={false}
+                  editorClassName='!max-h-[150px]'
+                />
               </Suspense>
             ) : (
               <p>Chưa có mô tả.</p>
@@ -150,7 +152,7 @@ const HomeInformation = () => {
             </div>
           </div>
           <div className='informationclass__lesson__left__end'>
-            <div className="informationclass__lesson-table-header">
+            <div className='informationclass__lesson-table-header'>
               <h1 className='text-lg'>Tên bài học</h1>
               <h1 className='text-lg'>Ngày tạo</h1>
             </div>
@@ -165,7 +167,9 @@ const HomeInformation = () => {
                       </p>
                     </div>
                     <div className='lesson-date' onClick={() => toggleLessonBox(lesson.id)}>
-                      <p  className='text-xl !text-[#000000] font-semibold'>{formatDateTime(lesson.createdAt)}</p>
+                      <p className='text-xl !text-[#000000] font-semibold'>
+                        {formatDateTime(lesson.createdAt)}
+                      </p>
                       <i
                         className={`fa-solid ${
                           expandedLessons[lesson.id] ? 'fa-caret-up' : 'fa-caret-down'
@@ -210,7 +214,8 @@ const HomeInformation = () => {
                           </div>
                         </div>
                         <div className='right__tap__noidung'>
-                          <div className={`right__tap__noidung__colum ${status.backgroundClass}`}></div>
+                          <div
+                            className={`right__tap__noidung__colum ${status.backgroundClass}`}></div>
                           <div className='right__tap__noidung__contextclass'>
                             <h4>{classroom.name}</h4>
                             <div className='contextclass'>
@@ -223,11 +228,11 @@ const HomeInformation = () => {
                             </div>
                             <div className='contextclass'>
                               <span>Thời gian giao: </span>
-                              <p>{formatDateTime(post.createdAt)}</p>
+                              <p>{formatDate(post.createdAt)}</p>
                             </div>
                             <div className='contextclass'>
                               <span>Hạn nộp: </span>
-                              <p>{formatDateTime(post.deadline)}</p>
+                              <p>{formatDate(post.deadline)}</p>
                             </div>
                           </div>
                         </div>

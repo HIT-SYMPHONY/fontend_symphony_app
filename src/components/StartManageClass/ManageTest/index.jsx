@@ -24,6 +24,8 @@ const ManageTest = () => {
       if (!classId) return []
       const params = {
         keyword: keyword || null,
+        sortBy: 'createdAt',
+        isAscending: true,
       }
       const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
       const response = await getPostsByClassroomId(classId, filteredParams)
@@ -97,7 +99,11 @@ const ManageTest = () => {
         </div>
         {expandedItems[item.id] && (
           <div className='managelesson__grid-details-row'>
-            <span className='cursor-pointer' onClick={() => navigate(`/manage/classes/${classId}/tests/${item.id}/edit`)}>Nội dung chi tiết</span>
+            <span
+              className='cursor-pointer'
+              onClick={() => navigate(`/manage/classes/${classId}/tests/${item.id}/comments`)}>
+              Xem câu trả lời của học sinh
+            </span>
             <span>{formatDateTime(item.createdAt)}</span>
           </div>
         )}

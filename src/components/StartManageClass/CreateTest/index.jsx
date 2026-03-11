@@ -11,6 +11,7 @@ import { createPost } from '../../../apis/post.api'
 import TiptapEditor from '../../TiptapEditor'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../constants/commonConstant'
 import './style.scss'
+import { formatDate } from 'utils/formatters'
 
 const CreateTest = () => {
   const navigate = useNavigate()
@@ -34,7 +35,7 @@ const CreateTest = () => {
 
   useEffect(() => {
     const today = new Date()
-    const formattedDate = today.toLocaleDateString('vi-VN')
+    const formattedDate = formatDate(today.toISOString())
     setCurrentDate(formattedDate)
   }, [])
 

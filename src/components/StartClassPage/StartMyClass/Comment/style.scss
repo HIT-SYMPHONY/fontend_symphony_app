@@ -14,7 +14,7 @@ $background-light: #ffefe4;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 90%;
+    flex: 1;
     &__one {
       display: flex;
       align-items: center;
@@ -35,23 +35,19 @@ $background-light: #ffefe4;
     }
     &__two {
       border: 2px solid $border-color;
-      height: 40%;
       border-radius: 10px;
       box-sizing: border-box;
       padding: 10px;
       box-shadow: 0 4px 8px $shadow-color;
       width: 100%;
-      height: 320px;
     }
     &__three {
       border: 2px solid $border-color;
-      height: 40%;
       border-radius: 10px;
       box-sizing: border-box;
       padding: 10px;
       box-shadow: 0 4px 8px $shadow-color;
       width: 100%;
-      height: 220px;
     }
     &-title {
       display: flex;
@@ -68,18 +64,15 @@ $background-light: #ffefe4;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    align-items: center;
+    padding: 1rem;
     gap: 20px;
-    width: 10%;
     padding-bottom: 20px;
-
     &__icon {
       color: #ff6911;
     }
     &__diem {
       padding: 12px;
       background-color: $secondary-color;
-      min-width: 50px;
       border-radius: 10px;
       color: #fdfdfd;
       display: flex;
@@ -87,20 +80,15 @@ $background-light: #ffefe4;
       align-items: center;
     }
     &__nop {
-      padding: 10px;
+      text-align: center;
       background-color: #a2a2a2;
-      min-width: 40px;
-      min-height: 70px;
       border-radius: 10px;
       color: #fdfdfd;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      padding: .5rem;
     }
-  }
-}
-@media (min-width: 1200px) and (min-height: 780px) {
-  .comment__left__three {
-    height: 45%;
   }
 }

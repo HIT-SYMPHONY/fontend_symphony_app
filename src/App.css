@@ -30,3 +30,14 @@ select,
 button {
   font-family: inherit;
 }
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  border-top: 1px solid #f27b36;
+  border-bottom: 1px solid #f27b36;
+}
+.ant-table-tbody > tr.ant-table-row:hover > td:first-child {
+  border-left: 1px solid #f27b36;
+}
+.ant-table-tbody > tr.ant-table-row:hover > td:last-child {
+  border-right: 1px solid #f27b36;
+}
