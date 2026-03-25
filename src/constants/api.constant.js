@@ -49,7 +49,8 @@ export const ApiConstant = {
     getById: (competitionId) => `/competitions/${competitionId}`,
   },
   competitionUsers: {
-    join: '/competition-users/join',
+    base: '/competition-users',
+    register: (competitionId) => `/competitions/${competitionId}/users`,
     addMultipleMembers: '/competition-users/add-multiple',
     removeMultipleMembers: '/competition-users/remove-multiple',
     getMembers: (competitionId) => `/competition-users/${competitionId}/members`,

@@ -79,7 +79,7 @@ $background-light: #ffefe4;
       gap: 10px;
       padding-left: 0;
       &__box {
-        padding: 10px;
+        padding: 1rem 2.5rem 1rem 1rem;
         border: 2px solid $border-color;
         border-radius: 10px;
         box-sizing: border-box;
@@ -108,10 +108,10 @@ $background-light: #ffefe4;
           }
           &__list {
             display: flex;
-            justify-content: space-between;
             &__span1 {
               color: $secondary-color;
               background-color: #ffefe4;
+              margin-right: auto;
             }
             &__span2 {
               padding-left: 20px;
@@ -121,9 +121,11 @@ $background-light: #ffefe4;
               color: #fff;
               cursor: pointer;
               border: none;
+              margin-right: 100px;
             }
             i {
               color: #ff6911;
+              font-size: 1.5rem;
             }
             &__span3 {
               padding-left: 20px;
@@ -154,15 +156,16 @@ $background-light: #ffefe4;
         width: 100%;
         height: 150px;
         background-size: cover;
-        background-image: url('./../../../assets/img/hit.png');
         display: flex;
         justify-content: end;
         align-items: end;
         box-sizing: border-box;
+        border-radius: 10px;
         padding: 10px;
-        i {
-          color: #ff6911;
-          font-size: 24px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
         }
       }
 
@@ -179,6 +182,9 @@ $background-light: #ffefe4;
       height: 60%;
       color: #ccc;
     }
+  }
+  .completed-contest {
+    background-color: #828282 !important;
   }
 }
 @media (min-width: 1200px) and (min-height: 780px) {

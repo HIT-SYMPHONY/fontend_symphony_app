@@ -34,7 +34,7 @@ const Main = () => {
 
   // 2. Fetch Classes for Display
   const { data: recentClasses, isLoading: isLoadingClasses } = useQuery({
-    queryKey: ['my-classes', globalSearch],
+    queryKey: ['classrooms', 'my',  globalSearch],
     queryFn: async () => {
       try {
         const params = { keyword: globalSearch || null }
@@ -52,7 +52,7 @@ const Main = () => {
 
   // 3. Fetch Competitions for WebSocket subscription
   const { data: competitions } = useQuery({
-    queryKey: ['my-competitions'],
+    queryKey: ['competitions', 'my'],
     queryFn: () => getMyCompetitions({}),
     select: (data) => data.data?.items || [],
   })

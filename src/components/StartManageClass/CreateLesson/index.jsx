@@ -68,7 +68,6 @@ const CreateLessonID = () => {
       endTime: data.endTime ? data.endTime.format(API_TIME_FORMAT) : null,
       content: data.content ? JSON.stringify(data.content) : '',
     }
-    console.log(content)
     createLessonMutation.mutate(payload)
   }
 
