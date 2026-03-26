@@ -96,6 +96,9 @@ const MainCompetition = () => {
           <h2>Cuộc thi</h2>
         </div>
         <div className='competition__left__board'>
+          {!isLoadingCompetitions && competitions[0].image && (
+            <img src={competitions[0].image} alt={competitions[0].name} />
+          )}
           <i className='fa-solid fa-circle-info board'></i>
         </div>
         <div className='competition__left__bang'>
@@ -183,7 +186,8 @@ const MainCompetition = () => {
           ) : firstMyCompetition.description ? (
             <TiptapEditor
               value={safeParse(firstMyCompetition.description)}
-              editable={false} editorClassName='!rounded-lg'></TiptapEditor>
+              editable={false}
+              editorClassName='!rounded-lg'></TiptapEditor>
           ) : (
             <TextMessage text='Chưa có giới thiệu.'></TextMessage>
           )}

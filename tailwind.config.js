@@ -23,6 +23,7 @@ export default {
           dark: '#FAB78E',
           medium: '#FED5BA',
           light: '#FFFEF4', 
+          grey: '#828282',
         },
         black: '#000000',
         white: '#FFFEF4',

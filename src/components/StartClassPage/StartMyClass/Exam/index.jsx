@@ -10,7 +10,6 @@ import { Modal, Statistic } from 'antd'
 import { getPostById } from '../../../../apis/post.api'
 import { createCommentPost, getMyCommentInPost, updateMyComment } from 'apis/commentPost.api'
 import { commentPostCreationSchema } from '../../../../utils/commentPostValidate.js'
-import './style.scss'
 import TiptapEditor from 'components/TiptapEditor'
 
 const { Timer } = Statistic
@@ -21,19 +20,17 @@ const Exam = () => {
   const queryClient = useQueryClient()
 
   const [submit, setSubmit] = useState(false)
-
   const [targetTime, setTargetTime] = useState(null)
   const [isWarningTime, setIsWarningTime] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [pendingFormData, setPendingFormData] = useState(null)
-
   const [isExpired, setIsExpired] = useState(false)
 
   const hasEndedRef = useRef(false)
 
   const { handleSubmit, control, setValue } = useForm({
     defaultValues: {
-      content: '', 
+      content: '',
     },
     resolver: yupResolver(commentPostCreationSchema),
   })
@@ -132,7 +129,7 @@ const Exam = () => {
       return
     }
     setPendingFormData(data)
-    setIsModalVisible(true) 
+    setIsModalVisible(true)
   }
 
   const handleConfirmSubmit = () => {
@@ -149,11 +146,10 @@ const Exam = () => {
     }
   }
 
-  // Fires dynamically when the countdown reaches 0
   const handleTimeUp = () => {
     if (hasEndedRef.current) return
     hasEndedRef.current = true
-    setIsExpired(true) // Lock the exam
+    setIsExpired(true)
     toast.error('Hết giờ làm bài!')
   }
 
@@ -171,66 +167,77 @@ const Exam = () => {
 
   return (
     <>
-      <div className='exam'>
-        <div className='exam-title'>
-          <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)}></i>
-          <h2>{postData.classRoomName || 'Tên lớp học'}</h2>
+      <div className='flex flex-col gap-[10px]'>
+        {/* Title Section */}
+        <div className='flex items-center gap-[15px]'>
+          <i
+            className='fa-solid fa-arrow-left text-[#ff6911] text-[30px] cursor-pointer'
+            onClick={() => navigate(-1)}></i>
+          <h2 className='text-xl font-semibold'>{postData.classRoomName || 'Tên lớp học'}</h2>
         </div>
-        <div className='exam__one'>
-          <div className='exam__one__tap'>
-            <strong className='exam__one__tap__than'>1</strong>
-            <strong className='tapthan'>
+
+        {/* Header Section */}
+        <div className='flex justify-between items-center'>
+          <div className='flex gap-[20px] items-center'>
+            <strong className='bg-[#ff6911] text-[#ffefe4] w-[35px] h-[35px] rounded-[10px] flex justify-center items-center'>
+              1
+            </strong>
+            <strong className='text-[#ff6911]'>
               <i className='fa-solid fa-angles-right'></i>
             </strong>
             <strong>{postData.title}</strong>
           </div>
 
-          <div className='exam__one__time'>
+          <div className='py-[5px] px-[10px] bg-[#ff6911] rounded-[10px]'>
             {targetTime ? (
               <Timer
-                type='countdown' // antd expects type="countdown" instead of <Countdown /> when importing from Statistic
+                type='countdown'
                 value={targetTime}
                 onFinish={handleTimeUp}
                 onChange={handleTimerChange}
                 format='HH:mm:ss'
                 valueStyle={{
-                  color: isWarningTime || isExpired ? '#ff0000' : '#fff',
+                  color: isWarningTime || isExpired ? '#ff0000' : '#ffefe4',
                   fontSize: '1.25rem',
                   fontWeight: 'bold',
                   lineHeight: 'inherit',
                 }}
               />
             ) : (
-              <strong style={{ color: '#ff0000', fontSize: '1.25rem', fontWeight: 'bold' }}>
-                00:00:00
-              </strong>
+              <strong className='text-[#ff0000] text-xl font-bold'>00:00:00</strong>
             )}
           </div>
         </div>
-        <div className='exam__two'>
-          <strong>Nội dung bài kiểm tra: </strong>
+
+        {/* Question Content Section */}
+        <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
+          <strong className='block mb-2'>Nội dung bài kiểm tra: </strong>
           <TiptapEditor
-            value={postData.content} // Readonly display of the prompt
+            value={postData.content}
             editable={false}
             editorClassName='!max-h-[300px]'
           />
         </div>
 
+        {/* Submission Form Section */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='exam__nop'>
-            <p className='exam__label'>
+          <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
+            <p className='block mb-[4px] font-bold'>
               Trả lời
               {isSubmitted && !isExpired && (
-                <span className='text-green-600 text-sm ml-2'>
+                <span className='text-green-600 text-sm ml-2 font-semibold'>
                   (Bạn đã nộp bài, có thể chỉnh sửa trước khi hết giờ)
                 </span>
               )}
               {isExpired && (
-                <span className='text-red-600 text-sm ml-2'>(Đã hết thời gian làm bài)</span>
+                <span className='text-red-600 text-sm ml-2 font-normal'>
+                  (Đã hết thời gian làm bài)
+                </span>
               )}
               :
             </p>
-            <div className='exam__input-wrapper'>
+
+            <div className='rounded-[10px] flex gap-4 pb-[10px] items-end'>
               <Controller
                 name='content'
                 control={control}
@@ -239,22 +246,23 @@ const Exam = () => {
                     value={field.value}
                     onChange={field.onChange}
                     error={error}
-                    editable={!isExpired} // Prevent editing if time is up
+                    editable={!isExpired}
                     editorClassName='!max-h-[200px]'
+                    className='flex-1'
                   />
                 )}
               />
 
               {/* Action Buttons Wrapper */}
-              <div className='exam__input-wrapper-actions'>
-                {/* Only show Submit/Update button if the exam is NOT expired */}
+              <div className='flex flex-col mb-[10px] gap-2'>
                 {!isExpired && (
                   <button
                     type='submit'
                     title={isSubmitted ? 'Cập nhật' : 'Nộp bài'}
-                    disabled={isPendingMutate}>
+                    disabled={isPendingMutate}
+                    className='w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-50 transition-colors'>
                     {isPendingMutate ? (
-                      <span style={{ fontSize: '12px', color: '#F06C25' }}>Đang tải...</span>
+                      <span className='text-[12px] text-[#F06C25]'>Đang tải...</span>
                     ) : (
                       <Icon
                         icon={
@@ -265,18 +273,16 @@ const Exam = () => {
                         color='#F06C25'
                         width='30'
                         height='30'
-                        className='exam__submit'
                       />
                     )}
                   </button>
                 )}
 
-                {/* Score Navigation Button (Always visible if they submitted) */}
                 {isSubmitted && (
                   <button
                     type='button'
                     title='Xem điểm'
-                    className='exam__submit-button bg-gray-100 hover:bg-gray-200 transition-colors'
+                    className='w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors'
                     onClick={() => navigate(`/my-classes/${classId}/exams/${examId}/score`)}>
                     <Icon icon='material-symbols:grading' color='#3b82f6' width='30' height='30' />
                   </button>

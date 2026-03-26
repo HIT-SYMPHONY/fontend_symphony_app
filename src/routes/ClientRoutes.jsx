@@ -4,22 +4,17 @@ import ProtectedRoute from '../components/ProtecedRoute/ProtectedRoute'
 import HomeInformation from '../components/StartClassPage/StartMyClass/InformationClass'
 import ListMember from '../pages/ClassPage/MyResult'
 import Classroom from '../components/StartClassPage/StartMyClass/Classroom'
-import AllClassroom from '../components/StartClassPage/StartMyClass/AllClassroom'
 import Lesson from '../components/StartClassPage/StartMyClass/Lession'
 import Main from '../components/StartHomePage/MainPage'
 import DashboardOfMain from '../pages/DashboardOfMain'
 import Exam from '../components/StartClassPage/StartMyClass/Exam'
 import MainCompetition from '../components/StartCompetition/MainPage'
-import InformationCompetition from '../components/StartCompetition/InformationPage'
 import Assignment from '../components/StartCompetition/Assignment'
 import Complete from '../components/StartCompetition/Complete'
-import HomeAccount from '../components/StartAccount/HomeAccount'
 import MainManage from '../components/StartManageClass/MainManage'
 import InformationManage from '../components/StartManageClass/Information'
 import Communication from '../components/StartManageClass/Communication'
 import Notification from '../components/StartManageClass/Notification'
-import CreateLesson from '../components/StartManageClass/CreateLesson'
-import TestContent from '../components/StartManageClass/TestContent'
 import CreateNotification from '../components/StartManageClass/MemberClass'
 import AllMember from '../components/StartManageClass/AllMember'
 import ManageLesson from '../components/StartManageClass/ManageLesson'
@@ -32,12 +27,6 @@ import RulesOfManageCompet from '../components/StartManageClass/RulesOfManageCom
 import TestOfManageCompet from '../components/StartManageClass/TestOfManageCompet'
 import CommentOfCompet from '../components/StartManageClass/CommentOfCompet'
 import EditLesson from '../components/StartManageClass/EditLesson/index'
-import {
-  Introduction,
-  Rules,
-  Rating,
-  YourTest,
-} from '../components/StartCompetition/InformationPage'
 import AccountPage from '../pages/AccountPage'
 import CreateTest from '../components/StartManageClass/CreateTest'
 import ManageTest from 'components/StartManageClass/ManageTest'
@@ -46,6 +35,13 @@ import MyNotificationsPage from 'pages/MyNotificationsPage'
 import Comment from 'components/StartClassPage/StartMyClass/Comment'
 import CommentOfTests from 'pages/CommentOfTests'
 import GradeTestPage from 'pages/GradeTestPage'
+import CompetitionDetailPage from 'pages/CompetitionDetailPage'
+import CompetitionInfosPage from 'pages/CompetitionInfosPage'
+import CompetitionRulesPage from 'pages/CompetitionRulesPage/CompetitionRulesPage'
+import CompetitionRankingPage from 'pages/CompetitionRankingPage'
+import CompetitionTestsPage from 'pages/CompetitionTestsPage'
+import CompetitionSubmissionPage from 'pages/CompetitionSubmissionPage'
+import CompetitionScorePage from 'pages/CompetitionScorePage'
 const ClientRoutes = (
   <>
     <Route
@@ -71,14 +67,14 @@ const ClientRoutes = (
       {/* trang cuộc thi công khai */}
       <Route path='competitions'>
         <Route index element={<MainCompetition />} />
-        <Route path=':competitionId' element={<InformationCompetition />}>
-          <Route index element={<Introduction />} /> {/* Default tab */}
-          <Route path='rules' element={<Rules />} />
-          <Route path='rating' element={<Rating />} />
-          <Route path='my-test' element={<YourTest />} />
+        <Route path=':competitionId' element={<CompetitionDetailPage />}>
+          <Route path='description' element={<CompetitionInfosPage />} />
+          <Route path='rules' element={<CompetitionRulesPage />} />
+          <Route path='ranking' element={<CompetitionRankingPage />} />
+          <Route path='my-test' element={<CompetitionTestsPage />} />
         </Route>
-        <Route path=':competitionsId/test' element={<Assignment />} />
-        <Route path=':competitionsId/comment' element={<Complete />} />
+        <Route path=':competitionsId/test' element={<CompetitionSubmissionPage />} />
+        <Route path=':competitionsId/score' element={<CompetitionScorePage />} />
       </Route>
       <Route path='notifications' element={<MyNotificationsPage></MyNotificationsPage>}></Route>
       {/* các trang quản lý của leader */}
