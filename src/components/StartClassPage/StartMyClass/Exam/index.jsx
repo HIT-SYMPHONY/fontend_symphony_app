@@ -51,7 +51,7 @@ const Exam = () => {
     isLoading: loadingMyComment,
     isSuccess: hasSubmittedPrev,
   } = useQuery({
-    queryKey: ['myComment', examId],
+    queryKey: ['post-comment', examId],
     queryFn: () => getMyCommentInPost(examId),
     enabled: !!examId,
     retry: false,
@@ -168,7 +168,6 @@ const Exam = () => {
   return (
     <>
       <div className='flex flex-col gap-[10px]'>
-        {/* Title Section */}
         <div className='flex items-center gap-[15px]'>
           <i
             className='fa-solid fa-arrow-left text-[#ff6911] text-[30px] cursor-pointer'
@@ -176,7 +175,6 @@ const Exam = () => {
           <h2 className='text-xl font-semibold'>{postData.classRoomName || 'Tên lớp học'}</h2>
         </div>
 
-        {/* Header Section */}
         <div className='flex justify-between items-center'>
           <div className='flex gap-[20px] items-center'>
             <strong className='bg-[#ff6911] text-[#ffefe4] w-[35px] h-[35px] rounded-[10px] flex justify-center items-center'>
@@ -209,7 +207,6 @@ const Exam = () => {
           </div>
         </div>
 
-        {/* Question Content Section */}
         <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
           <strong className='block mb-2'>Nội dung bài kiểm tra: </strong>
           <TiptapEditor
@@ -219,7 +216,6 @@ const Exam = () => {
           />
         </div>
 
-        {/* Submission Form Section */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
             <p className='block mb-[4px] font-bold'>
@@ -253,7 +249,6 @@ const Exam = () => {
                 )}
               />
 
-              {/* Action Buttons Wrapper */}
               <div className='flex flex-col mb-[10px] gap-2'>
                 {!isExpired && (
                   <button

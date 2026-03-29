@@ -73,8 +73,8 @@ const ClientRoutes = (
           <Route path='ranking' element={<CompetitionRankingPage />} />
           <Route path='my-test' element={<CompetitionTestsPage />} />
         </Route>
-        <Route path=':competitionsId/test' element={<CompetitionSubmissionPage />} />
-        <Route path=':competitionsId/score' element={<CompetitionScorePage />} />
+        <Route path=':competitionId/test' element={<CompetitionSubmissionPage />} />
+        <Route path=':competitionId/score' element={<CompetitionScorePage />} />
       </Route>
       <Route path='notifications' element={<MyNotificationsPage></MyNotificationsPage>}></Route>
       {/* các trang quản lý của leader */}

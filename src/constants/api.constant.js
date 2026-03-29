@@ -62,6 +62,12 @@ export const ApiConstant = {
     getCommentsByPostId: (postId) => `/posts/${postId}/comments`,
     getMyCommentInPost: (postId) => `/posts/${postId}/comments/me`,
   },
+  commentCompetitions: {
+    base: '/competition-comments',
+    getById: (commentId) => `/competition-comments/${commentId}`,
+    getCommentsBycompetitionId: (competitionId) => `/competitions/${competitionId}/comments`,
+    getMyCommentsInCompetition: (competitionId) => `/competitions/${competitionId}/comments/me`,
+  },
   images: {
     base: '/images',
   },
