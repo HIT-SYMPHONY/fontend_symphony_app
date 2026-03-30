@@ -15,7 +15,7 @@ const NavigationDropdown = ({ options, placeholder = '--- Danh mục ---', class
   const displayLabel = currentOption ? currentOption.option : placeholder
 
   const handleNavigate = (link) => {
-    navigate(link)
+    navigate(link, { replace: true })
     setIsOpen(false)
   }
 

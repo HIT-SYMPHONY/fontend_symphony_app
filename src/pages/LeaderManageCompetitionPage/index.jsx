@@ -46,7 +46,7 @@ function LeaderManageCompetitionPage() {
         />
         <h2 className='text-2xl font-bold'>Quản lý cuộc thi</h2>
       </div>
-      <div className='flex items-center gap-4'>
+      <div className='flex items-center gap-4 mb-6'>
         <i
           className='fa-solid fa-arrow-left text-primary cursor-pointer text-[1.2rem]'
           onClick={() => navigate(-1)}></i>
