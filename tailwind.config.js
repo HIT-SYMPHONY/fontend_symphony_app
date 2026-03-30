@@ -22,7 +22,7 @@ export default {
         neutral: {
           dark: '#FAB78E',
           medium: '#FED5BA',
-          light: '#FFFEF4', 
+          light: '#FFEFE4', 
           grey: '#828282',
         },
         black: '#000000',

@@ -42,6 +42,12 @@ import CompetitionRankingPage from 'pages/CompetitionRankingPage'
 import CompetitionTestsPage from 'pages/CompetitionTestsPage'
 import CompetitionSubmissionPage from 'pages/CompetitionSubmissionPage'
 import CompetitionScorePage from 'pages/CompetitionScorePage'
+import ManageCompetitionPage from 'pages/LeaderManageCompetitionPage'
+import LeaderManageCompetitionPage from 'pages/LeaderManageCompetitionPage'
+import LeaderCompetitionInfosPage from 'pages/LeaderCompetitionInfosPage'
+import LeaderCompetitionRulesPage from 'pages/LeaderCompetitionRulesPage'
+import LeaderCompetitionParticipantsPage from 'pages/LeaderCompetitionParticipantsPage'
+import LeaderCompetitionAnswersPage from 'pages/LeaderCompetitionAnswersPage'
 const ClientRoutes = (
   <>
     <Route
@@ -104,12 +110,15 @@ const ClientRoutes = (
           <Route path='tests/:testId/comments' element={<CommentOfTests></CommentOfTests>}></Route>
           <Route path='tests/:testId/comments/:commentId/grade' element={<GradeTestPage />}></Route>
         </Route>
-        <Route path='competitions' element={<ManageCompetitions />} />
-        <Route path='competitions/:competitionId' element={<InformationOfCompet />} />
-        <Route path='competitions/:competitionId/rules' element={<RulesOfManageCompet />} />
-        <Route path='competitions/:competitionId/test' element={<TestOfManageCompet />} />
-        <Route path='competitions/:competitionId/members' element={<IntroOfCompetAdmin />} />
-        <Route path='competitions/:competitionId/comment' element={<CommentOfCompet />} />
+        <Route path='competitions'>
+          <Route index element={<ManageCompetitions />} />
+          <Route path=':competitionId' element={<LeaderManageCompetitionPage />}>
+            <Route path='infos' element={<LeaderCompetitionInfosPage />} />
+            <Route path='rules' element={<LeaderCompetitionRulesPage />} />
+            <Route path='tests' element={<LeaderCompetitionAnswersPage />} />
+            <Route path='participants' element={<LeaderCompetitionParticipantsPage />} />
+          </Route>
+        </Route>
       </Route>
 
       {/* trang viết thông tin cá nhân */}

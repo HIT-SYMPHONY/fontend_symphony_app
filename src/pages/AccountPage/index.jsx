@@ -206,8 +206,8 @@ const AccountPage = () => {
                 </button>
               </div>
             ) : (
-              <span onClick={() => setIsEditingPersonal(true)} className='edit-span'>
-                <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
+              <span onClick={() => setIsEditingPersonal(true)} className='edit-span flex gap-1'>
+                <Icon icon='iconamoon:edit-fill' width='20' height='20' /> <p>Chỉnh sửa</p>
               </span>
             )}
           </div>
@@ -355,8 +355,8 @@ const AccountPage = () => {
       <div className='account__taikhoan'>
         <div className='account__taikhoan__fix'>
           <h4>Thông tin tài khoản</h4>
-          <span onClick={() => setShowPasswordPopup(true)} className='edit-span'>
-            <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
+          <span onClick={() => setShowPasswordPopup(true)} className='edit-span flex gap-1'>
+            <Icon icon='iconamoon:edit-fill' width='20' height='20' /> <p>Chỉnh sửa</p>
           </span>
         </div>
         <div className='account__taikhoan__context'>

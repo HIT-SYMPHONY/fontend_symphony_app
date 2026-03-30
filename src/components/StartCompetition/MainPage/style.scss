@@ -36,7 +36,7 @@ $background-light: #ffefe4;
 
   &__left {
     width: 70%;
-    gap: 10px;    
+    gap: 10px;
     padding-right: 10px;
     display: flex;
     height: 100%;
@@ -70,6 +70,9 @@ $background-light: #ffefe4;
         width: 100%;
         object-fit: cover;
       }
+      div {
+        width: 100% !important;
+      }
       i {
         align-self: end;
         justify-self: end;
@@ -102,7 +105,7 @@ $background-light: #ffefe4;
         gap: 20px;
 
         &__board {
-          width: 400px;
+          width: 300px;
           height: 100px;
           background-color: #ccc;
           border-radius: 10px;
@@ -115,7 +118,7 @@ $background-light: #ffefe4;
         }
 
         &__information {
-          width: 100%;
+          flex: 1;
           p {
             color: #b6b5b5;
           }
@@ -180,6 +183,9 @@ $background-light: #ffefe4;
           height: 100%;
           object-fit: cover;
         }
+        div {
+          width: 100% !important;
+        }
       }
 
       hr {
@@ -198,10 +204,5 @@ $background-light: #ffefe4;
   }
   .completed-contest {
     background-color: #828282 !important;
-  }
-}
-@media (min-width: 1200px) and (min-height: 780px) {
-  .competition__left__bang {
-    height: 480px;
   }
 }
