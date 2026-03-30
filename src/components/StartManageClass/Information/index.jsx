@@ -8,38 +8,44 @@ import {
   useOutletContext,
   useSearchParams,
 } from 'react-router-dom'
-import toast from 'react-hot-toast'
 import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
 import { getClassroomById } from '../../../apis/classroom.api'
 import NavigationDropdown from '../../NavigationDropdown'
-import TextMessage from '../../TextMessage'
-import './style.scss'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
 import useDebounce from 'hooks/useDebounce'
+import './style.scss'
 
 const InformationManage = () => {
   const { classId } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
+
   const [searchParams, setSearchParams] = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+
   const debouncedSearchQuery = useDebounce(searchQuery, 500)
+
   useEffect(() => {
-    const newParams = new URLSearchParams(searchParams)
-    if (debouncedSearchQuery) {
-      newParams.set('keyword', debouncedSearchQuery)
-    } else {
-      newParams.delete('keyword')
-    }
-    setSearchParams(newParams, { replace: true })
+    setSearchParams(
+      (prevParams) => {
+        if (debouncedSearchQuery) {
+          prevParams.set('keyword', debouncedSearchQuery)
+        } else {
+          prevParams.delete('keyword')
+        }
+        return prevParams
+      },
+      { replace: true },
+    )
   }, [debouncedSearchQuery, setSearchParams])
-  useEffect(() => {
-    setSearchQuery(searchParams.get('keyword') || '')
-  }, [searchParams.get('keyword') || ''])
+
+  // React Query Fetching
   const {
     data: classroom,
     isLoading,
     isError,
-    error,
+    refetch,
   } = useQuery({
     queryKey: ['classroom', classId],
     queryFn: async () => {
@@ -51,6 +57,7 @@ const InformationManage = () => {
     refetchOnWindowFocus: false,
   })
 
+  // Navigation Links
   const linkOptions = useMemo(() => {
     if (!classId) return []
     const basePath = `/manage/classes/${classId}`
@@ -63,13 +70,7 @@ const InformationManage = () => {
     ]
   }, [classId])
 
-  useEffect(() => {
-    if (isError) {
-      toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
-      navigate('/manage/classes')
-    }
-  }, [isError, error, navigate])
-
+  // Dynamic Create Path logic
   const createPath = useMemo(() => {
     const path = location.pathname
     if (path.endsWith('/create')) return null
@@ -80,26 +81,42 @@ const InformationManage = () => {
   }, [location.pathname, classId])
 
   const handleCreateClick = () => {
-    if (createPath) {
-      navigate(createPath)
-    }
+    if (createPath) navigate(createPath)
   }
 
-  const outletContext = useMemo(
-    () => ({
-      classroom,
-    }),
-    [classroom],
-  )
+  const outletContext = useMemo(() => ({ classroom }), [classroom])
+
+  if (isError) {
+    return (
+      <ApiErrorDisplay
+        title='Không thể tải dữ liệu lớp học'
+        refetchQueries={[refetch]}
+        backUrl='/manage/classes'
+      />
+    )
+  }
 
   if (isLoading) {
-    return <TextMessage text='Đang tải thông tin lớp học...' />
+    return (
+      <div className='manage-infor'>
+        <div className='manage-infor__title flex gap-2 items-center mb-4'>
+          <Skeleton.Button active shape='circle' size='large' />
+          <Skeleton.Input active size='large' style={{ width: 300 }} />
+        </div>
+
+        <div className='manage-infor__search flex gap-4 mb-6'>
+          <Skeleton.Button active style={{ width: 40 }} />
+          <Skeleton.Input active style={{ width: 200 }} />
+          <Skeleton.Input active style={{ width: 300 }} />
+          <Skeleton.Button active style={{ width: 100 }} />
+        </div>
+
+        <Skeleton active paragraph={{ rows: 6 }} />
+      </div>
+    )
   }
 
-  if (isError || !classroom) {
-    return <TextMessage text='Không tìm thấy dữ liệu lớp học.' />
-  }
-
+  // Main Render Layout
   return (
     <div className='manage-infor'>
       <div className='manage-infor__title'>
@@ -109,16 +126,18 @@ const InformationManage = () => {
           height='30'
           className='manage-infor__title__icon'
         />
-        <h2>Quản lý lớp học: {classroom.name}</h2>
+        <h2>Quản lý lớp học: {classroom?.name}</h2>
       </div>
 
       <div className='manage-infor__search'>
-        <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)} />
+        <i className='fa-solid fa-arrow-left cursor-pointer' onClick={() => navigate(-1)} />
+
         <NavigationDropdown
           options={linkOptions}
           placeholder='Thông tin lớp học'
           className='manage-infor__search__select'
         />
+
         <div className='manage-infor__search__container'>
           <input
             type='text'
@@ -129,6 +148,7 @@ const InformationManage = () => {
           />
           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
         </div>
+
         <button
           className={`manage-infor__search__button ${!createPath ? 'not-creatable' : ''}`}
           onClick={handleCreateClick}

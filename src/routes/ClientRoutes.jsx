@@ -48,6 +48,7 @@ import LeaderCompetitionInfosPage from 'pages/LeaderCompetitionInfosPage'
 import LeaderCompetitionRulesPage from 'pages/LeaderCompetitionRulesPage'
 import LeaderCompetitionParticipantsPage from 'pages/LeaderCompetitionParticipantsPage'
 import LeaderCompetitionAnswersPage from 'pages/LeaderCompetitionAnswersPage'
+import LeaderManageCompetitionsIndexPage from 'pages/LeaderManageCompetitionsIndexPage'
 const ClientRoutes = (
   <>
     <Route
@@ -113,6 +114,7 @@ const ClientRoutes = (
         <Route path='competitions'>
           <Route index element={<ManageCompetitions />} />
           <Route path=':competitionId' element={<LeaderManageCompetitionPage />}>
+            <Route index element={<LeaderManageCompetitionsIndexPage />} />
             <Route path='infos' element={<LeaderCompetitionInfosPage />} />
             <Route path='rules' element={<LeaderCompetitionRulesPage />} />
             <Route path='tests' element={<LeaderCompetitionAnswersPage />} />
