@@ -21,7 +21,7 @@ const Exam = () => {
 
   const [submit, setSubmit] = useState(false)
   const [targetTime, setTargetTime] = useState(null)
-  const [isWarningTime, setIsWarningTime] = useState(false)
+  const [isWarningTime, setIsWarninogTime] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [pendingFormData, setPendingFormData] = useState(null)
   const [isExpired, setIsExpired] = useState(false)
