@@ -1,14 +1,20 @@
 import * as yup from 'yup'
+import { yupDayjs, yupTiptapJSON } from './yupHelpers'
 
 export const postCreationSchema = yup
   .object({
     title: yup.string().trim().required('Tiêu đề không thể trống'),
-    content: yup.string().trim().required('Nội dung không thể trống'),
-    deadline: yup
-      .date()
-      .required('Hạn nộp không thể trống')
-      .min(new Date(), 'Hạn nộp phải ở trong tương lai')
-      .typeError('Vui lòng nhập ngày giờ hợp lệ'),
-    classRoomId: yup.string().required(),
+    content: yupTiptapJSON({
+      isRequired: true,
+      requiredMessage: 'Nội dung không thể trống',
+    }),
+    deadline: yupDayjs({
+      isRequired: true,
+      requiredMessage: 'Hạn nộp không thể trống',
+      mustBeInFuture: true,
+      futureMessage: 'Hạn nộp phải ở trong tương lai',
+    }),
   })
   .required()
+
+

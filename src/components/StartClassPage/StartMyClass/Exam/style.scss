@@ -53,21 +53,17 @@ $background-light: #ffefe4;
   }
   &__two {
     border: 2px solid $border-color;
-    height: 50%;
     border-radius: 10px;
     box-sizing: border-box;
     padding: 10px;
     box-shadow: 0 4px 8px $shadow-color;
-    height: 280px;
   }
   &__nop {
     border: 2px solid $border-color;
-    height: 25%;
     border-radius: 10px;
     box-sizing: border-box;
     padding: 10px;
     box-shadow: 0 4px 8px $shadow-color;
-    height: 250px;
   }
 
   &__label {
@@ -80,10 +76,18 @@ $background-light: #ffefe4;
     border-radius: 10px;
     background: #fff;
     display: flex;
-    justify-content: space-between;
-    align-items: end;
+    gap: 1rem;
     padding-bottom: 10px;
-    box-sizing: border-box;
+    align-items: flex-end;
+    .tiptap-container {
+      flex: 1;
+    }
+    &-actions {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+      gap: .5rem;
+    }
   }
 
   &__textarea {
@@ -98,9 +102,6 @@ $background-light: #ffefe4;
   }
 
   &__submit {
-    background-color: #f26522;
-    color: #fff;
-    border: none;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -108,15 +109,5 @@ $background-light: #ffefe4;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 0;
-  }
-}
-
-@media (min-width: 1200px) and (min-height: 780px) {
-  .exam__nop {
-    height: 30%;
-  }
-  .exam__submit {
-    bottom: -100px;
   }
 }

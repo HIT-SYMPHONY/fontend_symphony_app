@@ -1,25 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Icon } from '@iconify/react'
+import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import { DatePicker, Select } from 'antd'
+import dayjs from 'dayjs'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../utils/userValidate.js'
 import { getCurrentUser, updateUser } from '../../apis/user.api'
-import {
-  formatDate,
-  translateGender,
-  formatDateForAPI,
-  getDisplayName,
-} from '../../utils/formatters'
+import { formatDate, translateGender, getDisplayName } from '../../utils/formatters'
+import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT, intakeOptions } from '../../constants/commonConstant'
 import useAuth from '../../hooks/useAuth'
-import useOnClickOutside from '../../hooks/useOnClickOutside'
 import ReplaceOfAdmin from '../../components/Admin/NotiOfAdmin/ReplaceOfNoti/index.jsx'
 import placeholderImage from '../../assets/img/Ellipse.png'
+import TextMessage from '../../components/TextMessage'
 import './style.scss'
 
 const AccountPage = () => {
   const { user, saveUser } = useAuth()
-  const [initialData, setInitialData] = useState({})
+  const [initialData, setInitialData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isEditingPersonal, setIsEditingPersonal] = useState(false)
   const [showPasswordPopup, setShowPasswordPopup] = useState(false)
@@ -27,17 +26,23 @@ const AccountPage = () => {
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
-  const formRef = useRef(null)
-  const imageUploadRef = useRef(null)
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
+    control,
+    formState: { errors, isDirty, isSubmitting },
     reset,
   } = useForm({
     resolver: yupResolver(userUpdateSchema),
+    mode: 'onTouched',
   })
+
+  const intakeSelectOptions = useMemo(() => {
+    return intakeOptions
+      .filter((option) => option !== 'Tất cả')
+      .map((option) => ({ value: option, label: option }))
+  }, [])
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -47,23 +52,21 @@ const AccountPage = () => {
         const response = await getCurrentUser()
         const userData = response.data
 
-        const formattedData = {
+        setInitialData(userData)
+        setPreviewUrl(userData.imageUrl)
+
+        const formattedDataForForm = {
           lastName: userData.lastName || '',
           firstName: userData.firstName || '',
           studentCode: userData.studentCode || '',
           email: userData.email || '',
           phoneNumber: userData.phoneNumber || '',
-          intake: userData.intake || '',
-          gender: userData.gender || '',
-          dateBirth: userData.dateBirth,
+          intake: userData.intake || null,
+          gender: userData.gender || null,
+          dateBirth: userData.dateBirth ? dayjs(userData.dateBirth) : null,
           username: userData.username || '',
-          fullName: userData.fullName || '',
-          imageUrl: userData.imageUrl || null,
         }
-
-        setInitialData(formattedData)
-        setPreviewUrl(formattedData.imageUrl)
-        reset(formattedData)
+        reset(formattedDataForForm)
       } catch (error) {
         toast.error('Không thể tải thông tin tài khoản.')
       } finally {
@@ -77,7 +80,7 @@ const AccountPage = () => {
     const file = e.target.files[0]
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Chỉ cho phép hình ảnh PNG, JPG, JPEG, WEBP hoặc GIF')
+        toast.error('Chỉ cho phép hình ảnh.')
         return
       }
       setImageFile(file)
@@ -87,35 +90,34 @@ const AccountPage = () => {
       }
     }
   }
+
   const handleCancelEdit = () => {
-    reset(initialData)
+    const formattedDataForForm = {
+      lastName: initialData.lastName || '',
+      firstName: initialData.firstName || '',
+      studentCode: initialData.studentCode || '',
+      email: initialData.email || '',
+      phoneNumber: initialData.phoneNumber || '',
+      intake: initialData.intake || null,
+      gender: initialData.gender || null,
+      dateBirth: initialData.dateBirth ? dayjs(initialData.dateBirth) : null,
+      username: initialData.username || '',
+    }
+    reset(formattedDataForForm)
     setPreviewUrl(initialData.imageUrl)
     setImageFile(null)
     setIsEditingPersonal(false)
   }
-  useOnClickOutside([formRef, imageUploadRef], () => {
-    if (isEditingPersonal) handleCancelEdit()
-  })
 
   const onSubmit = async (data) => {
-    if (!isDirty && !imageFile) {
-      toast.error('Không có thay đổi nào để lưu.')
-      setIsEditingPersonal(false)
-      return
-    }
-
     const updateToast = toast.loading('Đang cập nhật thông tin...')
-    const payload = { ...data }
-
-    if (payload.dateBirth instanceof Date) {
-      payload.dateBirth = formatDateForAPI(payload.dateBirth)
-    } else if (!payload.dateBirth) {
-      payload.dateBirth = null
+    const payload = {
+      ...data,
+      dateBirth: data.dateBirth ? data.dateBirth.format(API_DATE_FORMAT) : null,
     }
 
     const formData = new FormData()
     formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
-
     if (imageFile) {
       formData.append('image', imageFile)
     }
@@ -124,23 +126,20 @@ const AccountPage = () => {
       const response = await updateUser(user.id, formData)
       const updatedUserData = response.data
 
-      const formattedData = {
+      setInitialData(updatedUserData)
+      setPreviewUrl(updatedUserData.imageUrl)
+      const formattedDataForForm = {
         lastName: updatedUserData.lastName || '',
         firstName: updatedUserData.firstName || '',
         studentCode: updatedUserData.studentCode || '',
         email: updatedUserData.email || '',
         phoneNumber: updatedUserData.phoneNumber || '',
-        intake: updatedUserData.intake || '',
-        gender: updatedUserData.gender || '',
-        dateBirth: updatedUserData.dateBirth,
+        intake: updatedUserData.intake || null,
+        gender: updatedUserData.gender || null,
+        dateBirth: updatedUserData.dateBirth ? dayjs(updatedUserData.dateBirth) : null,
         username: updatedUserData.username || '',
-        fullName: updatedUserData.fullName || '',
-        imageUrl: updatedUserData.imageUrl || null,
       }
-
-      setInitialData(formattedData)
-      setPreviewUrl(formattedData.imageUrl)
-      reset(formattedData)
+      reset(formattedDataForForm)
       saveUser({ ...user, fullName: updatedUserData.fullName, imageUrl: updatedUserData.imageUrl })
       setIsEditingPersonal(false)
       setImageFile(null)
@@ -153,7 +152,8 @@ const AccountPage = () => {
     }
   }
 
-  if (loading) return <div>Đang tải...</div>
+  if (loading) return <TextMessage />
+  if (!initialData) return <TextMessage text='Không tìm thấy người dùng.' />
 
   const displayName = getDisplayName(initialData)
 
@@ -166,8 +166,7 @@ const AccountPage = () => {
       <div className='account__user'>
         <div
           className='account__user__img'
-          onClick={() => isEditingPersonal && fileInputRef.current.click()}
-          ref={imageUploadRef}>
+          onClick={() => isEditingPersonal && fileInputRef.current.click()}>
           <img
             src={previewUrl || placeholderImage}
             alt='User Avatar'
@@ -191,16 +190,24 @@ const AccountPage = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className='account__information' ref={formRef}>
+        <div className='account__information'>
           <div className='account__information__fix'>
             <h5>Thông tin cá nhân</h5>
             {isEditingPersonal ? (
-              <button type='submit' className='edit-button save'>
-                Lưu
-              </button>
+              <div className='account__button'>
+                <button
+                  type='submit'
+                  className='edit-button save'
+                  disabled={isSubmitting || (!isDirty && !imageFile)}>
+                  {isSubmitting ? 'Đang lưu...' : 'Lưu'}
+                </button>
+                <button type='button' className='edit-button cancel' onClick={handleCancelEdit}>
+                  Hủy
+                </button>
+              </div>
             ) : (
-              <span onClick={() => setIsEditingPersonal(true)} className='edit-span'>
-                <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
+              <span onClick={() => setIsEditingPersonal(true)} className='edit-span flex gap-1'>
+                <Icon icon='iconamoon:edit-fill' width='20' height='20' /> <p>Chỉnh sửa</p>
               </span>
             )}
           </div>
@@ -210,59 +217,104 @@ const AccountPage = () => {
               {isEditingPersonal ? (
                 <input type='text' {...register('firstName')} className='edit-input' />
               ) : (
-                <span>{initialData.firstName || 'N/A'}</span>
+                <span>{initialData.firstName || 'Trống'}</span>
               )}
-              {errors.firstName && <span className='error-message'>{errors.firstName.message}</span>}
+              {errors.firstName && (
+                <span className='error-message'>{errors.firstName.message}</span>
+              )}
             </div>
             <div className='account__info-item'>
               <span>Tên</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('lastName')} className='edit-input' />
               ) : (
-                <span>{initialData.lastName || 'N/A'}</span>
+                <span>{initialData.lastName || 'Trống'}</span>
               )}
               {errors.lastName && <span className='error-message'>{errors.lastName.message}</span>}
+            </div>
+            <div className='account__info-item'>
+              <span>Khóa</span>
+              {isEditingPersonal ? (
+                <Controller
+                  name='intake'
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Select
+                        {...field}
+                        value={field.value === null ? undefined : field.value}
+                        placeholder='Chọn khóa'
+                        options={intakeSelectOptions}
+                        status={error ? 'error' : ''}
+                        className='ant-select-custom'
+                      />
+                      {error && <p className='error-message'>{error.message}</p>}
+                    </>
+                  )}
+                />
+              ) : (
+                <span>{initialData.intake || 'Trống'}</span>
+              )}
             </div>
             <div className='account__info-item'>
               <span>Tên tài khoản</span>
               {isEditingPersonal ? (
                 <input type='text' {...register('username')} className='edit-input' />
               ) : (
-                <span>{initialData.username || 'N/A'}</span>
+                <span>{initialData.username || 'Trống'}</span>
               )}
               {errors.username && <span className='error-message'>{errors.username.message}</span>}
             </div>
-            <div className='account__info-item'>
-              <span>Khóa</span>
-              {isEditingPersonal ? (
-                <input type='text' {...register('intake')} className='edit-input' />
-              ) : (
-                <span>{initialData.intake || 'N/A'}</span>
-              )}
-              {errors.intake && <span className='error-message'>{errors.intake.message}</span>}
-            </div>
+
             <div className='account__info-item'>
               <span>Giới tính</span>
               {isEditingPersonal ? (
-                <select {...register('gender')} className='edit-input'>
-                  <option value='MALE'>Nam</option>
-                  <option value='FEMALE'>Nữ</option>
-                  <option value='OTHER'>Khác</option>
-                </select>
+                <Controller
+                  name='gender'
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <Select
+                        {...field}
+                        value={field.value === null ? undefined : field.value}
+                        placeholder='Chọn giới tính'
+                        options={[
+                          { value: 'MALE', label: 'Nam' },
+                          { value: 'FEMALE', label: 'Nữ' },
+                          { value: 'OTHER', label: 'Khác' },
+                        ]}
+                        status={error ? 'error' : ''}
+                        className='ant-select-custom'
+                      />
+                      {error && <p className='error-message'>{error.message}</p>}
+                    </>
+                  )}
+                />
               ) : (
                 <span>{translateGender(initialData.gender)}</span>
               )}
-              {errors.gender && <span className='error-message'>{errors.gender.message}</span>}
             </div>
             <div className='account__info-item'>
               <span>Ngày sinh</span>
               {isEditingPersonal ? (
-                <input type='date' {...register('dateBirth')} className='edit-input' />
+                <Controller
+                  name='dateBirth'
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <DatePicker
+                        {...field}
+                        format={DISPLAY_DATE_FORMAT}
+                        placeholder='Chọn ngày sinh'
+                        className='ant-picker-custom'
+                        status={error ? 'error' : ''}
+                      />
+                      {error && <p className='error-message'>{error.message}</p>}
+                    </>
+                  )}
+                />
               ) : (
-                <span>{initialData.dateBirth ? formatDate(initialData.dateBirth) : 'N/A'}</span>
-              )}
-              {errors.dateBirth && (
-                <span className='error-message'>{errors.dateBirth.message}</span>
+                <span>{initialData.dateBirth ? formatDate(initialData.dateBirth) : 'Trống'}</span>
               )}
             </div>
             <div className='account__info-item'>
@@ -270,7 +322,7 @@ const AccountPage = () => {
               {isEditingPersonal ? (
                 <input type='text' {...register('email')} className='edit-input' />
               ) : (
-                <span>{initialData.email || 'N/A'}</span>
+                <span>{initialData.email || 'Trống'}</span>
               )}
               {errors.email && <span className='error-message'>{errors.email.message}</span>}
             </div>
@@ -279,7 +331,7 @@ const AccountPage = () => {
               {isEditingPersonal ? (
                 <input type='text' {...register('phoneNumber')} className='edit-input' />
               ) : (
-                <span>{initialData.phoneNumber || 'N/A'}</span>
+                <span>{initialData.phoneNumber || 'Trống'}</span>
               )}
               {errors.phoneNumber && (
                 <span className='error-message'>{errors.phoneNumber.message}</span>
@@ -290,7 +342,7 @@ const AccountPage = () => {
               {isEditingPersonal ? (
                 <input type='text' {...register('studentCode')} className='edit-input' />
               ) : (
-                <span>{initialData.studentCode || 'N/A'}</span>
+                <span>{initialData.studentCode || 'Trống'}</span>
               )}
               {errors.studentCode && (
                 <span className='error-message'>{errors.studentCode.message}</span>
@@ -303,8 +355,8 @@ const AccountPage = () => {
       <div className='account__taikhoan'>
         <div className='account__taikhoan__fix'>
           <h4>Thông tin tài khoản</h4>
-          <span onClick={() => setShowPasswordPopup(true)} className='edit-span'>
-            <Icon icon='iconamoon:edit-fill' width='20' height='20' /> Chỉnh sửa
+          <span onClick={() => setShowPasswordPopup(true)} className='edit-span flex gap-1'>
+            <Icon icon='iconamoon:edit-fill' width='20' height='20' /> <p>Chỉnh sửa</p>
           </span>
         </div>
         <div className='account__taikhoan__context'>

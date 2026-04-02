@@ -6,13 +6,12 @@ $background-light: #ffefe4;
 
 .main-class-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
   padding: 0 1rem;
-  border-radius: 10px;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 50px);
   gap: 5px;
   overflow-y: auto;
   &::-webkit-scrollbar {
@@ -22,7 +21,7 @@ $background-light: #ffefe4;
   -ms-overflow-style: none;
   &__header {
     display: flex;
-    margin-top: .5rem;
+    margin-top: 0.5rem;
     gap: 3rem;
     align-items: center;
   }

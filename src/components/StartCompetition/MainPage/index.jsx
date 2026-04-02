@@ -1,324 +1,103 @@
-// import React from 'react'
-// import { Icon } from '@iconify/react'
-// import { useNavigate } from 'react-router-dom'
-// import { getAllCompetitions } from '../../../apis/competition.api'
-// import './style.scss'
-
-// const MainCompetition = () => {
-//   const navigate = useNavigate()
-//   const contests = [
-//     {
-//       id: 1,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 3,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 4,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 5,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 6,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 7,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//     {
-//       id: 8,
-//       name: 'HIT Contest Series 2025',
-//       startDate: '14/07/2025',
-//       status: 'Đang diễn ra',
-//     },
-//   ]
-
-//   return (
-//     <div className='competition'>
-//       <div className='competition__left'>
-//         <div className='competition__left__title'>
-//           <Icon
-//             icon='streamline-ultimate:ranking-stars-ribbon-bold'
-//             width='30'
-//             height='30'
-//             className='competition__left__title__icon'
-//           />
-//           <h2>Cuộc thi</h2>
-//         </div>
-//         <div className='competition__left__board'>
-//           <i className='fa-solid fa-circle-info board'></i>
-//         </div>
-//         <div className='competition__left__bang'>
-//           {contests.map((contest) => (
-//             <div className='competition__left__bang__box' key={contest.id}>
-//               <div className='competition__left__bang__box__board'></div>
-//               <div className='competition__left__bang__box__information'>
-//                 <h4>{contest.name}</h4>
-//                 <div className='competition__left__bang__box__information__list'>
-//                   <span className='competition__left__bang__box__information__list__span1'>
-//                     {contest.status}
-//                   </span>
-//                   <span
-//                     className={
-//                       contest.id % 2 == 0
-//                         ? 'competition__left__bang__box__information__list__span2'
-//                         : 'competition__left__bang__box__information__list__span3'
-//                     }>
-//                     {contest.id % 2 == 0 ? 'Đăng ký' : 'Đã đăng ký'}
-//                   </span>
-//                   <i className='fa-solid fa-circle-info'></i>
-//                 </div>
-//                 <p>Ngày bắt đầu: {contest.startDate}</p>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//       <div className='competition__among'></div>
-//       <div className='competition__right'>
-//         <h2>Bạn đang tham gia</h2>
-//         <div className='competition__right__body'>
-//           <div
-//             className='competition__right__body__board'
-//             onClick={() => navigate('/competition/information')}>
-//             <i className='fa-solid fa-circle-info'></i>
-//           </div>
-//           <hr />
-//         </div>
-//         <h3>Giới thiệu</h3>
-//         <div className='competition__right__text'>
-//           <span>text...</span>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default MainCompetition
-
-// import React, { useState, useEffect, useCallback } from 'react'
-// import { Icon } from '@iconify/react'
-// import { useNavigate } from 'react-router-dom'
-// import toast from 'react-hot-toast'
-
-// // --- Core Tools ---
-// import { getAllCompetitions } from '../../../apis/competition.api' // Correct import
-// import { formatDate, translateStatus } from '../../../utils/formatters'
-
-// // --- Styles ---
-// import './style.scss'
-
-// const MainCompetition = () => {
-//   const navigate = useNavigate()
-//   const [competitions, setCompetitions] = useState([])
-//   const [loading, setLoading] = useState(true)
-
-//   // --- Data Fetching using API Service ---
-//   const fetchCompetitions = useCallback(async () => {
-//     try {
-//       setLoading(true)
-//       // Define the parameters to send to the API
-//       const params = {
-//         pageNum: 1,
-//         pageSize: 10,
-//         sortBy: 'startTime',
-//         isAscending: false, // false for DESC to get newest first
-//       }
-
-//       const response = await getAllCompetitions(params)
-
-//       // The interceptor ensures `response` is { status, data: { meta, items } }
-//       // We need to access the inner `data` object.
-//       setCompetitions(response.data?.items || [])
-//     } catch (error) {
-//       if (error.response?.data?.message) {
-//         toast.error(error.response.data.message)
-//       } else {
-//         toast.error('Có lỗi xảy ra khi tải danh sách cuộc thi.')
-//       }
-//     } finally {
-//       setLoading(false)
-//     }
-//   }, []) // useCallback has no dependencies here
-
-//   useEffect(() => {
-//     fetchCompetitions()
-//   }, [fetchCompetitions])
-
-//   return (
-//     <div className='competition'>
-//       <div className='competition__left'>
-//         <div className='competition__left__title'>
-//           <Icon
-//             icon='streamline-ultimate:ranking-stars-ribbon-bold'
-//             width='30'
-//             height='30'
-//             className='competition__left__title__icon'
-//           />
-//           <h2>Cuộc thi</h2>
-//         </div>
-//         <div className='competition__left__board'>
-//           <i className='fa-solid fa-circle-info board'></i>
-//         </div>
-//         <div className='competition__left__bang'>
-//           {loading && <p style={{ padding: '1rem' }}>Đang tải các cuộc thi...</p>}
-//           {!loading && competitions.length === 0 && (
-//             <p style={{ padding: '1rem' }}>Chưa có cuộc thi nào.</p>
-//           )}
-//           {!loading &&
-//             competitions.map((contest) => (
-//               <div className='competition__left__bang__box' key={contest.id}>
-//                 <div className='competition__left__bang__box__board'>
-//                   {contest.image && <img src={contest.image} alt={contest.name} />}
-//                 </div>
-//                 <div className='competition__left__bang__box__information'>
-//                   <h4>{contest.name}</h4>
-//                   <div className='competition__left__bang__box__information__list'>
-//                     <span className='competition__left__bang__box__information__list__span1'>
-//                       {translateStatus(contest.status)}
-//                     </span>
-//                     {/* This "Đăng ký" status will need to be driven by real data later */}
-//                     <span className='competition__left__bang__box__information__list__span2'>
-//                       Đăng ký
-//                     </span>
-//                     <i className='fa-solid fa-circle-info'></i>
-//                   </div>
-//                   <p>Ngày bắt đầu: {formatDate(contest.startTime)}</p>
-//                 </div>
-//               </div>
-//             ))}
-//         </div>
-//       </div>
-//       <div className='competition__among'></div>
-//       <div className='competition__right'>
-//         <h2>Bạn đang tham gia</h2>
-//         <div className='competition__right__body'>
-//           <div
-//             className='competition__right__body__board'
-//             onClick={() => navigate('/competition/information')}>
-//             <i className='fa-solid fa-circle-info'></i>
-//           </div>
-//           <hr />
-//         </div>
-//         <h3>Giới thiệu</h3>
-//         <div className='competition__right__text'>
-//           <span>text...</span>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default MainCompetition
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useInfiniteQuery, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Skeleton } from 'antd' // <-- Imported Skeleton
 import { getAllCompetitions } from '../../../apis/competition.api'
-import { joinCompetition } from '../../../apis/competitionUser.api'
+import { registerCompetition } from '../../../apis/competitionUser.api'
 import { getMyCompetitions } from '../../../apis/user.api'
-import { formatDate, translateStatus } from '../../../utils/formatters'
+import { formatDate, safeParse, translateStatus } from '../../../utils/formatters'
 import LoadMoreButton from '../../LoadMoreButton'
 import EndOfListMessage from '../../EndOfListMessage'
 import './style.scss'
+import TextMessage from 'components/TextMessage'
+import TiptapEditor from 'components/TiptapEditor'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
 
 const MainCompetition = () => {
   const navigate = useNavigate()
-  const [competitions, setCompetitions] = useState([])
-  const [myCompetitions, setMyCompetitions] = useState([]) // 👈 State for joined competitions
-  const [pagination, setPagination] = useState({ pageNum: 1, totalPages: 1, totalElements: 0 })
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [joinLoading, setJoinLoading] = useState(null)
+  const queryClient = useQueryClient()
+  const [searchParams] = useSearchParams()
+  const globalSearch = searchParams.get('q') || ''
+  const [loadingId, setLoadingId] = useState(null)
 
-  const fetchCompetitions = useCallback(async (page, isLoadMore = false) => {
-    isLoadMore ? setLoadingMore(true) : setLoading(true)
-    try {
-      const params = { pageNum: page, pageSize: 10, sortBy: 'startTime', isAscending: false }
-      const [allCompetitionsResponse, myCompetitionsResponse] = await Promise.all([
-        getAllCompetitions(params),
-        getMyCompetitions(),
-      ])
+  const listParams = { sortBy: 'startTime', isAscending: false, keyword: globalSearch }
+  const myParams = { status: 'ONGOING' }
 
-      const allContent = allCompetitionsResponse.data
-      const myContent = myCompetitionsResponse.data
-
-      if (allContent && allContent.items) {
-        if (isLoadMore) {
-          setCompetitions((prev) => [...prev, ...allContent.items])
-        } else {
-          setCompetitions(allContent.items)
-        }
+  const {
+    data: competitionsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: isLoadingCompetitions,
+    error: competitionsError,
+  } = useInfiniteQuery({
+    queryKey: ['competitions', 'list', listParams],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await getAllCompetitions({ ...listParams, pageNum: pageParam })
+      return response.data
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.meta.pageNum < lastPage.meta.totalPages) {
+        return lastPage.meta.pageNum + 1
       }
-      if (allContent && allContent.meta) {
-        setPagination({
-          pageNum: allContent.meta.pageNum,
-          totalPages: allContent.meta.totalPages,
-          totalElements: allContent.meta.totalElements,
-        })
-      }
-      if (myContent && myContent.items) {
-        setMyCompetitions(myContent.items)
-      }
-    } catch (error) {
-      if (error.response?.data?.message) toast.error(error.response.data.message)
-      else toast.error('Có lỗi xảy ra khi tải danh sách cuộc thi.')
-    } finally {
-      isLoadMore ? setLoadingMore(false) : setLoading(false)
-    }
-  }, [])
+      return undefined
+    },
+  })
 
-  useEffect(() => {
-    fetchCompetitions(1)
-  }, [fetchCompetitions])
+  const { data: myCompetitions = [], isLoading: isLoadingMyCompetitions } = useQuery({
+    queryKey: ['competitions', 'my', myParams],
+    queryFn: async () => {
+      const response = await getMyCompetitions(myParams)
+      return response.data
+    },
+  })
 
-  const handleJoinCompetition = async (competitionId, event) => {
-    event.stopPropagation()
-    setJoinLoading(competitionId)
-    try {
-      const payload = { competitionId: competitionId }
-      await joinCompetition(payload)
+  const mutation = useMutation({
+    mutationFn: (competitionId) => registerCompetition(competitionId),
+    onMutate: (id) => setLoadingId(id),
+    onSuccess: () => {
       toast.success('Đăng ký tham gia thành công!')
-      // After successfully joining, refetch all data to update both lists
-      await fetchCompetitions(1)
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ['competitions'] })
+    },
+    onError: (error) => {
       if (error.response?.data?.message) {
         toast.error(error.response.data.message)
       } else {
         toast.error('Có lỗi xảy ra khi đăng ký.')
       }
-    } finally {
-      setJoinLoading(null)
+    },
+    onSettled: () => setLoadingId(null),
+  })
+
+  const handleButtonClick = (e, contest) => {
+    e.stopPropagation()
+    if (contest.status === 'COMPLETED') return
+
+    if (contest.isRegistered) {
+      navigate(`/competitions/${contest.id}`)
+    } else {
+      mutation.mutate(contest.id)
     }
   }
 
-  const handleLoadMore = () => {
-    const nextPage = pagination.pageNum + 1
-    fetchCompetitions(nextPage, true)
-  }
+  const competitions = competitionsData?.pages.flatMap((page) => page.items) || []
+  const firstMyCompetition = myCompetitions[0]
 
-  const hasMore = pagination.pageNum < pagination.totalPages
+  if (competitionsError) {
+    return (
+      <ApiErrorDisplay
+        title='Lỗi tải dữ liệu'
+        subTitle='Không thể tải danh sách cuộc thi. Vui lòng thử lại.'
+      />
+    )
+  }
 
   return (
     <div className='competition'>
+      {/* ================= LEFT SECTION ================= */}
       <div className='competition__left'>
         <div className='competition__left__title'>
           <Icon
@@ -329,17 +108,41 @@ const MainCompetition = () => {
           />
           <h2>Cuộc thi</h2>
         </div>
+
+        {/* HERO IMAGE */}
         <div className='competition__left__board'>
+          {isLoadingCompetitions ? (
+            <Skeleton.Node active style={{ width: '100%', height: '250px' }}>
+              <Icon icon='lucide:image' color='#bfbfbf' width='40' height='40' />
+            </Skeleton.Node>
+          ) : competitions[0]?.image ? (
+            <img src={competitions[0]?.image} alt={competitions[0]?.name} />
+          ) : null}
           <i className='fa-solid fa-circle-info board'></i>
         </div>
-        <div className='competition__left__bang'>
-          {loading && <p style={{ padding: '1rem' }}>Đang tải các cuộc thi...</p>}
 
-          {!loading && competitions.length === 0 && (
-            <p style={{ padding: '1rem' }}>Chưa có cuộc thi nào.</p>
+        <div className='competition__left__bang'>
+          {isLoadingCompetitions &&
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div className='competition__left__bang__box' key={`skeleton-${idx}`}>
+                <div className='competition__left__bang__box__board'>
+                  <Skeleton.Image active style={{ width: '300px', height: '100px' }} />
+                </div>
+                <div className='competition__left__bang__box__information w-full py-2 flex flex-col justify-center'>
+                  <Skeleton
+                    active
+                    title={{ width: '80%' }}
+                    paragraph={{ rows: 2, width: ['40%', '60%'] }}
+                  />
+                </div>
+              </div>
+            ))}
+
+          {!isLoadingCompetitions && competitions.length === 0 && (
+            <TextMessage text={'Chưa có cuộc thi nào.'}></TextMessage>
           )}
 
-          {!loading &&
+          {!isLoadingCompetitions &&
             competitions.map((contest) => (
               <div
                 className='competition__left__bang__box'
@@ -349,64 +152,90 @@ const MainCompetition = () => {
                   {contest.image && <img src={contest.image} alt={contest.name} />}
                 </div>
                 <div className='competition__left__bang__box__information'>
-                  <h4>{contest.name}</h4>
-                  <div className='competition__left__bang__box__information__list'>
-                    <span className='competition__left__bang__box__information__list__span1'>
+                  <h4 className='font-semibold text-xl'>{contest.name}</h4>
+                  <div className='competition__left__bang__box__information__list items-center'>
+                    <span className='competition__left__bang__box__information__list__span1 text-lg my-1 rounded-md px-1'>
                       {translateStatus(contest.status)}
                     </span>
                     <button
-                      className='competition__left__bang__box__information__list__span2'
-                      onClick={(e) => handleJoinCompetition(contest.id, e)}
-                      disabled={
-                        joinLoading === contest.id ||
-                        myCompetitions.some((mc) => mc.id === contest.id)
-                      }>
-                      {joinLoading === contest.id
+                      className={`competition__left__bang__box__information__list__span2 py-1 font-semibold ${
+                        contest.status === 'COMPLETED' ? '!bg-[#828282]' : ''
+                      }`}
+                      onClick={(e) => handleButtonClick(e, contest)}
+                      disabled={loadingId === contest.id || contest.status === 'COMPLETED'}>
+                      {loadingId === contest.id
                         ? 'Đang xử lý...'
-                        : myCompetitions.some((mc) => mc.id === contest.id)
-                        ? 'Đã tham gia'
+                        : contest.status === 'COMPLETED'
+                        ? 'Kết thúc'
+                        : contest.isRegistered
+                        ? 'Làm bài'
                         : 'Đăng ký'}
                     </button>
-                    <i className='fa-solid fa-circle-info'></i>
+                    <i className='fa-solid fa-circle-info '></i>
                   </div>
                   <p>Ngày bắt đầu: {formatDate(contest.startTime)}</p>
                 </div>
               </div>
             ))}
 
-          <LoadMoreButton isLoading={loadingMore} hasMore={hasMore} onClick={handleLoadMore} />
-          <EndOfListMessage
-            isLoading={loading}
-            hasMore={hasMore}
-            itemCount={competitions.length}
-            itemName='cuộc thi'
-          />
+          {!isLoadingCompetitions && competitions.length > 0 && (
+            <>
+              <LoadMoreButton
+                isLoading={isFetchingNextPage}
+                hasMore={hasNextPage}
+                onClick={() => fetchNextPage()}
+              />
+              <EndOfListMessage
+                isLoading={isLoadingCompetitions}
+                hasMore={hasNextPage}
+                itemCount={competitions.length}
+                itemName='cuộc thi'
+              />
+            </>
+          )}
         </div>
       </div>
+
       <div className='competition__among'></div>
+
+      {/* ================= RIGHT SECTION ================= */}
       <div className='competition__right'>
         <h2>Bạn đang tham gia</h2>
         <div className='competition__right__body'>
-          {loading ? (
-            <p>Đang tải...</p>
+          {isLoadingMyCompetitions ? (
+            <div className='competition__right__body__board'>
+              <Skeleton.Image active style={{ width: '100%', height: '120px' }} />
+            </div>
           ) : myCompetitions.length > 0 ? (
-            myCompetitions.map((contest) => (
-              <div
-                key={contest.id}
-                className='competition__right__body__board'
-                onClick={() => navigate(`/competitions/${contest.id}`)}>
-                <i className='fa-solid fa-circle-info'></i>
-                <span>{contest.name}</span>
-              </div>
-            ))
+            <div
+              className={`competition__right__body__board ${
+                !firstMyCompetition?.image && '!bg-[#ccc]'
+              }`}
+              onClick={() => navigate(`/competitions/${firstMyCompetition?.id}`)}>
+              {firstMyCompetition?.image ? (
+                <img src={firstMyCompetition.image} alt={firstMyCompetition.name} />
+              ) : (
+                <h1 className='text-xl'>{firstMyCompetition?.name}</h1>
+              )}
+            </div>
           ) : (
-            <p>Bạn chưa tham gia cuộc thi nào.</p>
+            <TextMessage text='Bạn chưa tham gia cuộc thi nào.'></TextMessage>
           )}
           <hr />
         </div>
+
         <h3>Giới thiệu</h3>
-        <div className='competition__right__text'>
-          <span>text...</span>
+        <div>
+          {isLoadingMyCompetitions ? (
+            <Skeleton active title={false} paragraph={{ rows: 6 }} className='mt-4' />
+          ) : firstMyCompetition?.description ? (
+            <TiptapEditor
+              value={safeParse(firstMyCompetition.description)}
+              editable={false}
+              editorClassName='!rounded-lg'></TiptapEditor>
+          ) : (
+            <TextMessage text='Chưa có giới thiệu.'></TextMessage>
+          )}
         </div>
       </div>
     </div>

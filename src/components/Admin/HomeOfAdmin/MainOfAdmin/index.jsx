@@ -1,70 +1,94 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+// --- NEW: Import useSearchParams ---
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllUsers } from '../../../../apis/user.api'
-import './style.scss'
 import placeHolderImage from '../../../../assets/img/Ellipse.png'
 import { getDisplayName } from '../../../../utils/formatters'
+import EndOfListMessage from '../../../EndOfListMessage'
+import TextMessage from '../../../TextMessage'
+import LoadMoreButton from '../../../LoadMoreButton'
+import useDebounce from '../../../../hooks/useDebounce'
+import useOnClickOutside from '../../../../hooks/useOnClickOutside'
+import { roleFilterOptions, PAGE_SIZE } from '../../../../constants/commonConstant'
+import './style.scss'
 
-const classOptions = ['ALL', 'USER', 'LEADER', 'ADMIN']
 const MainOfAdmin = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedRole, setSelectedRole] = useState(() => searchParams.get('role') || 'Tất cả')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [users, setUsers] = useState([])
+  const [totalElements, setTotalElements] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [selectedClass, setSelectedClass] = useState('ALL')
+  const [loadingMore, setLoadingMore] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const dropdownRef = useRef(null)
-
+  useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true)
-        const response = await getAllUsers()
-        setUsers(response.data || [])
-      } catch (error) {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message)
-        } else {
-          toast.error('Có lỗi xảy ra khi tải danh sách thành viên.')
-        }
-      } finally {
-        setLoading(false)
-      }
+    const newParams = new URLSearchParams()
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
     }
-    fetchUsers()
-  }, [])
+    if (selectedRole && selectedRole !== 'Tất cả') {
+      newParams.set('role', selectedRole)
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [selectedRole, debouncedSearchQuery, setSearchParams])
 
-  const filteredUsers = useMemo(() => {
-    let filtered = [...users]
-    if (selectedClass !== 'ALL') {
-      filtered = filtered.filter((user) => user.role === selectedClass)
+  const fetchUsers = useCallback(
+    async (page, isLoadMore = false) => {
+      if (isLoadMore) setLoadingMore(true)
+      else setLoading(true)
+
+      try {
+        const params = {
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+          keyword: searchParams.get('keyword') || null,
+          role: searchParams.get('role') || null,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
+
+        const response = await getAllUsers(filteredParams)
+        const { items = [], meta } = response.data || {}
+
+        setUsers((prev) => (isLoadMore ? [...prev, ...items] : items))
+        if (meta) {
+          setTotalElements(meta.totalElements)
+          setCurrentPage(meta.pageNum)
+          setHasMore(meta.pageNum < meta.totalPages)
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách thành viên.')
+      } finally {
+        if (isLoadMore) setLoadingMore(false)
+        else setLoading(false)
+      }
+    },
+    [searchParams],
+  )
+  useEffect(() => {
+    setCurrentPage(1)
+    fetchUsers(1, false)
+  }, [fetchUsers]) 
+
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      const nextPage = currentPage + 1
+      fetchUsers(nextPage, true)
     }
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        (user) =>
-          user.fullName?.toLowerCase().includes(lowercasedQuery) ||
-          user.studentCode?.includes(lowercasedQuery),
-      )
-    }
-    return filtered
-  }, [users, selectedClass, searchQuery])
-  const handleSelect = (item) => {
-    setSelectedClass(item)
+  }
+  const handleSelectRole = (role) => {
+    setSelectedRole(role)
     setIsDropdownOpen(false)
   }
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   return (
     <div className='main-admin'>
@@ -82,9 +106,7 @@ const MainOfAdmin = () => {
             height='28'
             className='main-admin__title__choose__icon'
           />
-          <div className='main-admin__title__choose__label'>
-            {selectedClass === 'ALL' ? 'Tất cả' : selectedClass}
-          </div>
+          <div className='main-admin__title__choose__label'>{selectedRole}</div>
           <Icon
             icon='mdi:chevron-down'
             width='20'
@@ -93,12 +115,12 @@ const MainOfAdmin = () => {
           />
           {isDropdownOpen && (
             <div className='main-admin__title__choose__dropdown'>
-              {classOptions.map((item, index) => (
+              {roleFilterOptions.map((item, index) => (
                 <div
                   key={index}
                   className='main-admin__title__choose__dropdown__item'
-                  onClick={() => handleSelect(item)}>
-                  {item === 'ALL' ? 'Tất cả' : item}
+                  onClick={() => handleSelectRole(item)}>
+                  {item}
                 </div>
               ))}
             </div>
@@ -121,7 +143,7 @@ const MainOfAdmin = () => {
         </button>
       </div>
       <h2>Danh sách thành viên </h2>
-      <h3>Số lượng thành viên: {loading ? '...' : filteredUsers.length}</h3>
+      <h3>Số lượng thành viên: {loading ? '...' : totalElements}</h3>
       <div className='main-admin__context'>
         <div className='main-admin__context__table__tbody-wrapper'>
           <table className='main-admin__context__table'>
@@ -136,18 +158,17 @@ const MainOfAdmin = () => {
               </tr>
             </thead>
             <tbody className='main-admin__context__table__tbody'>
-              {loading && (
+              {loading ? (
                 <tr>
-                  <td colSpan='6' style={{ textAlign: 'center', padding: '2rem' }}>
+                  <td colSpan='6' className='loading-message'>
                     Đang tải...
-                  </td>
+                  </td> 
                 </tr>
-              )}
-              {!loading &&
-                filteredUsers.map((user, index) => (
+              ) : users.length > 0 ? (
+                users.map((user, index) => (
                   <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)}>
                     <td className='tbody'>
-                      <h4>{index + 1}</h4>
+                      <h4>{index+1}</h4>
                     </td>
                     <td>{getDisplayName(user)}</td>
                     <td>{user.role}</td>
@@ -157,11 +178,25 @@ const MainOfAdmin = () => {
                       <img src={user.imageUrl || placeHolderImage} alt='Profile' />
                     </td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan='6'>
+                    <TextMessage text='Không tìm thấy thành viên nào.'></TextMessage>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
+      <LoadMoreButton hasMore={hasMore} isLoading={loadingMore} onClick={handleLoadMore} />
+      <EndOfListMessage
+        isLoading={loading}
+        hasMore={hasMore}
+        itemCount={users.length}
+        itemName='thành viên'
+      />
     </div>
   )
 }

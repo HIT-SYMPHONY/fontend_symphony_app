@@ -6,14 +6,13 @@ $background-light: #ffefe4;
 
 .account {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  height: calc(100vh - 50px);
+  gap: 5px;
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
@@ -21,10 +20,16 @@ $background-light: #ffefe4;
   scrollbar-width: none;
   -ms-overflow-style: none;
 
+  &__button {
+    display: flex;
+    gap: 1.5rem;
+  }
+
   &__symbol {
     display: flex;
     gap: 20px;
     align-items: center;
+    margin-top: 0.5rem;
     i {
       font-size: 24px;
       color: #ff6911;
@@ -102,13 +107,17 @@ $background-light: #ffefe4;
         margin: 0;
         font-size: 18px;
       }
-      button {
-        padding: 12px 36px;
+      .edit-button {
+        padding: 12px 1.5rem;
         font-weight: 600;
         border-radius: 8px;
         background-color: $primary-color;
         color: #ffffff;
         border: none;
+        transition: all .2s;
+        &:hover {
+          background-color: #cf772e;
+        }
       }
       .edit-span {
         cursor: pointer;
@@ -122,6 +131,7 @@ $background-light: #ffefe4;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: auto;
+      gap: 0rem 1rem;
     }
   }
 
@@ -153,7 +163,6 @@ $background-light: #ffefe4;
       flex-direction: column;
       .edit-input {
         padding: 10px;
-        width: 80%;
         border: none;
       }
       span:first-child {
@@ -176,10 +185,12 @@ $background-light: #ffefe4;
     span:last-child {
       font-weight: 600;
     }
+    div {
+      flex: 1;
+    }
 
     .edit-input {
       padding: 10px;
-      width: 80%;
       border: none;
     }
   }

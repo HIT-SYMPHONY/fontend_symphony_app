@@ -1,50 +1,77 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import { Select, TimePicker } from 'antd'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { lessonCreationSchema } from '../../../utils/lessonValidate.js'
 import { createLesson } from '../../../apis/lesson.api'
+import TiptapEditor from '../../TiptapEditor'
+import { DISPLAY_TIME_FORMAT, API_TIME_FORMAT } from 'constants/commonConstant.js'
 import './style.scss'
 
 const CreateLessonID = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
-  const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(lessonCreationSchema),
     defaultValues: {
       classRoomId: classId,
+      dayOfWeek: 'MONDAY',
     },
+    mode: 'onTouched',
   })
-
-  const onSubmit = async (data) => {
-    setLoading(true)
-    const creationToast = toast.loading('Đang tạo bài học...')
-    const payload = {
-      ...data,
-      startTime: data.startTime,
-      endTime: data.endTime,
-    }
-
-    try {
-      await createLesson(payload)
-      toast.success('Tạo bài học thành công!', { id: creationToast })
-    } catch (error) {
+  const createLessonMutation = useMutation({
+    mutationFn: createLesson,
+    onMutate: () => {
+      const toastId = toast.loading('Đang tạo bài học...')
+      return toastId
+    },
+    onSuccess: (data, variables, context) => {
+      toast.success('Tạo bài học thành công!', { id: context })
+      queryClient.invalidateQueries({ queryKey: ['lessons', classId] })
+      navigate(`/manage/classes/${classId}/lessons`)
+    },
+    onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo bài học.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
-        id: creationToast,
+        id: context,
       })
-    } finally {
-      setLoading(false)
+    },
+  })
+  const dayOfWeekOptions = useMemo(
+    () => [
+      { value: 'MONDAY', label: 'Thứ 2' },
+      { value: 'TUESDAY', label: 'Thứ 3' },
+      { value: 'WEDNESDAY', label: 'Thứ 4' },
+      { value: 'THURSDAY', label: 'Thứ 5' },
+      { value: 'FRIDAY', label: 'Thứ 6' },
+      { value: 'SATURDAY', label: 'Thứ 7' },
+      { value: 'SUNDAY', label: 'Chủ nhật' },
+    ],
+    [],
+  )
+
+  const onSubmit = (data) => {
+    const payload = {
+      ...data,
+      startTime: data.startTime ? data.startTime.format(API_TIME_FORMAT) : null,
+      endTime: data.endTime ? data.endTime.format(API_TIME_FORMAT) : null,
+      content: data.content ? JSON.stringify(data.content) : '',
     }
+    createLessonMutation.mutate(payload)
   }
+
+  const { isPending: isSubmitting } = createLessonMutation
 
   return (
     <div className='createlesson'>
@@ -88,46 +115,74 @@ const CreateLessonID = () => {
           <div className='createlesson__time'>
             <div className='createlesson__time-wrap'>
               <label htmlFor='startTime'>Thời gian bắt đầu</label>
-              <input type='time' id='startTime' {...register('startTime')} />
-              {errors.startTime && (
-                <span className='error-message'>{errors.startTime.message}</span>
-              )}
+              <Controller
+                name='startTime'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <TimePicker
+                      {...field}
+                      format={DISPLAY_TIME_FORMAT}
+                      placeholder='Chọn giờ'
+                      className='ant-picker-custom'
+                      status={error ? 'error' : ''}
+                    />
+                    {error && <span className='error-message'>{error.message}</span>}
+                  </>
+                )}
+              />
             </div>
             <div className='createlesson__time-wrap'>
               <label htmlFor='endTime'>Thời gian kết thúc</label>
-              <input type='time' id='endTime' {...register('endTime')} />
-              {errors.endTime && <span className='error-message'>{errors.endTime.message}</span>}
+              <Controller
+                name='endTime'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <TimePicker
+                      {...field}
+                      format={DISPLAY_TIME_FORMAT}
+                      placeholder='Chọn giờ'
+                      className='ant-picker-custom'
+                      status={error ? 'error' : ''}
+                    />
+                    {error && <span className='error-message'>{error.message}</span>}
+                  </>
+                )}
+              />
             </div>
             <div className='createlesson__time-wrap'>
               <label htmlFor='dayOfWeek'>Ngày học</label>
-              {/* Corrected id and name to match API */}
-              <select id='dayOfWeek' {...register('dayOfWeek')}>
-                <option value='MONDAY'>Thứ 2</option>
-                <option value='TUESDAY'>Thứ 3</option>
-                <option value='WEDNESDAY'>Thứ 4</option>
-                <option value='THURSDAY'>Thứ 5</option>
-                <option value='FRIDAY'>Thứ 6</option>
-                <option value='SATURDAY'>Thứ 7</option>
-                <option value='SUNDAY'>Chủ nhật</option>
-              </select>
-              {errors.dayOfWeek && (
-                <span className='error-message'>{errors.dayOfWeek.message}</span>
-              )}
+              <Controller
+                name='dayOfWeek'
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <Select
+                      {...field}
+                      options={dayOfWeekOptions}
+                      className='ant-select-custom'
+                      status={error ? 'error' : ''}
+                    />
+                    {error && <span className='error-message'>{error.message}</span>}
+                  </>
+                )}
+              />
             </div>
           </div>
           <label htmlFor='content'>Nội dung</label>
-          <textarea
-            id='content'
-            placeholder='Nhập nội dung...'
-            className='createlesson__context__textarea'
-            {...register('content')}></textarea>
-          {errors.content && <span className='error-message'>{errors.content.message}</span>}
+          <Controller
+            name='content'
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <TiptapEditor value={field.value} onChange={field.onChange} error={error} />
+            )}
+          />
         </div>
 
-        {/* The submit button is now INSIDE the form */}
         <div className='createlesson__end'>
-          <button type='submit' className='createlesson__end__submit' disabled={loading}>
-            {loading ? 'Đang lưu...' : 'Lưu'}
+          <button type='submit' className='createlesson__end__submit' disabled={isSubmitting}>
+            {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </button>
         </div>
       </form>

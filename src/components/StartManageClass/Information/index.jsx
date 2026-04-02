@@ -1,9 +1,19 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Icon } from '@iconify/react'
-import { Outlet, useParams, useNavigate, useLocation, useOutletContext } from 'react-router-dom'
-import toast from 'react-hot-toast'
-import useFetch from '../../../hooks/useFetch'
-import { ApiConstant } from '../../../constants/api.constant'
+import {
+  Outlet,
+  useParams,
+  useNavigate,
+  useLocation,
+  useOutletContext,
+  useSearchParams,
+} from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
+import { getClassroomById } from '../../../apis/classroom.api'
+import NavigationDropdown from '../../NavigationDropdown'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import useDebounce from 'hooks/useDebounce'
 import './style.scss'
 
 const InformationManage = () => {
@@ -11,64 +21,102 @@ const InformationManage = () => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const {
-    data: classroomResponse,
-    loading,
-    error,
-    refetch,
-  } = useFetch(classId ? `${ApiConstant.classrooms.getById}${classId}` : null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
 
   useEffect(() => {
-    if (error) {
-      toast.error(error.response?.data?.message || 'Không thể tải dữ liệu lớp học.')
-      navigate('/manage/classes')
-    }
-  }, [error, navigate])
+    setSearchParams(
+      (prevParams) => {
+        if (debouncedSearchQuery) {
+          prevParams.set('keyword', debouncedSearchQuery)
+        } else {
+          prevParams.delete('keyword')
+        }
+        return prevParams
+      },
+      { replace: true },
+    )
+  }, [debouncedSearchQuery, setSearchParams])
 
-  const getCurrentSection = useMemo(() => {
-    const path = location.pathname
-    if (path.includes('/notifications')) return 'notifications'
-    if (path.includes('/lessons')) return 'lessons'
-    if (path.includes('/tests')) return 'tests'
-    if (path.includes('/members')) return 'members'
-    return '' 
-  }, [location.pathname])
+  // React Query Fetching
+  const {
+    data: classroom,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['classroom', classId],
+    queryFn: async () => {
+      if (!classId) return null
+      const response = await getClassroomById(classId)
+      return response.data
+    },
+    enabled: !!classId,
+    refetchOnWindowFocus: false,
+  })
 
-  const createPath = useMemo(() => {
-    switch (getCurrentSection) {
-      case 'notifications':
-        return `/manage/classes/${classId}/notifications/create`
-      case 'lessons':
-        return `/manage/classes/${classId}/lessons/create`
-      case 'tests':
-        return `/manage/classes/${classId}/tests/create`
-      default:
-        return null
-    }
-  }, [getCurrentSection, classId])
-
-  const handleNavigation = (e) => {
-    const sectionPath = e.target.value
+  // Navigation Links
+  const linkOptions = useMemo(() => {
+    if (!classId) return []
     const basePath = `/manage/classes/${classId}`
-    navigate(sectionPath ? `${basePath}/${sectionPath}` : basePath)
-  }
+    return [
+      { option: 'Thông tin lớp học', link: basePath },
+      { option: 'Thông báo', link: `${basePath}/notifications` },
+      { option: 'Bài học', link: `${basePath}/lessons` },
+      { option: 'Bài tập / Kiểm Tra', link: `${basePath}/tests` },
+      { option: 'Danh sách sinh viên', link: `${basePath}/members` },
+    ]
+  }, [classId])
+
+  // Dynamic Create Path logic
+  const createPath = useMemo(() => {
+    const path = location.pathname
+    if (path.endsWith('/create')) return null
+    if (path.includes('/notifications')) return `/manage/classes/${classId}/notifications/create`
+    if (path.includes('/lessons')) return `/manage/classes/${classId}/lessons/create`
+    if (path.includes('/tests')) return `/manage/classes/${classId}/tests/create`
+    return null
+  }, [location.pathname, classId])
 
   const handleCreateClick = () => {
-    if (createPath) {
-      navigate(createPath)
-    }
+    if (createPath) navigate(createPath)
   }
 
-  if (loading) {
-    return <div style={{ padding: '2rem', textAlign: 'center' }}>Đang tải thông tin lớp học...</div>
+  const outletContext = useMemo(() => ({ classroom }), [classroom])
+
+  if (isError) {
+    return (
+      <ApiErrorDisplay
+        title='Không thể tải dữ liệu lớp học'
+        refetchQueries={[refetch]}
+        backUrl='/manage/classes'
+      />
+    )
   }
 
-  if (!classroomResponse?.data) {
-    return null
+  if (isLoading) {
+    return (
+      <div className='manage-infor'>
+        <div className='manage-infor__title flex gap-2 items-center mb-4'>
+          <Skeleton.Button active shape='circle' size='large' />
+          <Skeleton.Input active size='large' style={{ width: 300 }} />
+        </div>
+
+        <div className='manage-infor__search flex gap-4 mb-6'>
+          <Skeleton.Button active style={{ width: 40 }} />
+          <Skeleton.Input active style={{ width: 200 }} />
+          <Skeleton.Input active style={{ width: 300 }} />
+          <Skeleton.Button active style={{ width: 100 }} />
+        </div>
+
+        <Skeleton active paragraph={{ rows: 6 }} />
+      </div>
+    )
   }
 
-  const classroom = classroomResponse.data
-
+  // Main Render Layout
   return (
     <div className='manage-infor'>
       <div className='manage-infor__title'>
@@ -78,40 +126,38 @@ const InformationManage = () => {
           height='30'
           className='manage-infor__title__icon'
         />
-        <h2>Quản lý lớp học: {classroom.name}</h2>
+        <h2>Quản lý lớp học: {classroom?.name}</h2>
       </div>
 
       <div className='manage-infor__search'>
-        <i className='fa-solid fa-arrow-left' onClick={() => navigate(-1)} />
-        <select
+        <i className='fa-solid fa-arrow-left cursor-pointer' onClick={() => navigate(-1)} />
+
+        <NavigationDropdown
+          options={linkOptions}
+          placeholder='Thông tin lớp học'
           className='manage-infor__search__select'
-          name='category'
-          value={getCurrentSection}
-          onChange={handleNavigation}>
-          <option value=''>Thông tin lớp học</option>
-          <option value='notifications'>Thông báo</option>
-          <option value='lessons'>Bài học</option>
-          <option value='tests'>Kiểm Tra</option>
-          <option value='members'>Danh sách sinh viên</option>
-        </select>
+        />
+
         <div className='manage-infor__search__container'>
           <input
             type='text'
             placeholder='Nhập tìm kiếm...'
             className='manage-infor__search__input'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <i className='fa-solid fa-magnifying-glass manage-infor__search__icon' />
         </div>
 
         <button
-          className='manage-infor__search__button'
+          className={`manage-infor__search__button ${!createPath ? 'not-creatable' : ''}`}
           onClick={handleCreateClick}
           disabled={!createPath}>
           <i className='fa-solid fa-plus'></i> <span>Tạo mới</span>
         </button>
       </div>
 
-      <Outlet context={{ classroom, refetchClassroom: refetch }} />
+      <Outlet context={outletContext} />
     </div>
   )
 }

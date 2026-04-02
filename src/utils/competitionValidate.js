@@ -1,39 +1,41 @@
 import * as yup from 'yup'
-export const competitionCreationSchema = yup.object({
+import { yupDayjs, yupTiptapJSON, toPartial } from './yupHelpers'
+
+const competitionBaseSchema = yup.object({
   name: yup.string().trim().required('Tên cuộc thi không thể trống'),
-
-  description: yup.string().trim(),
-
-  rule: yup.string().trim(),
-
-  content: yup.string().trim().required('Nội dung/Đề thi không thể trống'),
+  description: yupTiptapJSON({ isRequired: false }),
+  rule: yupTiptapJSON({ isRequired: false }),
+  content: yupTiptapJSON({
+    isRequired: true,
+    requiredMessage: 'Nội dung/Đề thi không thể trống',
+  }),
 
   competitionLeaderId: yup.string().required('Vui lòng chọn người phụ trách'),
 
-  startTime: yup
-    .date()
-    .required('Ngày bắt đầu không thể trống')
-    .min(new Date(), 'Ngày bắt đầu phải ở trong tương lai')
-    .typeError('Vui lòng nhập ngày giờ hợp lệ'),
+  startTime: yupDayjs({
+    isRequired: true,
+    requiredMessage: 'Ngày bắt đầu không thể trống',
+    mustBeInFuture: true,
+    futureMessage: 'Ngày bắt đầu phải ở trong tương lai',
+  }),
 
-  endTime: yup
-    .date()
-    .required('Ngày kết thúc không thể trống')
-    .min(yup.ref('startTime'), 'Ngày kết thúc phải sau ngày bắt đầu')
-    .typeError('Vui lòng nhập ngày giờ hợp lệ'),
+  endTime: yupDayjs({
+    isRequired: true,
+    requiredMessage: 'Ngày kết thúc không thể trống',
+  }).test('is-after-start', 'Ngày kết thúc phải sau ngày bắt đầu', function (endTime) {
+    const { startTime } = this.parent
+    if (!startTime || !endTime) {
+      return true
+    }
+    return endTime.isAfter(startTime)
+  }),
 })
 
-const toPartial = (schema) => {
-  const partialSchema = {}
-  const fields = schema.fields
-
-  for (const key in fields) {
-    partialSchema[key] = fields[key]
-      .optional()
-      .transform((value) => (value === '' ? undefined : value))
-  }
-
-  return yup.object(partialSchema)
-}
-
-export const competitionUpdateSchema = toPartial(competitionCreationSchema)
+export const competitionCreationSchema = competitionBaseSchema
+export const competitionUpdateSchema = toPartial(competitionBaseSchema, [
+  'competitionLeaderId',
+  'name',
+  'content',
+  'startTime',
+  'endTime'
+])

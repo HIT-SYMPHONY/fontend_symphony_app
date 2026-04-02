@@ -1,40 +1,48 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
 import { getManagedClasses } from '../../../apis/classroom.api'
 import { translateStatus } from '../../../utils/formatters'
-import './style.scss'
 import TextMessage from '../../TextMessage/'
+import useDebounce from '../../../hooks/useDebounce'
+import './style.scss'
 
 const MainManage = () => {
   const navigate = useNavigate()
-  const [managedClasses, setManagedClasses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('name') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
+
   useEffect(() => {
-    const fetchManagedClasses = async () => {
-      try {
-        setLoading(true)
-        const response = await getManagedClasses()
-        setManagedClasses(response.data || [])
-      } catch (error) {
-        if (error.response?.data?.message) {
-          toast.error(error.response.data.message)
-        } else {
-          toast.error('Không thể tải danh sách lớp học quản lý.')
-        }
-      } finally {
-        setLoading(false)
-      }
+    const newParams = new URLSearchParams(searchParams)
+    if (debouncedSearchQuery) {
+      newParams.set('name', debouncedSearchQuery)
     }
-    fetchManagedClasses()
-  }, [])
-  const filteredClasses = useMemo(() => {
-    if (!searchQuery) return managedClasses
-    const lowercasedQuery = searchQuery.toLowerCase()
-    return managedClasses.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
-  }, [managedClasses, searchQuery])
+    else {
+      newParams.delete('name')
+    }
+    setSearchParams(newParams, { replace: true })
+  }, [debouncedSearchQuery, setSearchParams])
+
+  const keyword = searchParams.get('name')
+
+  const { data: managedClasses, isLoading } = useQuery({
+    queryKey: ['managedClasses', { keyword }],
+    queryFn: async () => {
+      const params = {
+        keyword: keyword || null,
+      }
+      const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
+      const response = await getManagedClasses(filteredParams)
+      return response.data || []
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Không thể tải danh sách lớp học quản lý.')
+    },
+  })
 
   return (
     <div className='manage'>
@@ -53,31 +61,51 @@ const MainManage = () => {
           <i className='fa-solid fa-magnifying-glass'></i>
         </div>
       </div>
-      <h3>Danh sách lớp quản lý ({loading ? '...' : filteredClasses.length})</h3>
+      <h3>Danh sách lớp quản lý ({isLoading ? '...' : managedClasses?.length || 0})</h3>
       <div className='manage__table'>
-        {loading ? (
-          <TextMessage text='Đang tải...'></TextMessage>
-        ) : filteredClasses.length > 0 ? (
-          filteredClasses.map((item) => (
-            <div className='manage-table' key={item.id}>
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div className='manage-table' key={index}>
               <div className='manage-table__img'>
-                {item.image && <img src={item.image} alt={item.name} />}
+                <Skeleton.Image active style={{ width: 80, height: 80, borderRadius: 10 }} />
+              </div>
+              <div className='manage-table__context'>
+                <div className='manage-table__context__pair'>
+                  <Skeleton.Input active style={{ width: 200, height: 24, marginBottom: 8 }} />
+                  <Skeleton.Input active style={{ width: 100, height: 20 }} />
+                </div>
+                <Skeleton.Input active style={{ width: 100, height: 24 }} />
+              </div>
+            </div>
+          ))
+        ) : managedClasses?.length > 0 ? (
+          managedClasses.map((item) => (
+            <div
+              className='manage-table'
+              key={item.id}
+              onClick={() => navigate(`/manage/classes/${item.id}`)}>
+              <div className='manage-table__img'>
+                {item.image ? (
+                  <img src={item.image} alt={item.name} />
+                ) : (
+                  <div className='placeholder-image'></div>
+                )}
               </div>
               <div className='manage-table__context'>
                 <div className='manage-table__context__pair'>
                   <h4>{item.name}</h4>
                   <span>{translateStatus(item.status)}</span>
                 </div>
-                <span
-                  className='manage-table__context__span'
-                  onClick={() => navigate(`/manage/classes/${item.id}`)}>
-                  Xem chi tiết
-                </span>
+                <span className='manage-table__context__span'>Xem chi tiết</span>
               </div>
             </div>
           ))
         ) : (
-          <TextMessage text='Bạn không quản lý lớp học nào.'></TextMessage>
+          <TextMessage
+            text={
+              keyword ? 'Không tìm thấy lớp học nào phù hợp.' : 'Bạn không quản lý lớp học nào.'
+            }
+          />
         )}
       </div>
     </div>

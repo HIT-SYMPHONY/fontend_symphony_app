@@ -1,10 +1,6 @@
 body {
-  font-family: 'Baloo 2', sans-serif !important;
+  font-family: 'Baloo 2', sans-serif;
   box-sizing: border-box;
-}
-* {
-  padding: 0;
-  margin: 0;
 }
 .app {
   position: relative;
@@ -19,4 +15,43 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+a {
+  text-decoration: none;
+}
+ul,
+ol {
+  list-style: none;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  border-top: 1px solid #f27b36;
+  border-bottom: 1px solid #f27b36;
+}
+.ant-table-tbody > tr.ant-table-row:hover > td:first-child {
+  border-left: 1px solid #f27b36;
+}
+.ant-table-tbody > tr.ant-table-row:hover > td:last-child {
+  border-right: 1px solid #f27b36;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 9999px;
 }

@@ -6,19 +6,19 @@ $background-light: #ffefe4;
 
 .check-class-admin {
   border: 2px solid $border-color;
-  box-shadow: 0 4px 8px $shadow-color;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 0 1rem;
+  border-top-left-radius: 32px;
   box-sizing: border-box;
-  height: 90vh;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  height: calc(100vh - 50px);
+  gap: 5px;
 
   &__header {
     gap: 3rem;
     display: flex;
     align-items: center;
+    margin-top: .5rem;
   }
 
   &__back-icon {
@@ -154,7 +154,6 @@ $background-light: #ffefe4;
 
         &__infor {
           width: 150px;
-          height: 150px;
           background-color: #eee;
           display: flex;
           align-items: center;
@@ -174,7 +173,7 @@ $background-light: #ffefe4;
             display: flex;
             width: 100%;
             gap: 1.25rem;
-            & div {
+            & > div {
               display: flex;
               flex-direction: column;
               gap: 5px;
@@ -198,7 +197,7 @@ $background-light: #ffefe4;
             gap: 1.5rem;
             width: 100%;
 
-            & div {
+            & > div {
               flex: 1;
               display: flex;
               flex-direction: column;
@@ -234,7 +233,7 @@ $background-light: #ffefe4;
       &-mota {
         display: flex;
         flex-direction: column;
-        white-space: normal;
+        white-space: pre-wrap;
         word-wrap: break-word;
         overflow-wrap: break-word;
         &__textarea {
@@ -251,6 +250,7 @@ $background-light: #ffefe4;
       gap: 10px;
       justify-content: end;
       padding-right: 20px;
+      margin-top: 1rem;
       button {
         padding: 5px 20px;
         background-color: #f26522;
@@ -264,6 +264,10 @@ $background-light: #ffefe4;
         color: #f26522;
       }
     }
+  }
+  .description-display {
+    max-height: 700px;
+    overflow-y: auto;
   }
 }
 

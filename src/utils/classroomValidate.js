@@ -1,35 +1,40 @@
 import * as yup from 'yup'
+import dayjs from 'dayjs'
+import { yupDayjs, toPartial } from './yupHelpers'
 
 const classroomBaseSchema = yup.object({
   name: yup.string().trim().required('Tên lớp học không thể trống'),
-  startTime: yup.date().required('Ngày bắt đầu là bắt buộc').typeError('Ngày không hợp lệ'),
+  startTime: yupDayjs({ isRequired: false }),
+
   duration: yup
     .number()
-    .required('Độ dài là bắt buộc')
-    .positive()
-    .integer()
-    .typeError('Độ dài phải là số'),
+    .positive('Thời lượng phải là số dương')
+    .integer('Thời lượng phải là số nguyên')
+    .required('Thời lượng không thể trống')
+    .typeError('Vui lòng nhập số'),
+
   leaderId: yup.string().required('Vui lòng chọn leader'),
-  endTime: yup
-    .date()
-    .required('Ngày kết thúc là bắt buộc')
-    .min(yup.ref('startTime'), 'Ngày kết thúc phải sau ngày bắt đầu')
-    .typeError('Ngày không hợp lệ'),
+  endTime: yupDayjs({ isRequired: false }).test(
+    'is-after-start',
+    'Ngày kết thúc phải sau ngày bắt đầu',
+    function (endTime) {
+      const { startTime } = this.parent
+      if (!startTime || !endTime) {
+        return true
+      }
+      return endTime.isAfter(startTime)
+    },
+  ),
+
   timeSlot: yup.string().trim().required('Lịch học là bắt buộc'),
-  description: yup.string().trim(),
+  description: yup
+    .object()
+    .nullable() 
+    .test('is-tiptap-doc', 'Mô tả không hợp lệ', (value) => {
+      return !value || (value.type === 'doc' && Array.isArray(value.content))
+    }),
 })
 
 export const classroomCreationSchema = classroomBaseSchema
 
-const toPartial = (schema) => {
-  const partialSchema = {}
-  const fields = schema.fields
-  for (const key in fields) {
-    partialSchema[key] = fields[key]
-      .optional()
-      .transform((value) => (value === '' ? undefined : value))
-  }
-  return yup.object(partialSchema)
-}
-
-export const classroomUpdateSchema = toPartial(classroomBaseSchema)
+export const classroomUpdateSchema = toPartial(classroomBaseSchema, ['name'])

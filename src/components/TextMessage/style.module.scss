@@ -2,4 +2,7 @@
   color: #F48A4C;
   text-align: center;
   padding: 2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
 }

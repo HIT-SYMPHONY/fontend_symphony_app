@@ -1,81 +1,91 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { Icon } from '@iconify/react'
-import { Outlet, useNavigate } from 'react-router-dom'
+// --- NEW: Import useSearchParams ---
+import { Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { getAllClassrooms } from '../../../../apis/classroom.api'
 import { translateStatus } from '../../../../utils/formatters'
+import TextMessage from '../../../TextMessage'
+import LoadMoreButton from '../../../LoadMoreButton'
+import EndOfListMessage from '../../../EndOfListMessage'
+import useDebounce from '../../../../hooks/useDebounce'
+import useOnClickOutside from '../../../../hooks/useOnClickOutside'
+import { yearFilterOptions, PAGE_SIZE } from '../../../../constants/commonConstant'
 import './style.scss'
 
 const MainOfClassAdmin = () => {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [selectedYear, setSelectedYear] = useState(() => searchParams.get('year') || 'Tất cả')
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('keyword') || '')
+  const debouncedSearchQuery = useDebounce(searchQuery, 500)
   const [classrooms, setClassrooms] = useState([])
-  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
+  const [totalElements, setTotalElements] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedStatus, setSelectedStatus] = useState('Tất cả')
+  const [loadingMore, setLoadingMore] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
-
-  const statusOptions = ['Tất cả', 'UPCOMING', 'ONGOING', 'COMPLETED']
-
-  const fetchClasses = useCallback(async (page = 1) => {
-    try {
-      setLoading(true)
-      const params = { pageNum: page, pageSize: 10 }
-      const response = await getAllClassrooms(params)
-      const content = response.data
-
-      if (content && content.items) {
-        setClassrooms(content.items)
-      }
-      if (content && content.meta) {
-        setPagination((prev) => ({
-          ...prev,
-          totalElements: content.meta.totalElements,
-          pageNum: content.meta.pageNum,
-        }))
-      }
-    } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message)
-      } else {
-        toast.error('Có lỗi xảy ra khi tải danh sách lớp học.')
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
+  useOnClickOutside([dropdownRef], () => setIsDropdownOpen(false))
   useEffect(() => {
-    fetchClasses(pagination.pageNum)
-  }, [fetchClasses, pagination.pageNum])
-
-  const filteredClassrooms = useMemo(() => {
-    let filtered = [...classrooms]
-    if (selectedStatus !== 'Tất cả') {
-      filtered = filtered.filter((cls) => cls.status === selectedStatus)
+    const newParams = new URLSearchParams()
+    if (debouncedSearchQuery) {
+      newParams.set('keyword', debouncedSearchQuery)
     }
-    if (searchQuery) {
-      const lowercasedQuery = searchQuery.toLowerCase()
-      filtered = filtered.filter((cls) => cls.name.toLowerCase().includes(lowercasedQuery))
+    if (selectedYear && selectedYear !== 'Tất cả') {
+      newParams.set('year', selectedYear)
     }
-    return filtered
-  }, [classrooms, selectedStatus, searchQuery])
+    setSearchParams(newParams, { replace: true })
+  }, [selectedYear, debouncedSearchQuery, setSearchParams])
+  const fetchClasses = useCallback(
+    async (page, isLoadMore = false) => {
+      if (isLoadMore) setLoadingMore(true)
+      else setLoading(true)
+      try {
+        const params = {
+          pageNum: page,
+          pageSize: PAGE_SIZE,
+          keyword: searchParams.get('keyword') || null,
+          startYear: searchParams.get('year') || null,
+        }
+        const filteredParams = Object.fromEntries(
+          Object.entries(params).filter(([, v]) => v != null),
+        )
 
-  const handleSelect = (item) => {
-    setSelectedStatus(item)
+        const response = await getAllClassrooms(filteredParams)
+        const content = response.data
+        const meta = content?.meta
+        if (content && content.items) {
+          setClassrooms((prev) => (isLoadMore ? [...prev, ...content.items] : content.items))
+        }
+        if (meta) {
+          setTotalElements(meta.totalElements)
+          setCurrentPage(meta.pageNum)
+          setHasMore(meta.pageNum < meta.totalPages)
+        }
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tải danh sách lớp học.')
+      } finally {
+        if (isLoadMore) setLoadingMore(false)
+        else setLoading(false)
+      }
+    },
+    [searchParams], 
+  )
+  useEffect(() => {
+    fetchClasses(1, false)
+  }, [fetchClasses])
+
+  const handleLoadMore = () => {
+    if (hasMore && !loadingMore) {
+      fetchClasses(currentPage + 1, true)
+    }
+  }
+  const handleSelectYear = (yearOption) => {
+    setSelectedYear(yearOption)
     setIsDropdownOpen(false)
   }
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   return (
     <div className='main-class-admin'>
@@ -93,9 +103,7 @@ const MainOfClassAdmin = () => {
             height='28'
             className='main-class-admin__filter-icon'
           />
-          <div className='main-class-admin__filter-label'>
-            {selectedStatus === 'Tất cả' ? 'Tất cả' : translateStatus(selectedStatus)}
-          </div>
+          <div className='main-class-admin__filter-label'>{selectedYear}</div>
           <Icon
             icon='mdi:chevron-down'
             width='20'
@@ -104,12 +112,12 @@ const MainOfClassAdmin = () => {
           />
           {isDropdownOpen && (
             <div className='main-class-admin__dropdown'>
-              {statusOptions.map((item, index) => (
+              {yearFilterOptions.map((option) => (
                 <div
-                  key={index}
+                  key={option}
                   className='main-class-admin__dropdown-item'
-                  onClick={() => handleSelect(item)}>
-                  {item === 'Tất cả' ? 'Tất cả' : translateStatus(item)}
+                  onClick={() => handleSelectYear(option)}>
+                  {option}
                 </div>
               ))}
             </div>
@@ -118,7 +126,7 @@ const MainOfClassAdmin = () => {
         <div className='main-class-admin__search'>
           <input
             type='text'
-            placeholder='Tìm kiếm...'
+            placeholder='Tìm kiếm theo tên...'
             className='main-class-admin__search-input'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -132,13 +140,18 @@ const MainOfClassAdmin = () => {
           Tạo mới
         </button>
       </div>
+
       <div className='main-class-admin__content'>
-        <h3>Danh sách lớp học ({loading ? '...' : pagination.totalElements})</h3>
+        <h3>Danh sách lớp học ({loading ? '...' : totalElements})</h3>
         <div className='main-class-admin__content-body'>
-          {loading && <div style={{ textAlign: 'center', padding: '2rem' }}>Đang tải...</div>}
-          {!loading &&
-            filteredClassrooms.map((item) => (
-              <div className='main-class-admin__content-body-item' key={item.id}>
+          {loading ? (
+            <TextMessage />
+          ) : classrooms.length > 0 ? (
+            classrooms.map((item) => (
+              <div
+                className='main-class-admin__content-body-item'
+                key={item.id}
+                onClick={() => navigate(`/admin/classes/${item.id}`)}>
                 <div className='main-class-admin__content-body-item__img'>
                   {item.image ? (
                     <img src={item.image} alt={item.name} />
@@ -153,18 +166,22 @@ const MainOfClassAdmin = () => {
                       {translateStatus(item.status)}
                     </span>
                   </div>
-                  <span onClick={() => navigate(`/admin/classes/${item.id}`)}>Xem chi tiết</span>
+                  <span>Xem chi tiết</span>
                 </div>
               </div>
-            ))}
-          {!loading && filteredClassrooms.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
-              Không có lớp học nào.
-            </div>
+            ))
+          ) : (
+            <TextMessage text='Không tìm thấy lớp học nào phù hợp.' /> 
           )}
         </div>
       </div>
-      <Outlet />
+      <LoadMoreButton hasMore={hasMore} isLoading={loadingMore} onClick={handleLoadMore} />
+      <EndOfListMessage
+        isLoading={loading}
+        hasMore={hasMore}
+        itemCount={classrooms.length}
+        itemName='lớp học'
+      />
     </div>
   )
 }

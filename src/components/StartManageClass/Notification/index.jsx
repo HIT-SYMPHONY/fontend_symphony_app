@@ -1,439 +1,184 @@
-// import React, { useState } from "react";
-// import { Icon } from "@iconify/react";
-// import "./style.scss";
-
-// const Notification = () => {
-//   // State to track which notification is expanded
-//   const [expandedId, setExpandedId] = useState(null);
-//   // State to track which notification is being edited and its content
-//   const [editState, setEditState] = useState({ id: null, content: "" });
-//   // State to manage notifications
-//   const [notifications, setNotifications] = useState([
-//     {
-//       id: 1,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 2,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 3,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 4,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 5,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 6,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 7,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//     {
-//       id: 8,
-//       class: "Private - Đợt hoa - 2025",
-//       title: "Thay đổi lịch học bồi dưỡng thứ 3",
-//       date: "20/02/2000",
-//       creator: "Nguyễn Văn A",
-//       content: "Nội dung thông báo chi tiết ở đây.",
-//     },
-//   ]);
-
-//   // Toggle expansion for a specific notification
-//   const toggleExpand = (id) => {
-//     setExpandedId(expandedId === id ? null : id);
-//     // Reset edit state when collapsing
-//     if (expandedId === id) {
-//       setEditState({ id: null, content: "" });
-//     }
-//   };
-
-//   // Start editing a notification
-//   const startEdit = (id, content) => {
-//     setEditState({ id, content });
-//   };
-
-//   // Handle content change during editing
-//   const handleContentChange = (e) => {
-//     setEditState({ ...editState, content: e.target.value });
-//   };
-
-//   // Save edited content
-//   const saveEdit = (id) => {
-//     setNotifications(
-//       notifications.map((notification) =>
-//         notification.id === id
-//           ? { ...notification, content: editState.content }
-//           : notification
-//       )
-//     );
-//     setEditState({ id: null, content: "" });
-//   };
-
-//   return (
-//     <div className="notification">
-//       <h3>Tất cả thông báo</h3>
-//       <div className="notification__sum">
-//         <div className="notification__sum__table">
-//           <h4>STT</h4>
-//           <h4>Lớp</h4>
-//           <h4>Tên thông báo</h4>
-//           <h4>Ngày tạo</h4>
-//           <h4>Người tạo</h4>
-//         </div>
-//         <div className="notification__sum__list">
-//           {notifications.map((item) => (
-//             <div className="notification__sum__list__box" key={item.id}>
-//               <div className="notification__sum__list__box__item">
-//                 <h5>{item.id}</h5>
-//                 <h5>{item.class}</h5>
-//                 <h5>{item.title}</h5>
-//                 <h5>{item.date}</h5>
-//                 <h5>{item.creator}</h5>
-//                 <Icon
-//                   icon={
-//                     expandedId === item.id
-//                       ? "mingcute:up-fill"
-//                       : "mingcute:down-fill"
-//                   }
-//                   width="24"
-//                   height="24"
-//                   className="notification__sum__list__box__item__icon"
-//                   onClick={() => toggleExpand(item.id)}
-//                 />
-//               </div>
-//               {expandedId === item.id && (
-//                 <>
-//                   <hr />
-//                   <div className="notification__sum__list__box__para">
-//                     <div className="notification__sum__list__box__para__begin">
-//                       <h4>Nội dung: </h4>
-//                       {editState.id === item.id ? (
-//                         <button onClick={() => saveEdit(item.id)}>
-//                           <Icon
-//                             icon="material-symbols:save"
-//                             width="15"
-//                             height="15"
-//                           />{" "}
-//                           Lưu
-//                         </button>
-//                       ) : (
-//                         <button
-//                           onClick={() => startEdit(item.id, item.content)}
-//                         >
-//                           <Icon
-//                             icon="iconamoon:edit-fill"
-//                             width="15"
-//                             height="15"
-//                           />{" "}
-//                           chỉnh sửa
-//                         </button>
-//                       )}
-//                     </div>
-
-//                     {editState.id === item.id ? (
-//                       <textarea
-//                         value={editState.content}
-//                         onChange={handleContentChange}
-//                         className="notification__sum__list__box__para__textarea"
-//                       />
-//                     ) : (
-//                       <div className="notification__sum__list__box__para__end">
-//                         <p>{item.content}</p>
-//                       </div>
-//                     )}
-//                   </div>
-//                 </>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Notification;
-
-// import React, { useState, useEffect, useCallback } from 'react'
-// import { Icon } from '@iconify/react'
-// import { useParams } from 'react-router-dom'
-// import toast from 'react-hot-toast'
-// import { getNotificationsByClassId, deleteNotification } from '../../../apis/notification.api'
-// import { formatDate } from '../../../utils/formatters'
-// import './style.scss'
-
-// const Notification = () => {
-//   const { classId } = useParams()
-
-//   const [notifications, setNotifications] = useState([])
-//   const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
-//   const [loading, setLoading] = useState(true)
-//   const [expandedId, setExpandedId] = useState(null)
-
-//   const fetchNotifications = useCallback(
-//     async (page = 1) => {
-//       if (!classId) return
-//       try {
-//         setLoading(true)
-//         const params = { pageNum: page, pageSize: pagination.pageSize }
-//         const response = await getNotificationsByClassId(classId, params)
-//         const content = response.data
-//         if (content?.items) setNotifications(content.items)
-//         if (content?.meta) setPagination((prev) => ({ ...prev, ...content.meta }))
-//       } catch (error) {
-//         toast.error(error.response?.data?.message || 'Không thể tải danh sách thông báo.')
-//       } finally {
-//         setLoading(false)
-//       }
-//     },
-//     [classId, pagination.pageSize],
-//   )
-
-//   useEffect(() => {
-//     fetchNotifications(pagination.pageNum)
-//   }, [fetchNotifications, pagination.pageNum])
-
-//   const toggleExpand = (id) => {
-//     setExpandedId((prevId) => (prevId === id ? null : id))
-//   }
-
-//   // --- DELETE HANDLER ---
-//   const handleDelete = async (notificationId) => {
-//     // Ask for confirmation before deleting
-//     if (!window.confirm('Bạn có chắc chắn muốn xóa thông báo này không?')) {
-//       return
-//     }
-
-//     const deleteToast = toast.loading('Đang xóa...')
-//     try {
-//       await deleteNotification(notificationId)
-//       // If successful, remove the notification from the local state to update the UI instantly
-//       setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-//       toast.success('Xóa thông báo thành công!', { id: deleteToast })
-//     } catch (error) {
-//       toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: deleteToast })
-//     }
-//   }
-
-//   return (
-//     <div className='notification'>
-//       <h3>Tất cả thông báo</h3>
-//       <div className='notification__sum'>
-//         <div className='notification__sum__table'>
-//           <h4>STT</h4>
-//           <h4>Lớp</h4>
-//           <h4>Nội dung</h4>
-//           <h4>Ngày tạo</h4>
-//           <h4>Người tạo</h4>
-//           <th></th>
-//         </div>
-//         <div className='notification__sum__list'>
-//           {loading && <p style={{ textAlign: 'center', padding: '1rem' }}>Đang tải...</p>}
-//           {!loading &&
-//             notifications.map((item, index) => (
-//               <div className='notification__sum__list__box' key={item.id}>
-//                 <div className='notification__sum__list__box__item'>
-//                   <h5>{index + 1}</h5>
-//                   <h5>{item.classRoomName}</h5>
-//                   <h5>
-//                     {item.content.substring(0, 40)}
-//                     {item.content.length > 40 ? '...' : ''}
-//                   </h5>
-//                   <h5>{formatDate(item.createdAt)}</h5>
-//                   <h5>{item.createdBy.substring(0, 8)}...</h5>
-//                   <div className='notification-actions'>
-//                     <i className='fa-solid fa-trash' onClick={() => handleDelete(item.id)}></i>
-//                     <Icon
-//                       icon={expandedId === item.id ? 'mingcute:up-fill' : 'mingcute:down-fill'}
-//                       width='24'
-//                       height='24'
-//                       className='notification__sum__list__box__item__icon'
-//                       onClick={() => toggleExpand(item.id)}
-//                     />
-//                   </div>
-//                 </div>
-//                 {expandedId === item.id && (
-//                   <>
-//                     <hr />
-//                     <div className='notification__sum__list__box__para'>
-//                       <div className='notification__sum__list__box__para__begin'>
-//                         <h4>Nội dung: </h4>
-//                       </div>
-//                       <div className='notification__sum__list__box__para__end'>
-//                         <p>{item.content}</p>
-//                       </div>
-//                     </div>
-//                   </>
-//                 )}
-//               </div>
-//             ))}
-//           {!loading && notifications.length === 0 && (
-//             <div style={{ textAlign: 'center', padding: '1rem' }}>Không có thông báo nào.</div>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Notification
-
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { getNotificationsByClassId, deleteNotification } from '../../../apis/notification.api'
+import { Table, Button, Modal, Tooltip } from 'antd'
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import { deleteNotification } from '../../../apis/notification.api'
+import { getNotificationsOfClassroom } from 'apis/classroom.api'
 import { formatDate } from '../../../utils/formatters'
 import './style.scss'
 
 const Notification = () => {
   const { classId } = useParams()
-
-  const [notifications, setNotifications] = useState([])
-  const [pagination, setPagination] = useState({ pageNum: 1, pageSize: 10, totalElements: 0 })
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  const [searchParams] = useSearchParams()
+  const keyword = searchParams.get('keyword') || ''
+  const [pageNum, setPageNum] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [expandedId, setExpandedId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
 
-  const fetchNotifications = useCallback(
-    async (page = 1) => {
-      if (!classId) return
-      try {
-        setLoading(true)
-        const params = { pageNum: page, pageSize: pagination.pageSize }
-        const response = await getNotificationsByClassId(classId, params)
-        const content = response.data
-        if (content?.items) setNotifications(content.items)
-        if (content?.meta) setPagination((prev) => ({ ...prev, ...content.meta }))
-      } catch (error) {
-        toast.error(error.response?.data?.message || 'Không thể tải danh sách thông báo.')
-      } finally {
-        setLoading(false)
-      }
+  const {
+    data: notificationData,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ['notifications', classId, pageNum, pageSize, keyword],
+    queryFn: async () => {
+      if (!classId) return { items: [], meta: { totalElements: 0 } }
+      const response = await getNotificationsOfClassroom(classId, { pageNum, pageSize, keyword })
+      return response.data
     },
-    [classId, pagination.pageSize],
-  )
+    placeholderData: keepPreviousData,
+  })
 
-  useEffect(() => {
-    fetchNotifications(pagination.pageNum)
-  }, [fetchNotifications, pagination.pageNum])
+  const notifications = notificationData?.items || []
+  const totalElements = notificationData?.meta?.totalElements || 0
 
-  const toggleExpand = (id) => {
-    setExpandedId((prevId) => (prevId === id ? null : id))
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteNotification(id),
+    onMutate: () => toast.loading('Đang xóa...'),
+    onSuccess: (_, __, toastId) => {
+      toast.success('Xóa thông báo thành công!', { id: toastId })
+      if (notifications.length === 1 && pageNum > 1) {
+        setPageNum((prev) => prev - 1)
+      }
+      queryClient.invalidateQueries({ queryKey: ['notifications', classId] })
+    },
+    onError: (error, _, toastId) => {
+      toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: toastId })
+    },
+  })
+
+  const handleDelete = () => {
+    if (!deleteId) return
+    setIsModalOpen(false)
+    deleteMutation.mutate(deleteId)
   }
 
-  const handleDelete = async (notificationId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa thông báo này không?')) {
-      return
-    }
-
-    const deleteToast = toast.loading('Đang xóa...')
-    try {
-      await deleteNotification(notificationId)
-      setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
-      toast.success('Xóa thông báo thành công!', { id: deleteToast })
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: deleteToast })
-    }
+  const openDeleteModal = (id) => {
+    setDeleteId(id)
+    setIsModalOpen(true)
   }
+
+  const handleTableChange = (paginationConfig) => {
+    setPageNum(paginationConfig.current)
+    setPageSize(paginationConfig.pageSize)
+  }
+
+  const columns = [
+    {
+      title: 'STT',
+      key: 'stt',
+      width: '5%',
+      align: 'center',
+      render: (_, __, index) => (pageNum - 1) * pageSize + index + 1,
+    },
+    {
+      title: 'Lớp',
+      dataIndex: 'classRoomName',
+      key: 'classRoomName',
+      width: '15%',
+    },
+    {
+      title: 'Tên thông báo',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (title) => (
+        <Tooltip placement='topLeft' title={title}>
+          {title}
+        </Tooltip>
+      ),
+    },
+    {
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '15%',
+      align: 'center',
+      render: (text) => formatDate(text),
+    },
+    {
+      title: 'Người tạo',
+      dataIndex: 'createdByName',
+      key: 'createdByName',
+      width: '15%',
+      ellipsis: true,
+    },
+    {
+      title: '',
+      key: 'action',
+      width: '10%',
+      align: 'center',
+      render: (_, record) => (
+        <div className='notification__actions'>
+          <Button
+            type='text'
+            icon={
+              <Icon
+                color='#F27B36'
+                icon={expandedId === record.id ? 'fa-solid:chevron-up' : 'fa-solid:chevron-down'}
+              />
+            }
+            onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
+            disabled={!record.content}
+          />
+          <Button
+            type='text'
+            danger
+            icon={<Icon icon='fa-solid:trash' />}
+            onClick={() => openDeleteModal(record.id)}
+          />
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className='notification'>
       <h3>Tất cả thông báo</h3>
       <div className='notification__sum'>
-        <table className='notification__sum__table'>
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Lớp</th>
-              <th>Nội dung</th>
-              <th>Ngày tạo</th>
-              <th>Người tạo</th>
-              <th></th>
-            </tr>
-          </thead>
-        </table>
-        <div className='notification__sum__list'>
-          {loading && <p style={{ textAlign: 'center', padding: '1rem' }}>Đang tải...</p>}
-          {!loading &&
-            notifications.map((item, index) => (
-              <div className='notification__sum__list__box' key={item.id}>
-                <div className='notification__sum__list__box__item'>
-                  <h5>{index + 1}</h5>
-                  <h5>{item.classRoomName}</h5>
-                  <h5>
-                    {item.content.substring(0, 40)}
-                    {item.content.length > 40 ? '...' : ''}
-                  </h5>
-                  <h5>{formatDate(item.createdAt)}</h5>
-                  <h5>{item.createdBy.substring(0, 8)}...</h5>
-                  <div className='notification-actions'>
-                    <i className='fa-solid fa-trash' onClick={() => handleDelete(item.id)}></i>
-                    <Icon
-                      icon={expandedId === item.id ? 'mingcute:up-fill' : 'mingcute:down-fill'}
-                      width='24'
-                      height='24'
-                      className='notification__sum__list__box__item__icon'
-                      onClick={() => toggleExpand(item.id)}
-                    />
-                  </div>
-                </div>
-                {expandedId === item.id && (
-                  <>
-                    <hr />
-                    <div className='notification__sum__list__box__para'>
-                      <div className='notification__sum__list__box__para__begin'>
-                        <h4>Nội dung: </h4>
-                      </div>
-                      <div className='notification__sum__list__box__para__end'>
-                        <p>{item.content}</p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          {!loading && notifications.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '1rem' }}>Không có thông báo nào.</div>
-          )}
-        </div>
+        <Table
+          columns={columns}
+          scroll={{ y: 400 }}
+          dataSource={notifications}
+          rowKey='id'
+          loading={isLoading || isFetching}
+          pagination={{
+            current: pageNum,
+            pageSize: pageSize,
+            total: totalElements,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50'],
+          }}
+          onChange={handleTableChange}
+          expandable={{
+            expandedRowRender: (record) => <p>{record.content}</p>,
+            rowExpandable: (record) => !!record.content,
+            expandedRowKeys: expandedId ? [expandedId] : [],
+            showExpandColumn: false,
+          }}
+          locale={{
+            emptyText: 'Không có thông báo nào.',
+          }}
+        />
       </div>
+      <Modal
+        title='Xóa thông báo?'
+        open={isModalOpen}
+        onOk={handleDelete}
+        onCancel={() => setIsModalOpen(false)}
+        okText='Xóa'
+        cancelText='Hủy'
+        okButtonProps={{ danger: true }}
+        centered={true}>
+        <p>Bạn có chắc chắn muốn xóa thông báo này không?</p>
+      </Modal>
     </div>
   )
 }

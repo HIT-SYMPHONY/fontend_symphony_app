@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Icon } from '@iconify/react'
 import toast from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
 import { getMyLessons } from '../../apis/lesson.api'
 import TextMessage from '../../components/TextMessage'
 import './style.scss'
@@ -28,24 +29,16 @@ const apiStringToVietnamese = {
 }
 
 const SchedulePage = () => {
-  const [allLessons, setAllLessons] = useState([])
-  const [loading, setLoading] = useState(true)
   const [selectedDay, setSelectedDay] = useState(new Date())
 
-  useEffect(() => {
-    const fetchScheduleData = async () => {
-      try {
-        setLoading(true)
-        const response = await getMyLessons()
-        setAllLessons(response.data || [])
-      } catch (error) {
-        toast.error('Không thể tải thời khóa biểu.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchScheduleData()
-  }, [])
+  const { data: allLessons = [], isLoading: loading } = useQuery({
+    queryKey: ['my-lessons'],
+    queryFn: getMyLessons,
+    select: (response) => response.data || [],
+    onError: () => {
+      toast.error('Không thể tải thời khóa biểu.')
+    },
+  })
 
   // --- Calendar Logic ---
   const startOfWeek = new Date(selectedDay)
@@ -73,6 +66,7 @@ const SchedulePage = () => {
     // 2. Filter the lessons by directly comparing the strings
     return allLessons.filter((lesson) => lesson.dayOfWeek === selectedDayApiString)
   }, [allLessons, selectedDay])
+  console.log(filteredLessons)
 
   return (
     <div className='schedule'>
@@ -92,9 +86,9 @@ const SchedulePage = () => {
         {weekDays.map((item) => (
           <div
             key={item.date}
-            className={`date-item ${selectedDay.getDate() === item.date ? 'selected' : ''}`}
+            className={`date-item !px-3 ${selectedDay.getDate() === item.date ? 'selected' : ''}`}
             onClick={() => setSelectedDay(item.fullDate)}>
-            <span>{item.dayName}</span>
+            <span className='font-semibold'>{item.dayName}</span>
             <p>{item.date}</p>
           </div>
         ))}
@@ -109,12 +103,11 @@ const SchedulePage = () => {
         ) : filteredLessons.length > 0 ? (
           filteredLessons.map((item) => (
             <div key={item.id} className='schedule__item'>
-              <div className='div'></div>
-              <div>
+              <div className='font-bold'>
                 <span>
-                  Thời Gian: {item.startTime} - {item.endTime}
+                  Thời gian: {item.startTime} - {item.endTime}
                 </span>
-                <h5>{item.className}</h5>
+                <h5 className='text-lg'>{item.className}</h5>
                 <p>Leader: {item.leaderName || 'N/A'}</p>
                 <p>Địa điểm: {item.location || 'N/A'}</p>
               </div>

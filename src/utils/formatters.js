@@ -15,6 +15,7 @@ const genderMap = {
 export const translateGender = (genderKey) => {
   return genderMap[genderKey] || 'N/A'
 }
+
 export const formatDate = (dateString) => {
   if (!dateString) return ''
 
@@ -64,6 +65,18 @@ export const formatDateForAPI = (date) => {
   return `${year}-${month}-${day}`
 }
 
+export const formatDateTimeForAPI = (date) => {
+  if (!date || !(date instanceof Date) || isNaN(date)) {
+    return null
+  }
+  const pad = (num) => num.toString().padStart(2, '0')
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hours = pad(date.getHours())
+  const minutes = pad(date.getMinutes())
+  return `${year}-${month}-${day}T${hours}:${minutes}:00`
+}
 export const formatDateTime = (isoString) => {
   if (!isoString) return 'N/A'
   try {
@@ -77,13 +90,13 @@ export const formatDateTime = (isoString) => {
   }
 }
 
-// export const getDisplayName = (data) => {
-//   const name = data.fullName?.trim()
-//   const isValid =
-//     name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
-//   return isValid ? name : 'HỌ VÀ TÊN'
-// }
-export const getDisplayName = (user) => {
+export const getDisplayName = (data) => {
+  const name = data.fullName?.trim()
+  const isValid =
+    name && name.toLowerCase() !== 'null' && !name.toLowerCase().includes('null') && name !== ''
+  return isValid ? name : 'HỌ VÀ TÊN'
+}
+export const getDisplayNameForUser = (user) => {
   if (!user) return 'Không rõ'
   const name = user.fullName?.trim()
   if (name && name.toLowerCase() !== 'null') {
@@ -146,5 +159,21 @@ export const getPostStatus = (deadlineISO) => {
   } catch (error) {
     console.error('Error calculating homework status:', deadlineISO, error)
     return { text: 'Lỗi ngày', backgroundClass: 'back-three', colorClass: 'color-three' }
+  }
+}
+
+export const formatDateTimeForInput = (isoString) => {
+  if (!isoString || typeof isoString !== 'string') {
+    return ''
+  }
+  return isoString.slice(0, 16)
+}
+
+export const safeParse = (jsonString) => {
+  try {
+    return jsonString ? JSON.parse(jsonString) : null
+  } catch (e) {
+    console.error('Failed to parse description JSON:', jsonString)
+    return { type: 'doc', content: [{ type: 'paragraph' }] }
   }
 }

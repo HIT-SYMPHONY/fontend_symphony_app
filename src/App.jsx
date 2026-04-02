@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import './scss/style.scss'
 
@@ -14,10 +13,11 @@ import UnauthorizedPage from './pages/UnauthorizedPage'
 
 const App = () => (
   <>
-    <Toaster position='top-right' toastOptions={{ duration: 3000 }} />
+    <Toaster position='top-right' toastOptions={{ duration: 3000 }} containerStyle={{top: 50}} />
     <AuthListener />
     <Routes>
       <Route path='/' element={<LoginPage />} />
+      <Route path='/' element={<Navigate to="/login" replace />} />
       <Route path='/login' element={<LoginPage />} />
       <Route path='/forgot-password' element={<Confirm />} />
       <Route path='/unauthorized' element={<UnauthorizedPage />} />

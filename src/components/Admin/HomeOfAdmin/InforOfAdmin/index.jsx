@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react'
 import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
+import { DatePicker, Select } from 'antd'
+import dayjs from 'dayjs'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { userUpdateSchema } from '../../../../utils/userValidate.js'
-import { getUserById, updateUser, getUserClasses } from '../../../../apis/user.api'
-import {
-  formatDate,
-  formatDateForAPI,
-  translateGender,
-  translateStatus,
-} from '../../../../utils/formatters'
+import { getUserById, updateUser, getUserClasses, resetPassword } from '../../../../apis/user.api'
+import { formatDate, translateGender, translateStatus } from '../../../../utils/formatters'
+import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../../../constants/commonConstant'
+import TextMessage from '../../../TextMessage'
 import './style.scss'
 
 const InforOfAdmin = () => {
@@ -26,10 +25,12 @@ const InforOfAdmin = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isDirty },
+    control, // <-- Need 'control' for Controller
+    formState: { errors, isDirty, isSubmitting },
     reset,
   } = useForm({
     resolver: yupResolver(userUpdateSchema),
+    mode: 'onTouched',
   })
 
   useEffect(() => {
@@ -45,20 +46,18 @@ const InforOfAdmin = () => {
 
         const userData = userResponse.data
         setUserClasses(classesResponse.data || [])
-
-        const formattedData = {
+        setInitialData(userData)
+        const formattedDataForForm = {
           lastName: userData.lastName || '',
           firstName: userData.firstName || '',
           studentCode: userData.studentCode || '',
           email: userData.email || '',
           phoneNumber: userData.phoneNumber || '',
           intake: userData.intake || '',
-          gender: userData.gender || '',
-          dateBirth: userData.dateBirth || '',
+          gender: userData.gender || null,
+          dateBirth: userData.dateBirth ? dayjs(userData.dateBirth) : null,
         }
-
-        setInitialData(formattedData)
-        reset(formattedData)
+        reset(formattedDataForForm)
       } catch (error) {
         toast.error('Không thể tải thông tin người dùng.')
       } finally {
@@ -69,36 +68,33 @@ const InforOfAdmin = () => {
   }, [userId, reset])
 
   const onSubmit = async (data) => {
-    if (!isDirty) {
-      toast.error('Không có thay đổi nào để lưu.')
-      setIsEditing(false)
-      return
-    }
     const updateToast = toast.loading('Đang cập nhật...')
-    const payload = { ...data }
-    if (payload.dateBirth instanceof Date) {
-      payload.dateBirth = formatDateForAPI(payload.dateBirth)
-    } else if (!payload.dateBirth) {
-      payload.dateBirth = null
+    const payload = {
+      ...data,
+      dateBirth: data.dateBirth ? data.dateBirth.format(API_DATE_FORMAT) : null,
     }
+    console.log(payload)
+
     const formData = new FormData()
     formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
 
     try {
       const response = await updateUser(userId, formData)
+      console.log('day la response', response)
       const updatedUserData = response.data
-      const formattedData = {
+
+      setInitialData(updatedUserData)
+      const formattedDataForForm = {
         lastName: updatedUserData.lastName || '',
         firstName: updatedUserData.firstName || '',
         studentCode: updatedUserData.studentCode || '',
         email: updatedUserData.email || '',
         phoneNumber: updatedUserData.phoneNumber || '',
         intake: updatedUserData.intake || '',
-        gender: updatedUserData.gender || '',
-        dateBirth: updatedUserData.dateBirth || '',
+        gender: updatedUserData.gender || null,
+        dateBirth: updatedUserData.dateBirth ? dayjs(updatedUserData.dateBirth) : null,
       }
-      setInitialData(formattedData)
-      reset(formattedData)
+      reset(formattedDataForForm)
 
       setIsEditing(false)
       toast.success('Cập nhật thành công!', { id: updateToast })
@@ -109,13 +105,47 @@ const InforOfAdmin = () => {
   }
 
   const handleCancel = () => {
-    reset(initialData)
+    const formattedDataForForm = {
+      lastName: initialData.lastName || '',
+      firstName: initialData.firstName || '',
+      studentCode: initialData.studentCode || '',
+      email: initialData.email || '',
+      phoneNumber: initialData.phoneNumber || '',
+      intake: initialData.intake || '',
+      gender: initialData.gender || null,
+      dateBirth: initialData.dateBirth ? dayjs(initialData.dateBirth) : null,
+    }
+    reset(formattedDataForForm)
     setIsEditing(false)
   }
+
+  const handleResetPassword = async () => {
+    if (
+      !window.confirm(
+        `Bạn có chắc chắn muốn reset mật khẩu cho người dùng ${initialData.lastName} ${initialData.firstName}?`,
+      )
+    ) {
+      return
+    }
+    const resetToast = toast.loading('Đang reset mật khẩu...')
+    try {
+      const response = await resetPassword(userId)
+      console.log(response)
+      const newPassword = response.data.newPassword
+      toast.success(`Reset mật khẩu thành công! Mật khẩu mới là ${newPassword}`, {
+        id: resetToast,
+        duration: 10000,
+      })
+    } catch (error) {
+      const message = error.response?.data?.message || 'Lỗi khi reset mật khẩu'
+      toast.error(message, { id: resetToast })
+    }
+  }
+
   const displayValue = (value) => value || 'N/A'
 
-  if (loading) return <div>Đang tải...</div>
-  if (!initialData) return <div>Không tìm thấy người dùng.</div>
+  if (loading) return <TextMessage></TextMessage>
+  if (!initialData) return <TextMessage text='Không tìm thấy người dùng.'></TextMessage>
 
   return (
     <div className='inforofadmin'>
@@ -195,11 +225,27 @@ const InforOfAdmin = () => {
               <div className='inforofadmin__context__list__box__item'>
                 <span>Giới tính</span>
                 {isEditing ? (
-                  <select {...register('gender')}>
-                    <option value='MALE'>Nam</option>
-                    <option value='FEMALE'>Nữ</option>
-                    <option value='OTHER'>Khác</option>
-                  </select>
+                  <Controller
+                    name='gender'
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <Select
+                          {...field}
+                          value={field.value === null ? undefined : field.value}
+                          placeholder='Chọn giới tính'
+                          options={[
+                            { value: 'MALE', label: 'Nam' },
+                            { value: 'FEMALE', label: 'Nữ' },
+                            { value: 'OTHER', label: 'Khác' },
+                          ]}
+                          status={error ? 'error' : ''}
+                          className='ant-select-custom'
+                        />
+                        {error && <p className='error-message'>{error.message}</p>}
+                      </>
+                    )}
+                  />
                 ) : (
                   <h4>{translateGender(initialData.gender)}</h4>
                 )}
@@ -207,15 +253,50 @@ const InforOfAdmin = () => {
               <div className='inforofadmin__context__list__box__item'>
                 <span>Ngày sinh</span>
                 {isEditing ? (
-                  <input type='date' {...register('dateBirth')} />
+                  <Controller
+                    name='dateBirth'
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <DatePicker
+                          {...field}
+                          format={DISPLAY_DATE_FORMAT}
+                          placeholder='Chọn ngày sinh'
+                          className='ant-picker-custom'
+                          status={error ? 'error' : ''}
+                          allowClear={false}
+                        />
+                        {error && <p className='error-message'>{error.message}</p>}
+                      </>
+                    )}
+                  />
                 ) : (
                   <h4>{initialData.dateBirth ? formatDate(initialData.dateBirth) : 'N/A'}</h4>
                 )}
-                {errors.dateBirth && (
-                  <span className='error-message'>{errors.dateBirth.message}</span>
-                )}
               </div>
               <div style={{ flex: 1 }}></div>
+            </div>
+          </div>
+          <h3>Thống tin tài khoản</h3>
+          <div className='inforofadmin__context__list inforofadmin__horizontal-list'>
+            <div className='inforofadmin__context__list__box inforofadmin__horizontal-list-box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Tên đăng nhập</span>
+                <h4>{displayValue(initialData.studentCode)}</h4>
+              </div>
+            </div>
+            <div className='inforofadmin__context__list__box inforofadmin__horizontal-list-box'>
+              <div className='inforofadmin__context__list__box__item'>
+                <span>Mật khẩu</span>
+                <div className='inforofadmin__reset-wrap'>
+                  <h4>{'*'.repeat(8)}</h4>
+                  {!isEditing && (
+                    <div className='inforofadmin__reset-button' onClick={handleResetPassword}>
+                      Reset
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
           <div className='inforofadmin__context__button'>
@@ -246,7 +327,9 @@ const InforOfAdmin = () => {
           {userClasses.length > 0 ? (
             userClasses.map((item, index) => (
               <div className='inforofadmin__class__list__item' key={index}>
-                <div className='inforofadmin__class__list__item__img'></div>
+                <div className='inforofadmin__class__list__item__img'>
+                  <img src={item.image} alt={item.name} />
+                </div>
                 <div className='inforofadmin__class__list__item__box'>
                   <div className='inforofadmin__class__list__item__box__start'>
                     <h4>{item.name}</h4>
@@ -254,7 +337,9 @@ const InforOfAdmin = () => {
                       {translateStatus(item.status)}
                     </span>
                   </div>
-                  <span onClick={() => navigate(`/admin/users/${userId}/classes/${item.id}`)}>Xem chi tiết</span>
+                  <span onClick={() => navigate(`/admin/users/${userId}/classes/${item.id}`)}>
+                    Xem chi tiết
+                  </span>
                 </div>
               </div>
             ))
