@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        'custom' : '2px 2px 4px 4px rgba(0, 0, 0, 0.25)',
+      },
       colors: {
         primary: {
           DEFAULT: '#F06C25',
@@ -25,8 +28,10 @@ export default {
           light: '#FFEFE4', 
           grey: '#828282',
         },
+
+
         black: '#000000',
-        white: '#FFFEF4',
+        white: '#FFFFFF',
       },
     },
   },
