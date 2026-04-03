@@ -238,7 +238,7 @@ const CommentOfTests = () => {
             pageSize: pagination.pageSize,
             total: totalElements,
             showSizeChanger: true,
-            showTotal: (total) => `Tổng số ${total} bài nộp`,
+            showTotal: (total) => `Số lượng nộp ${total}`,
             pageSizeOptions: ['10', '20', '50'],
           }}
           className='custom-table'
