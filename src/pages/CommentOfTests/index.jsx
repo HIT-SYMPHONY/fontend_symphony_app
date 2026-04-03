@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Table, Tag } from 'antd'
+import { Table, Tag, Skeleton } from 'antd'
 import { Icon } from '@iconify/react'
 
 import { getPostById } from 'apis/post.api'
 import { getAllCommentsOfPost } from 'apis/commentPost.api'
 import { formatDate } from 'utils/formatters'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
 
 const CommentOfTests = () => {
   const navigate = useNavigate()
@@ -19,7 +20,12 @@ const CommentOfTests = () => {
   })
 
   // 1. Fetch Post Data (Test info)
-  const { data: postData, isLoading: loadingPost } = useQuery({
+  const {
+    data: postData,
+    isLoading: loadingPost,
+    isError: isErrorPost,
+    refetch: refetchPost,
+  } = useQuery({
     queryKey: ['post', testId],
     queryFn: () => getPostById(testId),
     enabled: !!testId,
@@ -27,7 +33,12 @@ const CommentOfTests = () => {
   })
 
   // 2. Fetch Comments (Submissions)
-  const { data: commentsData, isLoading: loadingComments } = useQuery({
+  const {
+    data: commentsData,
+    isLoading: loadingComments,
+    isError: isErrorComments,
+    refetch: refetchComments,
+  } = useQuery({
     queryKey: ['comments', testId, pagination.pageNum, pagination.pageSize],
     queryFn: () =>
       getAllCommentsOfPost(testId, {
@@ -35,7 +46,7 @@ const CommentOfTests = () => {
         pageSize: pagination.pageSize,
       }),
     enabled: !!testId,
-    select: (response) => response?.data || response, // Returns { meta: {...}, items: [...] }
+    select: (response) => response?.data || response,
   })
 
   // Define Table Columns
@@ -45,7 +56,8 @@ const CommentOfTests = () => {
       key: 'stt',
       width: 60,
       align: 'center',
-      render: (_, __, index) => (pagination.pageNum - 1) * pagination.pageSize + index + 1,
+      render: (_, __, index) =>
+        (pagination.pageNum - 1) * pagination.pageSize + index + 1,
     },
     {
       title: 'Mã Sinh Viên',
@@ -72,10 +84,10 @@ const CommentOfTests = () => {
         if (score === null || score === undefined) {
           return <Tag color='default'>Chưa chấm</Tag>
         }
-        // Change color based on score (e.g., < 5 is red, >= 8 is green)
-        const color = score >= 8 ? 'success' : score >= 5 ? 'processing' : 'error'
+        const color =
+          score >= 8 ? 'success' : score >= 5 ? 'processing' : 'error'
         return (
-          <Tag color={color} className='font-bold text-sm m-0'>
+          <Tag color={color} className='m-0 text-sm font-bold'>
             {score}
           </Tag>
         )
@@ -87,9 +99,11 @@ const CommentOfTests = () => {
       width: 120,
       render: (_, record) => (
         <div
-          className='hover:text-primary transition-colors'
+          className='cursor-pointer font-semibold transition-colors hover:text-primary'
           onClick={() =>
-            navigate(`/manage/classes/${classId}/tests/${testId}/comments/${record.id}/grade`)
+            navigate(
+              `/manage/classes/${classId}/tests/${testId}/comments/${record.id}/grade`,
+            )
           }>
           Chấm điểm
         </div>
@@ -108,43 +122,109 @@ const CommentOfTests = () => {
   const items = commentsData?.items || []
   const totalElements = commentsData?.meta?.totalElements || 0
 
-  if (loadingPost) return <div className='p-6'>Đang tải dữ liệu bài kiểm tra...</div>
+  // --- 1. ERROR STATE ---
+  if (isErrorPost || isErrorComments) {
+    return (
+      <ApiErrorDisplay
+        title='Không thể tải dữ liệu'
+        subTitle='Đã có lỗi xảy ra khi tải thông tin bài kiểm tra hoặc danh sách nộp bài.'
+        refetchQueries={[refetchPost, refetchComments]}
+        backUrl={-1}
+      />
+    )
+  }
 
+  if (loadingPost) {
+    return (
+      <div>
+        <div className='mb-6 flex items-center gap-4'>
+          <Skeleton.Input active size='large' style={{ width: 300 }} />
+        </div>
+
+        <div className='mb-8 grid grid-cols-1 gap-4 md:grid-cols-2'>
+          {[1, 2].map((key) => (
+            <div
+              key={key}
+              className='flex items-center gap-4 rounded-lg border border-gray-100 p-4 shadow-sm'>
+              <Skeleton.Avatar active size='large' shape='circle' />
+              <div className='flex flex-col gap-2'>
+                <Skeleton.Input
+                  active
+                  size='small'
+                  style={{ width: 100, height: 16 }}
+                />
+                <Skeleton.Input
+                  active
+                  size='small'
+                  style={{ width: 150, height: 20 }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className='overflow-hidden rounded-lg border border-gray-100 shadow-sm'>
+          <div className='border-b border-gray-100 bg-gray-50 p-4'>
+            <Skeleton.Input active size='small' style={{ width: 200 }} />
+          </div>
+          <div className='p-6'>
+            <Skeleton active title={false} paragraph={{ rows: 5 }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // --- 3. MAIN RENDER ---
   return (
     <div>
-      <div className='flex items-center gap-4 mb-6'>
-        <h1 className='text-2xl font-bold m-0 text-gray-800'>
+      <div className='mb-6 flex items-center gap-4'>
+        <h1 className='m-0 text-2xl font-bold text-gray-800'>
           {postData?.title || 'Đang tải tên bài kiểm tra...'}
         </h1>
       </div>
 
       {/* Info Cards Section */}
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-8'>
-        <div className=' p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4'>
-          <div className='bg-blue-100 p-3 rounded-full text-blue-600'>
-            <Icon icon='solar:calendar-add-bold-duotone' width='24' height='24' />
+      <div className='mb-8 grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='flex items-center gap-4 rounded-lg border border-gray-100 p-4 shadow-sm'>
+          <div className='rounded-full bg-blue-100 p-3 text-blue-600'>
+            <Icon
+              icon='solar:calendar-add-bold-duotone'
+              width='24'
+              height='24'
+            />
           </div>
           <div>
-            <p className='text-gray-500 m-0'>Ngày giao</p>
-            <p className='font-semibold text-gray-800 m-0'>{formatDate(postData?.createdAt)}</p>
+            <p className='m-0 text-gray-500'>Ngày giao</p>
+            <p className='m-0 font-semibold text-gray-800'>
+              {formatDate(postData?.createdAt)}
+            </p>
           </div>
         </div>
 
-        <div className='p-4 rounded-lg shadow-sm border border-gray-100 flex items-center gap-4'>
-          <div className='bg-red-100 p-3 rounded-full text-red-600'>
-            <Icon icon='solar:alarm-turn-off-bold-duotone' width='24' height='24' />
+        <div className='flex items-center gap-4 rounded-lg border border-gray-100 p-4 shadow-sm'>
+          <div className='rounded-full bg-red-100 p-3 text-red-600'>
+            <Icon
+              icon='solar:alarm-turn-off-bold-duotone'
+              width='24'
+              height='24'
+            />
           </div>
           <div>
-            <p className='text-gray-500 m-0'>Hạn nộp bài (Deadline)</p>
-            <p className='font-semibold text-gray-800 m-0'>{formatDate(postData?.deadline)}</p>
+            <p className='m-0 text-gray-500'>Hạn nộp bài (Deadline)</p>
+            <p className='m-0 font-semibold text-gray-800'>
+              {formatDate(postData?.deadline)}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Table Section */}
-      <div className=' rounded-lg shadow-sm border border-gray-100 overflow-hidden'>
-        <div className='p-4 border-b border-gray-100 bg-gray-50'>
-          <h2 className='text-lg font-semibold text-gray-700 m-0'>Danh sách bài nộp</h2>
+      <div className='overflow-hidden rounded-lg border border-gray-100 shadow-sm'>
+        <div className='border-b border-gray-100 bg-gray-50 p-4'>
+          <h2 className='m-0 text-lg font-semibold text-gray-700'>
+            Danh sách bài nộp
+          </h2>
         </div>
 
         <Table
