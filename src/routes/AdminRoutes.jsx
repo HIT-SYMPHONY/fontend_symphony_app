@@ -49,6 +49,7 @@ const AdminRoutes = (
       <Route path='create' element={<CreateOfClassAdmin />} />
       <Route path=':classId' element={<CheckOfClassAdmin />} />
       <Route path=':classId/members' element={<MemberOfClassAdmin />} />
+      {/*  */}
     </Route>
     {/* Competitions */}
     <Route path='competitions'>

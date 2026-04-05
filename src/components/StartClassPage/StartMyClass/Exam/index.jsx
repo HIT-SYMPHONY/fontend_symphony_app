@@ -11,6 +11,7 @@ import { getPostById } from '../../../../apis/post.api'
 import { createCommentPost, getMyCommentInPost, updateMyComment } from 'apis/commentPost.api'
 import { commentPostCreationSchema } from '../../../../utils/commentPostValidate.js'
 import TiptapEditor from 'components/TiptapEditor'
+import { commentPostKeys, postKeys } from 'constants/queryKeys'
 
 const { Timer } = Statistic
 
@@ -35,12 +36,12 @@ const Exam = () => {
     resolver: yupResolver(commentPostCreationSchema),
   })
 
-  const {
+   const {
     data: postData,
     isLoading: loadingPost,
     error: postError,
   } = useQuery({
-    queryKey: ['post', examId],
+    queryKey: postKeys.detail(examId),
     queryFn: () => getPostById(examId),
     enabled: !!examId,
     select: (response) => response?.data || response,
@@ -51,7 +52,7 @@ const Exam = () => {
     isLoading: loadingMyComment,
     isSuccess: hasSubmittedPrev,
   } = useQuery({
-    queryKey: ['post-comment', examId],
+    queryKey: commentPostKeys.myCommentInPost(examId), // REFACTORED
     queryFn: () => getMyCommentInPost(examId),
     enabled: !!examId,
     retry: false,
@@ -95,7 +96,7 @@ const Exam = () => {
       toast.success('Nộp bài thành công!', { id: context })
       setSubmit(true)
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['myComment', examId])
+      queryClient.invalidateQueries({ queryKey: commentPostKeys.myCommentInPost(examId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi nộp bài.'
@@ -112,7 +113,7 @@ const Exam = () => {
     onSuccess: (data, variables, context) => {
       toast.success('Cập nhật bài thành công!', { id: context })
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['myComment', examId])
+      queryClient.invalidateQueries({ queryKey: commentPostKeys.myCommentInPost(examId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật bài.'

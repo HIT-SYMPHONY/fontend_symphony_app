@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getMyLessons } from '../../apis/lesson.api'
 import TextMessage from '../../components/TextMessage'
 import './style.scss'
+import { lessonKeys } from 'constants/queryKeys'
 
 // Map from JS Day index (Sun=0) to API String
 const dayIndexToApiString = [
@@ -32,7 +33,7 @@ const SchedulePage = () => {
   const [selectedDay, setSelectedDay] = useState(new Date())
 
   const { data: allLessons = [], isLoading: loading } = useQuery({
-    queryKey: ['my-lessons'],
+    queryKey: lessonKeys.myLessons(),
     queryFn: getMyLessons,
     select: (response) => response.data || [],
     onError: () => {
@@ -58,15 +59,10 @@ const SchedulePage = () => {
     })
   }
 
-  // --- THE FIX IS HERE: Correct Filtering Logic ---
   const filteredLessons = useMemo(() => {
-    // 1. Get the API string for the currently selected day (e.g., "MONDAY")
     const selectedDayApiString = dayIndexToApiString[selectedDay.getDay()]
-
-    // 2. Filter the lessons by directly comparing the strings
     return allLessons.filter((lesson) => lesson.dayOfWeek === selectedDayApiString)
   }, [allLessons, selectedDay])
-  console.log(filteredLessons)
 
   return (
     <div className='schedule'>

@@ -9,6 +9,7 @@ import { translateStatus } from '../../../utils/formatters'
 import TextMessage from '../../TextMessage/'
 import useDebounce from '../../../hooks/useDebounce'
 import './style.scss'
+import { classroomKeys } from 'constants/queryKeys'
 
 const MainManage = () => {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ const MainManage = () => {
   const keyword = searchParams.get('name')
 
   const { data: managedClasses, isLoading } = useQuery({
-    queryKey: ['managedClasses', { keyword }],
+    queryKey: classroomKeys.managed({ keyword }),
     queryFn: async () => {
       const params = {
         keyword: keyword || null,

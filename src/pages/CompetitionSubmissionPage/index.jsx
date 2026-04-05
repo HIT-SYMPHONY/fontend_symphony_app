@@ -18,7 +18,7 @@ import { getCompetitionById } from 'apis/competition.api'
 import TextMessage from 'components/TextMessage'
 import SubmissionPageSkeleton from 'components/SubmissionPageSkeleton'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
-import useAuth from 'hooks/useAuth'
+import { commentCompetitionKeys, competitionKeys } from 'constants/queryKeys'
 
 const { Timer } = Statistic
 
@@ -33,8 +33,6 @@ const CompetitionSubmissionPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [pendingFormData, setPendingFormData] = useState(null)
   const [isExpired, setIsExpired] = useState(false)
-  const {user} =useAuth();
-  const currentUserId = user?.id;
 
   const hasEndedRef = useRef(false)
 
@@ -51,7 +49,7 @@ const CompetitionSubmissionPage = () => {
     error: competitionError,
     refetch: refetchCompetition,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId),
     enabled: !!competitionId,
     select: (response) => response?.data || response,
@@ -64,7 +62,7 @@ const CompetitionSubmissionPage = () => {
     error: myCommentError,
     refetch: refetchMyComment,
   } = useQuery({
-    queryKey: ['competition-comments', 'my', competitionId, currentUserId],
+    queryKey: commentCompetitionKeys.myComment(competitionId),
     queryFn: () => getMyCommentsInCompetition(competitionId),
     enabled: !!competitionId,
     retry: false,
@@ -108,7 +106,7 @@ const CompetitionSubmissionPage = () => {
       toast.success('Nộp bài thành công!', { id: context })
       setSubmit(true)
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['competition-comment', competitionId])
+      queryClient.invalidateQueries({ queryKey: commentCompetitionKeys.myComment(competitionId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi nộp bài.'
@@ -128,7 +126,7 @@ const CompetitionSubmissionPage = () => {
     onSuccess: (data, variables, context) => {
       toast.success('Cập nhật bài thành công!', { id: context })
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['competition-comment', competitionId, currentUserId])
+      queryClient.invalidateQueries({ queryKey: commentCompetitionKeys.myComment(competitionId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật bài.'

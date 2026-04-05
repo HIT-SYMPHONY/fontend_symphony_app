@@ -8,6 +8,7 @@ import { get } from 'react-hook-form'
 import { getCompetitionById } from 'apis/competition.api'
 import SubmissionPageSkeleton from 'components/SubmissionPageSkeleton'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { commentCompetitionKeys, competitionKeys } from 'constants/queryKeys'
 
 const ComeptitionScorePage = () => {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ const ComeptitionScorePage = () => {
     isLoading: loadingCompetition,
     error: isCompetitionError,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId),
     enabled: !!competitionId,
     select: (response) => response?.data || response,
@@ -29,7 +30,7 @@ const ComeptitionScorePage = () => {
     isLoading: loadingComment,
     error: isMyCommentError,
   } = useQuery({
-    queryKey: ['competition-comment', competitionId],
+    queryKey: commentCompetitionKeys.myComment(competitionId),
     queryFn: () => getMyCommentsInCompetition(competitionId),
     enabled: !!competitionId,
     retry: false,

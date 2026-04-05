@@ -8,6 +8,7 @@ import { Icon } from '@iconify/react'
 
 import { formatDate } from 'utils/formatters'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { commentCompetitionKeys, competitionKeys } from 'constants/queryKeys'
 
 function LeaderCompetitionAnswersPage() {
   const { competitionId } = useParams()
@@ -26,7 +27,7 @@ function LeaderCompetitionAnswersPage() {
     isError: isErrorCompetition,
     refetch: refetchCompetition,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId),
     enabled: !!competitionId,
     select: (response) => response?.data || response,
@@ -39,12 +40,10 @@ function LeaderCompetitionAnswersPage() {
     isError: isErrorComments,
     refetch: refetchCommnets,
   } = useQuery({
-    queryKey: [
-      'competition-comments',
-      competitionId,
-      pagination.pageNum,
-      pagination.pageSize,
-    ],
+    queryKey: commentCompetitionKeys.byCompetition(competitionId, {
+      pageNum: pagination.pageNum,
+      pageSize: pagination.pageSize,
+    }),
     queryFn: () =>
       getAllCommentsOfCompetition(competitionId, {
         pageNum: pagination.pageNum,

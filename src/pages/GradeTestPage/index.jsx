@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 
 import { getCommetPostById, markCommentPost } from 'apis/commentPost.api'
 import { gradingSchema } from 'utils/commentPostValidate'
+import { commentPostKeys } from 'constants/queryKeys'
 
 function GradeTestPage() {
   const { commentId } = useParams()
@@ -18,7 +19,7 @@ function GradeTestPage() {
 
   // Fetch Student's Submission
   const { data: commentPostData, isLoading: loadingCommentPost } = useQuery({
-    queryKey: ['commentPost', commentId],
+    queryKey: commentPostKeys.detail(commentId),
     queryFn: () => getCommetPostById(commentId),
     enabled: !!commentId,
     select: (response) => response?.data || response,
@@ -60,8 +61,8 @@ function GradeTestPage() {
     onMutate: () => toast.loading('Đang lưu điểm...'),
     onSuccess: (data, variables, context) => {
       toast.success('Chấm điểm thành công!', { id: context })
-      setIsEditing(false) // Turn off edit mode
-      queryClient.invalidateQueries(['commentPost', commentId]) // Refresh data
+      setIsEditing(false) 
+      queryClient.invalidateQueries({ queryKey: commentPostKeys.detail(commentId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi lưu điểm.'

@@ -31,11 +31,9 @@ const PublicPage = () => {
 
   const handleLichHoc = () => {
     // Logic cho "Lịch học" (có thể thêm trạng thái showSchedule nếu cần)
-    console.log("Lịch học clicked");
   };
 
   const handleBaiTap = () => {
-    console.log("Bài tập clicked");
   };
 
   return (

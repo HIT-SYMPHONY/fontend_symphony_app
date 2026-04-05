@@ -7,10 +7,13 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { userCreationSchema } from '../../../../utils/userValidate.js'
 import { createUser } from '../../../../apis/user.api.js'
 import './style.scss'
+import { useQueryClient } from '@tanstack/react-query'
+import { userKeys } from 'constants/queryKeys.js'
 
 const CreateOfMain = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const queryClient = useQueryClient()
 
   const {
     register,
@@ -30,6 +33,7 @@ const CreateOfMain = () => {
     try {
       await createUser(formData)
       toast.success('Tạo tài khoản thành công!', { id: creationToast })
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() }) 
     } catch (error) {
       const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo tài khoản.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
