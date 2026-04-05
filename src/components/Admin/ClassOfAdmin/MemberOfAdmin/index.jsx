@@ -17,11 +17,14 @@ import './style.scss'
 import TextMessage from '../../../TextMessage'
 import { getDisplayName } from 'utils/formatters'
 import { get } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
+import { classroomKeys } from 'constants/queryKeys'
 
 const PAGE_SIZE = 10
 
 const MemberOfClassAdmin = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { classId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const [nonMembers, setNonMembers] = useState([])
@@ -165,6 +168,7 @@ const MemberOfClassAdmin = () => {
     const toastId = toast.loading('Đang thêm thành viên...')
     try {
       await addMembersToClassroom(classId, { memberIds: selectedUserIds })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.detail(classId) })
       setRefetchTrigger((prev) => prev + 1)
       setSelectedUserIds([])
       toast.success('Thêm thành viên thành công!', { id: toastId })

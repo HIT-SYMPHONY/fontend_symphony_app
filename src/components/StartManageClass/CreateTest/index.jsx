@@ -12,6 +12,7 @@ import TiptapEditor from '../../TiptapEditor'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../constants/commonConstant'
 import './style.scss'
 import { formatDate } from 'utils/formatters'
+import { postKeys } from 'constants/queryKeys'
 
 const CreateTest = () => {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ const CreateTest = () => {
     onMutate: () => toast.loading('Đang tạo bài tập...'),
     onSuccess: (data, variables, context) => {
       toast.success('Tạo bài tập thành công!', { id: context })
-      queryClient.invalidateQueries({ queryKey: ['tests', classId] })
+      queryClient.invalidateQueries({ queryKey: postKeys.byClassroom(classId) })
       navigate(`/manage/classes/${classId}/tests`)
     },
     onError: (error, variables, context) => {

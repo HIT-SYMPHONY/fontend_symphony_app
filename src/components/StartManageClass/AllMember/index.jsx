@@ -11,6 +11,7 @@ import { getDisplayName } from '../../../utils/formatters'
 import { PAGE_SIZE } from 'constants/commonConstant'
 import './style.scss'
 import useDebounce from 'hooks/useDebounce'
+import { classroomKeys } from 'constants/queryKeys'
 
 const AllMember = () => {
   const { classId } = useParams()
@@ -19,7 +20,7 @@ const AllMember = () => {
 
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
-      queryKey: ['classroomMembers', classId, keyword],
+      queryKey: classroomKeys.members(classId, { keyword }), 
       queryFn: async ({ pageParam = 1 }) => {
         if (!classId) return { items: [], meta: {} }
         const params = {

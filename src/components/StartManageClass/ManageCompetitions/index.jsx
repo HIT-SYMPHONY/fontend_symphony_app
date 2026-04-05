@@ -10,6 +10,7 @@ import ApiErrorDisplay from 'components/ApiErrorDisplay'
 import { formatDate, translateStatus } from 'utils/formatters'
 import useAuth from 'hooks/useAuth'
 import './style.scss'
+import { competitionKeys } from 'constants/queryKeys'
 
 const ManageCompetitions = () => {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ const ManageCompetitions = () => {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useInfiniteQuery({
-      queryKey: ['competitions', 'manage-list', listParams],
+      queryKey: competitionKeys.list(listParams),
       queryFn: async ({ pageParam = 1 }) => {
         const response = await getAllCompetitions({ ...listParams, pageNum: pageParam })
         return response.data

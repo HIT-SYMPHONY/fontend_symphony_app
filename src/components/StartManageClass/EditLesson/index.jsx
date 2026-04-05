@@ -14,6 +14,7 @@ import TiptapEditor from '../../TiptapEditor'
 import TextMessage from '../../TextMessage'
 import '../ManageLesson/style.scss'
 import { DISPLAY_TIME_FORMAT, API_TIME_FORMAT } from 'constants/commonConstant.js'
+import { lessonKeys } from 'constants/queryKeys.js'
 
 const EditLesson = () => {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ const EditLesson = () => {
   })
 
   const { data: lesson, isLoading: isPageLoading } = useQuery({
-    queryKey: ['lesson', lessonId],
+    queryKey: lessonKeys.detail(lessonId),
     queryFn: async () => {
       if (!lessonId) return null
       const response = await getLessonById(lessonId)
@@ -62,8 +63,8 @@ const EditLesson = () => {
     onMutate: () => toast.loading('Đang cập nhật bài học...'),
     onSuccess: (updatedData, variables, context) => {
       toast.success('Cập nhật bài học thành công!', { id: context })
-      queryClient.invalidateQueries({ queryKey: ['lesson', lessonId] })
-      queryClient.invalidateQueries({ queryKey: ['lessons', classId] })
+   queryClient.invalidateQueries({ queryKey: lessonKeys.detail(lessonId) })
+      queryClient.invalidateQueries({ queryKey: lessonKeys.byClassroom(classId) })
       navigate(`/manage/classes/${classId}/lessons`)
     },
     onError: (error, variables, context) => {

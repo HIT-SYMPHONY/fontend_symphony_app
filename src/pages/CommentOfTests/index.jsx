@@ -8,6 +8,7 @@ import { getPostById } from 'apis/post.api'
 import { getAllCommentsOfPost } from 'apis/commentPost.api'
 import { formatDate } from 'utils/formatters'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { commentPostKeys, postKeys } from 'constants/queryKeys'
 
 const CommentOfTests = () => {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ const CommentOfTests = () => {
     isError: isErrorPost,
     refetch: refetchPost,
   } = useQuery({
-    queryKey: ['post', testId],
+    queryKey: postKeys.detail(testId),
     queryFn: () => getPostById(testId),
     enabled: !!testId,
     select: (response) => response?.data || response,
@@ -39,7 +40,7 @@ const CommentOfTests = () => {
     isError: isErrorComments,
     refetch: refetchComments,
   } = useQuery({
-    queryKey: ['comments', testId, pagination.pageNum, pagination.pageSize],
+    queryKey: commentPostKeys.byPost(testId, { pageNum: pagination.pageNum, pageSize: pagination.pageSize }),
     queryFn: () =>
       getAllCommentsOfPost(testId, {
         pageNum: pagination.pageNum,

@@ -3,6 +3,7 @@ import { Skeleton } from 'antd'
 import { getCompetitionById } from 'apis/competition.api'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
 import TiptapEditor from 'components/TiptapEditor'
+import { competitionKeys } from 'constants/queryKeys'
 import { useParams } from 'react-router-dom'
 import { safeParse } from 'utils/formatters'
 
@@ -15,7 +16,7 @@ function LeaderCompetitionRulesPage() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
   })

@@ -5,20 +5,21 @@ import TiptapEditor from 'components/TiptapEditor'
 import { useQuery } from '@tanstack/react-query'
 import { getPostById } from 'apis/post.api'
 import { getMyCommentInPost } from 'apis/commentPost.api'
+import { postKeys, commentPostKeys } from 'constants/queryKeys'
 
 const Comment = () => {
   const navigate = useNavigate()
   const { examId } = useParams()
 
-  const { data: postData, isLoading: loadingPost } = useQuery({
-    queryKey: ['post', examId],
+ const { data: postData, isLoading: loadingPost } = useQuery({
+    queryKey: postKeys.detail(examId), 
     queryFn: () => getPostById(examId),
     enabled: !!examId,
     select: (response) => response?.data || response,
   })
 
   const { data: myComment, isLoading: loadingComment } = useQuery({
-    queryKey: ['myComment', examId],
+    queryKey: commentPostKeys.myCommentInPost(examId),
     queryFn: () => getMyCommentInPost(examId),
     enabled: !!examId,
     retry: false,

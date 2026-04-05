@@ -11,6 +11,7 @@ import { createLesson } from '../../../apis/lesson.api'
 import TiptapEditor from '../../TiptapEditor'
 import { DISPLAY_TIME_FORMAT, API_TIME_FORMAT } from 'constants/commonConstant.js'
 import './style.scss'
+import { lessonKeys } from 'constants/queryKeys.js'
 
 const CreateLessonID = () => {
   const navigate = useNavigate()
@@ -38,7 +39,7 @@ const CreateLessonID = () => {
     },
     onSuccess: (data, variables, context) => {
       toast.success('Tạo bài học thành công!', { id: context })
-      queryClient.invalidateQueries({ queryKey: ['lessons', classId] })
+      queryClient.invalidateQueries({ queryKey: lessonKeys.byClassroom(classId) })
       navigate(`/manage/classes/${classId}/lessons`)
     },
     onError: (error, variables, context) => {

@@ -59,19 +59,16 @@ const AccountFrame = ({ onSetSub }) => {
 
     const handleNew = (event) => {
       setPassNew(event.target.value);
-      console.log("Mật khẩu mới:", event.target.value);
     };
 
     const handleRepeat = (event) => {
       setRepeat(event.target.value);
-      console.log("Mật khẩu nhập lại:", event.target.value);
     };
 
     const handleSubmit = () => {
       if (passNew === repeat && passNew !== "") {
         setFrame(handleFrame(3));
       } else {
-        console.log("Mật khẩu không khớp hoặc để trống!");
       }
     };
 
@@ -110,14 +107,12 @@ const AccountFrame = ({ onSetSub }) => {
 
     const handleChange = (event) => {
       setPassword(event.target.value);
-      console.log("Mật khẩu hiện tại:", event.target.value);
     };
 
     const handleCheck = () => {
       if (password !== "") {
         setFrame(handleFrame(2));
       } else {
-        console.log("Vui lòng nhập mật khẩu hiện tại!");
       }
     };
 

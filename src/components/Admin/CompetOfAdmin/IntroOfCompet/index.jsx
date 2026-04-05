@@ -15,13 +15,15 @@ import TextMessage from '../../../TextMessage'
 import TiptapEditor from '../../../TiptapEditor'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from 'constants/commonConstant.js'
 import './style.scss'
+import { useQueryClient } from '@tanstack/react-query'
+import { competitionKeys } from 'constants/queryKeys'
 
 const EditorPlaceholder = () => <div className='editor-placeholder'>Loading Editor...</div>
 
 const IntroOfCompetAdmin = () => {
   const { competitionId } = useParams()
   const navigate = useNavigate()
-
+  const queryClient = useQueryClient()
   const [information, setInformation] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [imageFile, setImageFile] = useState(null)
@@ -143,6 +145,8 @@ const IntroOfCompetAdmin = () => {
       toast.success('Cập nhật thành công!', { id: updateToast })
       setIsEditing(false)
       setImageFile(null)
+      queryClient.invalidateQueries({ queryKey: competitionKeys.detail(competitionId) })
+      queryClient.invalidateQueries({ queryKey: competitionKeys.lists() })
     } catch (err) {
       const message = err.response?.data?.message || 'Cập nhật thất bại.'
       toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {

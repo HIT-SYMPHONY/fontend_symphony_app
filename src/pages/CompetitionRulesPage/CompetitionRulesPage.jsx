@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { safeParse } from 'utils/formatters'
 import TextMessage from 'components/TextMessage'
 import { Skeleton } from 'antd'
+import { competitionKeys } from 'constants/queryKeys'
 
 function CompetitionRulesPage() {
   const navigate = useNavigate()
@@ -14,7 +15,7 @@ function CompetitionRulesPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
     onError: (error) => {

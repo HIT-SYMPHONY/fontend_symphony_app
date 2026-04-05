@@ -5,9 +5,10 @@ import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createNotification } from 'apis/classroom.api'
 import './style.scss'
+import { classroomKeys } from 'constants/queryKeys'
 
 const schema = yup.object().shape({
   title: yup.string().required('Vui lòng nhập tiêu đề'),
@@ -28,6 +29,7 @@ const CreateNotification = () => {
       content: '',
     },
   })
+  const queryClient = useQueryClient()
 
   const mutation = useMutation({
     mutationFn: (data) => {
@@ -39,9 +41,14 @@ const CreateNotification = () => {
     onSuccess: (data, variables, context) => {
       toast.success('Tạo thông báo thành công!', { id: context })
       reset()
+      queryClient.invalidateQueries({
+        queryKey: classroomKeys.notifications(classId),
+      })
     },
     onError: (error, variables, context) => {
-      toast.error(error?.response?.data?.message || 'Có lỗi xảy ra', { id: context })
+      toast.error(error?.response?.data?.message || 'Có lỗi xảy ra', {
+        id: context,
+      })
     },
   })
 
@@ -69,8 +76,7 @@ const CreateNotification = () => {
           <button
             type='submit'
             className='memberclass__title__button'
-            disabled={mutation.isPending}
-          >
+            disabled={mutation.isPending}>
             {mutation.isPending ? 'Đang lưu...' : 'Lưu'}
           </button>
         </div>
@@ -81,16 +87,19 @@ const CreateNotification = () => {
             placeholder='Nhập tiêu đề thông báo...'
             {...register('title')}
           />
-          {errors.title && <span style={{ color: 'red' }}>{errors.title.message}</span>}
+          {errors.title && (
+            <span style={{ color: 'red' }}>{errors.title.message}</span>
+          )}
 
           <span>Nội dung</span>
           <textarea
             className='memberclass__context__textarea'
             rows='5'
             placeholder='Nhập nội dung thông báo...'
-            {...register('content')}
-          ></textarea>
-          {errors.content && <span style={{ color: 'red' }}>{errors.content.message}</span>}
+            {...register('content')}></textarea>
+          {errors.content && (
+            <span style={{ color: 'red' }}>{errors.content.message}</span>
+          )}
         </div>
       </form>
     </div>

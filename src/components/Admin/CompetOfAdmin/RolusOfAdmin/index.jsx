@@ -9,11 +9,13 @@ import TiptapEditor from 'components/TiptapEditor'
 import { safeParse } from 'utils/formatters'
 import './style.scss'
 import useOnClickOutside from 'hooks/useOnClickOutside'
+import { competitionKeys } from 'constants/queryKeys'
+import { useQueryClient } from '@tanstack/react-query'
 
 const RulesOfManageCompet = () => {
   const navigate = useNavigate()
   const { competitionId } = useParams()
-
+  const queryClient = useQueryClient()
   const [information, setInformation] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
@@ -75,7 +77,6 @@ const RulesOfManageCompet = () => {
       ...information,
       rule: data.rule ? JSON.stringify(data.rule) : '',
     }
-    console.log(payload)
     delete payload.id
     delete payload.status
     delete payload.createdAt
@@ -89,6 +90,7 @@ const RulesOfManageCompet = () => {
       toast.success('Cập nhật thể lệ thành công!', { id: saveToast })
       setIsEditing(false)
       processAndSetData(response.data)
+      queryClient.invalidateQueries({ queryKey: competitionKeys.detail(competitionId) })
     } catch (error) {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
       const errorMessage = typeof message === 'object' ? Object.values(message).join('\n') : message

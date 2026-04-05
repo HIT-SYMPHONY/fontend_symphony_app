@@ -11,8 +11,12 @@ import { updateClassroom } from '../../../apis/classroom.api'
 import { formatDate, safeParse } from '../../../utils/formatters'
 import { useClassroomContext } from '../Information'
 import TiptapEditor from '../../TiptapEditor'
-import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../../constants/commonConstant'
+import {
+  DISPLAY_DATE_FORMAT,
+  API_DATE_FORMAT,
+} from '../../../constants/commonConstant'
 import './style.scss'
+import { classroomKeys } from 'constants/queryKeys'
 
 const Communication = () => {
   const { classId } = useParams()
@@ -50,11 +54,15 @@ const Communication = () => {
     onSuccess: (updatedData, variables, context) => {
       toast.success('Cập nhật thành công!', { id: context })
       setIsEditing(false)
-      queryClient.invalidateQueries({ queryKey: ['classroom', classId] })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.detail(classId) })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
-      const errorMessage = typeof message === 'object' ? Object.values(message).join('; ') : message
+      const errorMessage =
+        typeof message === 'object'
+          ? Object.values(message).join('; ')
+          : message
       toast.error(errorMessage, { id: context })
     },
   })
@@ -110,7 +118,9 @@ const Communication = () => {
 
   return (
     <div className='manage-infor__context-infor'>
-      <form onSubmit={handleSubmit(onSubmit)} className='manage-infor__context-infor-form'>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className='manage-infor__context-infor-form'>
         <div className='manage-infor__context-infor__title'>
           <div className='title-com'>
             <i className='fa-solid fa-circle-info title-com__i'></i>
@@ -230,7 +240,12 @@ const Communication = () => {
               type='button'
               className='manage-infor__context-cancel-btn manage-infor__context-btn'
               onClick={handleCancel}>
-              <Icon icon='material-symbols:cancel-outline' width='15' height='15' /> Hủy
+              <Icon
+                icon='material-symbols:cancel-outline'
+                width='15'
+                height='15'
+              />{' '}
+              Hủy
             </button>
           </div>
         ) : (

@@ -6,6 +6,7 @@ import { getLessonsByClassId, deleteLesson } from '../../../apis/lesson.api'
 import { formatDateTime } from '../../../utils/formatters'
 import TextMessage from '../../TextMessage'
 import './style.scss'
+import { lessonKeys } from 'constants/queryKeys'
 
 const ManageLesson = () => {
   const navigate = useNavigate()
@@ -19,14 +20,13 @@ const ManageLesson = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['lessons', classId, keyword],
+    queryKey: lessonKeys.byClassroom(classId, { keyword }),
     queryFn: async () => {
       if (!classId) return []
       const params = {
         keyword: keyword || null,
       }
       const filteredParams = Object.fromEntries(Object.entries(params).filter(([, v]) => v != null))
-      console.log(filteredParams)
       const response = await getLessonsByClassId(classId, filteredParams)
       return response.data || []
     },
@@ -43,7 +43,7 @@ const ManageLesson = () => {
     },
     onSuccess: (data, variables, context) => {
       toast.success('Xóa bài học thành công!', { id: context })
-      queryClient.invalidateQueries({ queryKey: ['lessons', classId] })
+      queryClient.invalidateQueries({ queryKey: lessonKeys.byClassroom(classId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi xóa bài học.'
