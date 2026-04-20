@@ -10,7 +10,6 @@ const TableCompetition = ({ onSetSub }) => {
   const lop = [
     {
       name: 'Tuần 1',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -19,7 +18,6 @@ const TableCompetition = ({ onSetSub }) => {
     },
     {
       name: 'Tuần 2',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -28,7 +26,6 @@ const TableCompetition = ({ onSetSub }) => {
     },
     {
       name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -37,7 +34,6 @@ const TableCompetition = ({ onSetSub }) => {
     },
     {
       name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -46,7 +42,6 @@ const TableCompetition = ({ onSetSub }) => {
     },
     {
       name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -55,7 +50,6 @@ const TableCompetition = ({ onSetSub }) => {
     },
     {
       name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -65,7 +59,6 @@ const TableCompetition = ({ onSetSub }) => {
 
     {
       name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -152,7 +145,6 @@ const TableCompetition = ({ onSetSub }) => {
                         <p>{item.timegiao}</p>
                       </div>
                       <div className='list-table__thongtin'>
-                        <p>{item.nguoinop}</p>
                         <p>{item.timenop}</p>
                       </div>
                       <Icon

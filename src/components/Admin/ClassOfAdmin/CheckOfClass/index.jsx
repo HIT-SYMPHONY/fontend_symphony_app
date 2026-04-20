@@ -130,6 +130,7 @@ const CheckOfClassAdmin = () => {
       setIsEditing(false)
       queryClient.invalidateQueries({ queryKey: classroomKeys.detail(classId) })
       queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
       await fetchData()
     } catch (err) {
       const message = err.response?.data?.message || 'Cập nhật thất bại.'

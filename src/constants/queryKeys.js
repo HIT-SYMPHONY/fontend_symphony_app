@@ -29,7 +29,8 @@ export const classroomKeys = {
   all: ['classrooms'],
   lists: () => [...classroomKeys.all, 'list'],
   list: (params) => [...classroomKeys.lists(), params],
-
+  summaries: () => [...classroomKeys.all, 'summary'],
+  summary: (params) => [...classroomKeys.summaries(), params],
   managed: (params) => [...classroomKeys.all, 'managed', params],
 
   details: () => [...classroomKeys.all, 'detail'],

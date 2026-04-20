@@ -90,6 +90,7 @@ const CreateOfClassAdmin = () => {
       await createClassroom(formDataToSend)
       toast.success('Tạo lớp học thành công!', { id: createToast })
       queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
       navigate('/admin/classes')
     } catch (err) {
       const message = err.response?.data?.message || 'Tạo lớp học thất bại.'

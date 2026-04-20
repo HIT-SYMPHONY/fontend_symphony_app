@@ -1,16 +1,77 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '@iconify/react'
+import { useInfiniteQuery, useQueries, useQuery } from '@tanstack/react-query'
+import { getAllClassroomSummaries } from 'apis/classroom.api'
+import { getClassroomPostsWithScore } from 'apis/post.api'
 import './style.scss'
+import { classroomKeys, postKeys } from 'constants/queryKeys'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { useInView } from 'react-intersection-observer'
+import useAuth from 'hooks/useAuth'
+import { translateStatus } from 'utils/formatters'
 
 const TableResult = ({ onSetSub }) => {
   const navigate = useNavigate()
+  const { ref, inView } = useInView({ threshold: 0, rootMargin: '100px' })
+  const { user } = useAuth()
+  const currentUserId = user?.id
+  const {
+    data: classrooms,
+    fetchNextPage: fetchMoreClassrooms,
+    hasNextPage: hasMoreClassrooms,
+    isFetchingNextPage: isFetchingMoreClassrooms,
+    isLoading: isLoadingClassrooms,
+    isError: isErrorClassrooms,
+    refetch: refetchClassrooms,
+  } = useInfiniteQuery({
+    queryKey: classroomKeys.list(),
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await getAllClassroomSummaries({
+        pageNum: pageParam,
+      })
+      return response.data
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage?.meta?.pageNum < lastPage?.meta?.totalPages) {
+        return lastPage.meta.pageNum + 1
+      }
+      return undefined
+    },
+    enabled: !!currentUserId,
+  })
+  const classroomsData = classrooms?.pages.flatMap((page) => page.items) || []
+  if (isErrorClassrooms) {
+    return (
+      <ApiErrorDisplay
+        title='Lỗi tải danh sách cuộc thi'
+        refetchQueries={[refetch]}
+      />
+    )
+  }
+  if (!isLoadingClassrooms) {
+    console.log(classroomsData)
+  }
+  const {
+    data: classroomPosts,
+    isLoading: isLoadingPosts,
+    isError: isErrorPosts,
+    refetch: refetchPosts,
+  } = useQuery({
+    queryKey: postKeys.byClassroom(classroomsData[5]?.id),
+    queryFn: () => getClassroomPostsWithScore(classroomsData[5]?.id).then((res) => res.data),
+    enabled: !!classroomsData[5],
+  })
+  if (!isLoadingPosts) {
+    console.log(classroomPosts)
+  }
+
   // Dữ liệu mẫu
   const list = [1, 2, 3, 4, 5, 6, 7]
   const lop = [
     {
       name: 'Buổi 8: Kiểm tra',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -19,7 +80,6 @@ const TableResult = ({ onSetSub }) => {
     },
     {
       name: 'Bài tập buổi 1',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -28,7 +88,6 @@ const TableResult = ({ onSetSub }) => {
     },
     {
       name: 'Bài tập buổi 2',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -37,7 +96,6 @@ const TableResult = ({ onSetSub }) => {
     },
     {
       name: 'Bài tập buổi 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -46,7 +104,6 @@ const TableResult = ({ onSetSub }) => {
     },
     {
       name: 'Bài tập buổi 4',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -55,7 +112,6 @@ const TableResult = ({ onSetSub }) => {
     },
     {
       name: 'Bài tập buổi 4',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -65,7 +121,6 @@ const TableResult = ({ onSetSub }) => {
 
     {
       name: 'Bài tập buổi 4',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
       timenop: 'Ngày kiểm tra: 30/06/2025',
       nguoigiao: 'Người giao: Nguyễn Thị N',
       timegiao: 'Thời gian làm bài: 01 : 30 : 00',
@@ -79,7 +134,9 @@ const TableResult = ({ onSetSub }) => {
 
   // Hàm toggle trạng thái add cho một mục cụ thể
   const toggleAdd = (index) => {
-    setAddStates((prev) => prev.map((state, i) => (i === index ? !state : state)))
+    setAddStates((prev) =>
+      prev.map((state, i) => (i === index ? !state : state)),
+    )
   }
 
   return (
@@ -103,19 +160,28 @@ const TableResult = ({ onSetSub }) => {
       </div>
 
       <div className='table-result__body'>
-        {list.map((item, index) => (
-          <div className='body' key={index}>
+        {classroomsData.map((classroom, index) => (
+          <div className='body' key={classroom.id}>
             <div className='body__img'>
-              <div className='body__img__hinhanh'></div>
+              <div className='body__img__hinhanh overflow-hidden'>
+                <img
+                  src={classroom.image}
+                  alt=''
+                  className='h-full w-full object-cover'
+                />
+              </div>
               <div className='body__img__tieumuc'>
-                <h5>PRIVATE: Đồ họa - 2025</h5>
+                <h5>{classroom.name || 'Chưa cập nhật'}</h5>
                 <div className='body__img__tieumuc__space'>
-                  <span>Đang diễn ra</span>
+                  <span>{translateStatus(classroom.status) || 'Chưa cập nhật'}</span>
                   <div className='space'>
-                    <span>6 bài tập</span>
-                    <span>1 bài kiểm tra</span>
+                    <span>{`${classroom.numberOfPosts} bài tập`}</span>
                     <Icon
-                      icon={addStates[index] ? 'mingcute:up-fill' : 'mingcute:down-fill'}
+                      icon={
+                        addStates[index]
+                          ? 'mingcute:up-fill'
+                          : 'mingcute:down-fill'
+                      }
                       width='24'
                       height='24'
                       className='space__mau'
@@ -123,7 +189,7 @@ const TableResult = ({ onSetSub }) => {
                     />
                   </div>
                 </div>
-                <p>Leader: Vũ Gia Chiến</p>
+                <p>{classroom.leaderName || 'Chưa cập nhật'}</p>
               </div>
             </div>
             {addStates[index] && (
@@ -139,9 +205,7 @@ const TableResult = ({ onSetSub }) => {
                     <div className='list-table' key={index}>
                       <div className='list-table__title'>
                         <Icon
-                          icon={
-                            item.style === 1 ? 'ph:exam-fill' : 'material-symbols:menu-book-rounded'
-                          }
+                          icon='material-symbols:menu-book-rounded'
                           width='24'
                           height='24'
                           className='list-table__title__icon'
@@ -151,10 +215,9 @@ const TableResult = ({ onSetSub }) => {
                       <h3 className='list-table__h3'>{item.diem}</h3>
                       <div className='list-table__thongtin'>
                         <p>{item.nguoigiao}</p>
-                        <p>{item.timegiao}</p>
+                        <p>{item.timenop}</p>
                       </div>
                       <div className='list-table__thongtin'>
-                        <p>{item.nguoinop}</p>
                         <p>{item.timenop}</p>
                       </div>
                       <Icon

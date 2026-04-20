@@ -17,9 +17,15 @@ const postApi = () => ({
 
   getPostById: async (postId) => api.get(ApiConstant.posts.getById(postId)),
 
-  updatePost: async (postId, payload) => api.put(ApiConstant.posts.getById(postId), payload),
+  updatePost: async (postId, payload) =>
+    api.put(ApiConstant.posts.getById(postId), payload),
 
   deletePost: async (postId) => api.delete(ApiConstant.posts.getById(postId)),
+
+  getClassroomPostsWithScore: async (classroomId, params) =>
+    api.get(ApiConstant.posts.getByClassroomIdWithScore(classroomId), {
+      params,
+    }),
 })
 
 export const {
@@ -29,4 +35,5 @@ export const {
   getPostById,
   updatePost,
   deletePost,
+  getClassroomPostsWithScore,
 } = postApi()
