@@ -127,7 +127,7 @@ const TableResult = ({ onSetSub }) => {
 
                 <div className='body__img__tieumuc'>
                   <h3>{classroom.name || 'Chưa cập nhật'}</h3>
-                  <div className='body__img__tieumuc__space'>
+                  <div className='body__img__tieumuc__space justify-between'>
                     <span>
                       {translateStatus(classroom.status) || 'Chưa cập nhật'}
                     </span>
