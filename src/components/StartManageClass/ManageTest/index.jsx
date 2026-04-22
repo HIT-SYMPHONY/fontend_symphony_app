@@ -6,7 +6,7 @@ import { getPostsByClassroomId, deletePost } from '../../../apis/post.api'
 import { formatDateTime } from '../../../utils/formatters'
 import TextMessage from '../../TextMessage'
 import '../ManageLesson/style.scss'
-import { postKeys } from 'constants/queryKeys'
+import { classroomKeys, postKeys } from 'constants/queryKeys'
 
 const ManageTest = () => {
   const navigate = useNavigate()
@@ -46,6 +46,7 @@ const ManageTest = () => {
     onSuccess: (data, variables, context) => {
       toast.success('Xóa bài kiểm tra thành công!', { id: context })
       queryClient.invalidateQueries({ queryKey: postKeys.byClassroom(classId) })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi xóa bài kiểm tra.'

@@ -144,7 +144,6 @@ $background-light: #ffefe4;
               gap: 20px;
               align-items: center;
               &__icon {
-                padding: 10px;
                 color: #fff;
                 background-color: #ff6911;
                 border-radius: 10px;
@@ -152,6 +151,7 @@ $background-light: #ffefe4;
             }
             &__thongtin {
               justify-self: center;
+              color: #757575;
             }
 
             &__h3 {

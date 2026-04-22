@@ -9,7 +9,7 @@ import { Modal, Statistic } from 'antd'
 
 import {
   createCommentCompetition,
-  getMyCommentsInCompetition,
+  getMyCommentInCompetition,
   updateMyComment,
 } from 'apis/commentCompetition.api'
 import { commentCompetitionCreationSchema } from 'utils/commentCompetition'
@@ -63,7 +63,7 @@ const CompetitionSubmissionPage = () => {
     refetch: refetchMyComment,
   } = useQuery({
     queryKey: commentCompetitionKeys.myComment(competitionId),
-    queryFn: () => getMyCommentsInCompetition(competitionId),
+    queryFn: () => getMyCommentInCompetition(competitionId),
     enabled: !!competitionId,
     retry: false,
     select: (response) => response?.data || response,

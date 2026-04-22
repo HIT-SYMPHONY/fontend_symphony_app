@@ -56,6 +56,7 @@ const Communication = () => {
       setIsEditing(false)
       queryClient.invalidateQueries({ queryKey: classroomKeys.detail(classId) })
       queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'

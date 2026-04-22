@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { useNavigate, useParams } from 'react-router-dom'
 import TiptapEditor from 'components/TiptapEditor'
 import { useQuery } from '@tanstack/react-query'
-import { getMyCommentsInCompetition } from 'apis/commentCompetition.api'
+import { getMyCommentInCompetition } from 'apis/commentCompetition.api'
 import { get } from 'react-hook-form'
 import { getCompetitionById } from 'apis/competition.api'
 import SubmissionPageSkeleton from 'components/SubmissionPageSkeleton'
@@ -31,7 +31,7 @@ const ComeptitionScorePage = () => {
     error: isMyCommentError,
   } = useQuery({
     queryKey: commentCompetitionKeys.myComment(competitionId),
-    queryFn: () => getMyCommentsInCompetition(competitionId),
+    queryFn: () => getMyCommentInCompetition(competitionId),
     enabled: !!competitionId,
     retry: false,
     select: (response) => response?.data || response,

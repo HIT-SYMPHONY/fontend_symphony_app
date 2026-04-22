@@ -63,7 +63,7 @@ const EditLesson = () => {
     onMutate: () => toast.loading('Đang cập nhật bài học...'),
     onSuccess: (updatedData, variables, context) => {
       toast.success('Cập nhật bài học thành công!', { id: context })
-   queryClient.invalidateQueries({ queryKey: lessonKeys.detail(lessonId) })
+      queryClient.invalidateQueries({ queryKey: lessonKeys.detail(lessonId) })
       queryClient.invalidateQueries({ queryKey: lessonKeys.byClassroom(classId) })
       navigate(`/manage/classes/${classId}/lessons`)
     },
