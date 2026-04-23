@@ -49,6 +49,7 @@ import LeaderCompetitionRulesPage from 'pages/LeaderCompetitionRulesPage'
 import LeaderCompetitionParticipantsPage from 'pages/LeaderCompetitionParticipantsPage'
 import LeaderCompetitionAnswersPage from 'pages/LeaderCompetitionAnswersPage'
 import LeaderManageCompetitionsIndexPage from 'pages/LeaderManageCompetitionsIndexPage'
+import GradeCompetitionPage from 'pages/GradeCompetitionPage'
 const ClientRoutes = (
   <>
     <Route
@@ -117,6 +118,7 @@ const ClientRoutes = (
             <Route path='rules' element={<LeaderCompetitionRulesPage />} />
             <Route path='tests' element={<LeaderCompetitionAnswersPage />} />
             <Route path='participants' element={<LeaderCompetitionParticipantsPage />} />
+            <Route path='tests/:testId' element={<GradeCompetitionPage></GradeCompetitionPage>}></Route>
           </Route>
         </Route>
       </Route>
