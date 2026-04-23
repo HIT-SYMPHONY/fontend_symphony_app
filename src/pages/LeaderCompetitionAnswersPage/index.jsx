@@ -105,7 +105,7 @@ function LeaderCompetitionAnswersPage() {
           className='cursor-pointer font-semibold transition-colors hover:text-primary'
           onClick={() =>
             navigate(
-              `/manage/competitions/${competitionId}/tests/${record.id}/grade`,
+              `/manage/competitions/${competitionId}/tests/${record.id}`,
             )
           }>
           Chấm điểm
