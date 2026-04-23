@@ -28,8 +28,7 @@ const AccountPage = () => {
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
-  const formRef = useRef(null)
-  const imageUploadRef = useRef(null)
+  const queryClient = useQueryClient()
 
   const {
     register,

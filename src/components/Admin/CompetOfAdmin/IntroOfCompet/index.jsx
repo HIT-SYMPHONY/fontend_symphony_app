@@ -18,7 +18,6 @@ import './style.scss'
 import { useQueryClient } from '@tanstack/react-query'
 import { competitionKeys } from 'constants/queryKeys'
 
-const EditorPlaceholder = () => <div className='editor-placeholder'>Loading Editor...</div>
 
 const EditorPlaceholder = () => <div className='editor-placeholder'>Loading Editor...</div>
 
