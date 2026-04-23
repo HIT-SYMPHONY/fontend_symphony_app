@@ -13,6 +13,8 @@ import './style.scss'
 import { getDisplayName } from 'utils/formatters.js'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from 'constants/commonConstant.js'
 import EditorPlaceholder from 'components/EditorPlaceHolder/index.jsx'
+import { useQueryClient } from '@tanstack/react-query'
+import { classroomKeys } from 'constants/queryKeys.js'
 const TiptapEditor = React.lazy(() => import('../../../TiptapEditor'))
 const CreateOfClassAdmin = () => {
   const navigate = useNavigate()
@@ -30,6 +32,7 @@ const CreateOfClassAdmin = () => {
   const [imagePreview, setImagePreview] = useState(null)
   const [leaders, setLeaders] = useState([])
   const fileInputRef = useRef(null)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const fetchLeaders = async () => {
@@ -86,6 +89,8 @@ const CreateOfClassAdmin = () => {
     try {
       await createClassroom(formDataToSend)
       toast.success('Tạo lớp học thành công!', { id: createToast })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
       navigate('/admin/classes')
     } catch (err) {
       const message = err.response?.data?.message || 'Tạo lớp học thất bại.'

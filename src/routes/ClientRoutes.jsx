@@ -49,6 +49,7 @@ import LeaderCompetitionRulesPage from 'pages/LeaderCompetitionRulesPage'
 import LeaderCompetitionParticipantsPage from 'pages/LeaderCompetitionParticipantsPage'
 import LeaderCompetitionAnswersPage from 'pages/LeaderCompetitionAnswersPage'
 import LeaderManageCompetitionsIndexPage from 'pages/LeaderManageCompetitionsIndexPage'
+import GradeCompetitionPage from 'pages/GradeCompetitionPage'
 const ClientRoutes = (
   <>
     <Route
@@ -98,11 +99,9 @@ const ClientRoutes = (
           <Route index element={<Communication />} />
           <Route path='notifications' element={<Notification />} />
           <Route path='notifications/create' element={<CreateNotification />} />
-          <Route path='tests/:testId/grade' element={<VeiwsLesson />} />
           <Route path='members' element={<AllMember />} />
           <Route path='lessons' element={<ManageLesson />} />
           <Route path='lessons/create' element={<CreateLessonID />} />
-          <Route path='lessons/:lessonId' element={<VeiwsLesson />} />
           <Route path='lessons/:lessonId/edit' element={<EditLesson />}></Route>
           <Route path='tests' element={<ManageTest />} />
           {/* <Route path='tests' element={<TestContent />} /> */}
@@ -119,6 +118,7 @@ const ClientRoutes = (
             <Route path='rules' element={<LeaderCompetitionRulesPage />} />
             <Route path='tests' element={<LeaderCompetitionAnswersPage />} />
             <Route path='participants' element={<LeaderCompetitionParticipantsPage />} />
+            <Route path='tests/:testId' element={<GradeCompetitionPage></GradeCompetitionPage>}></Route>
           </Route>
         </Route>
       </Route>

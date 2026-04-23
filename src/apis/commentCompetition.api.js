@@ -7,12 +7,12 @@ const commentCompetitionApi = () => ({
     api.post(ApiConstant.commentCompetitions.getCommentsBycompetitionId(competitionId), payload),
   getAllCommentsOfCompetition: async (competitionId) =>
     api.get(ApiConstant.commentCompetitions.getCommentsBycompetitionId(competitionId)),
-  getMyCommentsInCompetition: async (competitionId) =>
-    api.get(ApiConstant.commentCompetitions.getMyCommentsInCompetition(competitionId)),
+  getMyCommentInCompetition: async (competitionId) =>
+    api.get(ApiConstant.commentCompetitions.getMyCommentInCompetition(competitionId)),
   markCommentCompetiton: async (commentId, payload) =>
     api.patch(ApiConstant.commentCompetitions.getById(commentId), payload),
   updateMyComment: async (competitionId, payload) =>
-    api.patch(ApiConstant.commentCompetitions.getMyCommentsInCompetition(competitionId), payload),
+    api.patch(ApiConstant.commentCompetitions.getMyCommentInCompetition(competitionId), payload),
   getCommentCompetitionById: async (commentId) =>
     api.get(ApiConstant.commentCompetitions.getById(commentId)),
 })
@@ -20,7 +20,7 @@ const commentCompetitionApi = () => ({
 export const {
   createCommentCompetition,
   getAllCommentsOfCompetition,
-  getMyCommentsInCompetition,
+  getMyCommentInCompetition,
   markCommentCompetiton,
   updateMyComment,
   getCommentCompetitionById,

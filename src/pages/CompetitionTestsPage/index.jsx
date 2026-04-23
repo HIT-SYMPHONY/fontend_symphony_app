@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { formatDate, translateStatus } from 'utils/formatters'
 
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { competitionKeys, userKeys } from 'constants/queryKeys'
 
 function CompetitionTestsPage() {
   const navigate = useNavigate()
@@ -20,7 +21,7 @@ function CompetitionTestsPage() {
     isError: isErrorCompetition,
     refetch: refetchCompetition,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
   })
@@ -31,7 +32,7 @@ function CompetitionTestsPage() {
     isError: isErrorUser,
     refetch: refetchUser,
   } = useQuery({
-    queryKey: ['user'],
+    queryKey: userKeys.currentUser(),
     queryFn: () => getCurrentUser().then((res) => res.data),
     enabled: true,
   })

@@ -5,6 +5,9 @@ import { ApiConstant } from '../constants/api.constant'
 const classroomApi = () => ({
   getAllClassrooms: async (params) => api.get(ApiConstant.classrooms.base, { params }),
 
+  getAllClassroomSummaries: async (params) =>
+    api.get(ApiConstant.classrooms.summaries, { params }),
+
   getClassroomById: async (classroomId) =>
     api.get(ApiConstant.classrooms.getById(classroomId)),
 
@@ -36,7 +39,6 @@ const classroomApi = () => ({
 
   createNotification: async (classroomId, payload) => {
     const url = ApiConstant.classrooms.createNotification(classroomId)
-    console.log(url);
     return api.post(url, payload)
   },
 
@@ -58,5 +60,6 @@ export const {
   getManagedClasses,
   getMembersNotInClassroom,
   createNotification,
-  getNotificationsOfClassroom
+  getNotificationsOfClassroom,
+  getAllClassroomSummaries,
 } = classroomApi()

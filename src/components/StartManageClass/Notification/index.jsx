@@ -8,6 +8,7 @@ import { deleteNotification } from '../../../apis/notification.api'
 import { getNotificationsOfClassroom } from 'apis/classroom.api'
 import { formatDate } from '../../../utils/formatters'
 import './style.scss'
+import { classroomKeys } from 'constants/queryKeys'
 
 const Notification = () => {
   const { classId } = useParams()
@@ -25,7 +26,7 @@ const Notification = () => {
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ['notifications', classId, pageNum, pageSize, keyword],
+    queryKey: classroomKeys.notifications(classId, { pageNum, pageSize, keyword }),
     queryFn: async () => {
       if (!classId) return { items: [], meta: { totalElements: 0 } }
       const response = await getNotificationsOfClassroom(classId, { pageNum, pageSize, keyword })
@@ -45,7 +46,7 @@ const Notification = () => {
       if (notifications.length === 1 && pageNum > 1) {
         setPageNum((prev) => prev - 1)
       }
-      queryClient.invalidateQueries({ queryKey: ['notifications', classId] })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.notifications(classId) })
     },
     onError: (error, _, toastId) => {
       toast.error(error.response?.data?.message || 'Xóa thất bại.', { id: toastId })

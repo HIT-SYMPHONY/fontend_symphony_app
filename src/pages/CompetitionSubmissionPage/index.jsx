@@ -9,7 +9,7 @@ import { Modal, Statistic } from 'antd'
 
 import {
   createCommentCompetition,
-  getMyCommentsInCompetition,
+  getMyCommentInCompetition,
   updateMyComment,
 } from 'apis/commentCompetition.api'
 import { commentCompetitionCreationSchema } from 'utils/commentCompetition'
@@ -18,6 +18,7 @@ import { getCompetitionById } from 'apis/competition.api'
 import TextMessage from 'components/TextMessage'
 import SubmissionPageSkeleton from 'components/SubmissionPageSkeleton'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { commentCompetitionKeys, competitionKeys } from 'constants/queryKeys'
 
 const { Timer } = Statistic
 
@@ -48,7 +49,7 @@ const CompetitionSubmissionPage = () => {
     error: competitionError,
     refetch: refetchCompetition,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId),
     enabled: !!competitionId,
     select: (response) => response?.data || response,
@@ -57,12 +58,12 @@ const CompetitionSubmissionPage = () => {
   const {
     data: myCommentData,
     isLoading: loadingMyComment,
-    isSuccess: hasSubmittedPrev,
+    isSuccess: hasSubmittedPrev, 
     error: myCommentError,
     refetch: refetchMyComment,
   } = useQuery({
-    queryKey: ['competition-comment', competitionId],
-    queryFn: () => getMyCommentsInCompetition(competitionId),
+    queryKey: commentCompetitionKeys.myComment(competitionId),
+    queryFn: () => getMyCommentInCompetition(competitionId),
     enabled: !!competitionId,
     retry: false,
     select: (response) => response?.data || response,
@@ -105,13 +106,16 @@ const CompetitionSubmissionPage = () => {
       toast.success('Nộp bài thành công!', { id: context })
       setSubmit(true)
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['competition-comment', competitionId])
+      queryClient.invalidateQueries({ queryKey: commentCompetitionKeys.myComment(competitionId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi nộp bài.'
-      toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
-        id: context,
-      })
+      toast.error(
+        typeof message === 'object'
+          ? Object.values(message).join('\n')
+          : message,
+        { id: context },
+      )
       setIsModalVisible(false)
     },
   })
@@ -122,13 +126,16 @@ const CompetitionSubmissionPage = () => {
     onSuccess: (data, variables, context) => {
       toast.success('Cập nhật bài thành công!', { id: context })
       setIsModalVisible(false)
-      queryClient.invalidateQueries(['competition-comment', competitionId])
+      queryClient.invalidateQueries({ queryKey: commentCompetitionKeys.myComment(competitionId) })
     },
     onError: (error, variables, context) => {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật bài.'
-      toast.error(typeof message === 'object' ? Object.values(message).join('\n') : message, {
-        id: context,
-      })
+      toast.error(
+        typeof message === 'object'
+          ? Object.values(message).join('\n')
+          : message,
+        { id: context },
+      )
       setIsModalVisible(false)
     },
   })
@@ -145,7 +152,9 @@ const CompetitionSubmissionPage = () => {
   const handleConfirmSubmit = () => {
     if (pendingFormData) {
       const formattedPayload = {
-        content: pendingFormData.content ? JSON.stringify(pendingFormData.content) : '',
+        content: pendingFormData.content
+          ? JSON.stringify(pendingFormData.content)
+          : '',
       }
 
       if (isSubmitted) {
@@ -170,28 +179,43 @@ const CompetitionSubmissionPage = () => {
   }
 
   if (loadingCompetition || loadingMyComment) return <SubmissionPageSkeleton />
-  if (competitionError || myCommentError)
-    return (
-      <ApiErrorDisplay refetchQueries={[refetchCompetition, refetchMyComment]}></ApiErrorDisplay>
-    )
-  if (!competitionData) return <TextMessage text='Không tìm thấy bài kiểm tra.'></TextMessage>
 
-  const isPendingMutate = createCommentMutation.isPending || updateCommentMutation.isPending
+  const isRealCommentError =
+    myCommentError &&
+    myCommentError.response?.status !== 404 &&
+    myCommentError.response?.status !== 400
+
+  if (competitionError || isRealCommentError) {
+    return (
+      <ApiErrorDisplay
+        refetchQueries={[refetchCompetition, refetchMyComment]}
+      />
+    )
+  }
+
+  if (!competitionData) {
+    return <TextMessage text='Không tìm thấy bài kiểm tra.'></TextMessage>
+  }
+
+  const isPendingMutate =
+    createCommentMutation.isPending || updateCommentMutation.isPending
 
   return (
     <>
       <div className='flex flex-col gap-[10px]'>
         <div className='flex items-center gap-[15px]'>
           <i
-            className='fa-solid fa-arrow-left text-[#ff6911] text-[30px] cursor-pointer'
+            className='fa-solid fa-arrow-left cursor-pointer text-[30px] text-[#ff6911]'
             onClick={() => navigate(-1)}></i>
-          <h2 className='text-xl font-semibold'>{competitionData?.name || 'Tên cuộc thi'}</h2>
+          <h2 className='text-xl font-semibold'>
+            {competitionData?.name || 'Tên cuộc thi'}
+          </h2>
         </div>
 
-        <div className='flex justify-between items-center'>
-          <div className='flex gap-[20px] items-center'></div>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-[20px]'></div>
 
-          <div className='py-[5px] px-[10px] bg-[#ff6911] rounded-[10px]'>
+          <div className='rounded-[10px] bg-[#ff6911] px-[10px] py-[5px]'>
             {targetTime ? (
               <Timer
                 type='countdown'
@@ -207,13 +231,15 @@ const CompetitionSubmissionPage = () => {
                 }}
               />
             ) : (
-              <strong className='text-[#ff0000] text-xl font-bold'>00:00:00</strong>
+              <strong className='text-xl font-bold text-[#ff0000]'>
+                00:00:00
+              </strong>
             )}
           </div>
         </div>
 
-        <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
-          <strong className='block mb-2'>Đề bài: </strong>
+        <div className='rounded-[10px] border-2 border-[#eeecec] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
+          <strong className='mb-2 block'>Đề bài: </strong>
           <TiptapEditor
             value={competitionData?.content}
             editable={false}
@@ -222,23 +248,23 @@ const CompetitionSubmissionPage = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='border-2 border-[#eeecec] rounded-[10px] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
-            <p className='block mb-[4px] font-bold'>
+          <div className='rounded-[10px] border-2 border-[#eeecec] p-[10px] shadow-[0_4px_8px_rgba(0,0,0,0.1)]'>
+            <p className='mb-[4px] block font-bold'>
               Trả lời
               {isSubmitted && !isExpired && (
-                <span className='text-green-600 text-sm ml-2 font-semibold'>
+                <span className='ml-2 text-sm font-semibold text-green-600'>
                   (Bạn đã nộp bài, có thể chỉnh sửa trước khi hết giờ)
                 </span>
               )}
               {isExpired && (
-                <span className='text-red-600 text-sm ml-2 font-normal'>
+                <span className='ml-2 text-sm font-normal text-red-600'>
                   (Đã hết thời gian làm bài)
                 </span>
               )}
               :
             </p>
 
-            <div className='rounded-[10px] flex gap-4 pb-[10px] items-end'>
+            <div className='flex items-end gap-4 rounded-[10px] pb-[10px]'>
               <Controller
                 name='content'
                 control={control}
@@ -254,15 +280,17 @@ const CompetitionSubmissionPage = () => {
                 )}
               />
 
-              <div className='flex flex-col mb-[10px] gap-2'>
+              <div className='mb-[10px] flex flex-col gap-2'>
                 {!isExpired && (
                   <button
                     type='submit'
                     title={isSubmitted ? 'Cập nhật' : 'Nộp bài'}
                     disabled={isPendingMutate}
-                    className='w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer hover:bg-orange-50 transition-colors'>
+                    className='flex h-[40px] w-[40px] cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-orange-50'>
                     {isPendingMutate ? (
-                      <span className='text-[12px] text-[#F06C25]'>Đang tải...</span>
+                      <span className='text-[12px] text-[#F06C25]'>
+                        Đang tải...
+                      </span>
                     ) : (
                       <Icon
                         icon={
@@ -282,9 +310,16 @@ const CompetitionSubmissionPage = () => {
                   <button
                     type='button'
                     title='Xem điểm'
-                    className='w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors'
-                    onClick={() => navigate(`/competitions/${competitionId}/score`)}>
-                    <Icon icon='material-symbols:grading' color='#3b82f6' width='30' height='30' />
+                    className='flex h-[40px] w-[40px] items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200'
+                    onClick={() =>
+                      navigate(`/competitions/${competitionId}/score`)
+                    }>
+                    <Icon
+                      icon='material-symbols:grading'
+                      color='#3b82f6'
+                      width='30'
+                      height='30'
+                    />
                   </button>
                 )}
               </div>
@@ -307,7 +342,7 @@ const CompetitionSubmissionPage = () => {
             ? 'Bạn có chắc chắn muốn thay đổi câu trả lời của mình không?'
             : 'Bạn có chắc chắn muốn nộp bài không?'}
         </p>
-        <p className='text-gray-500 text-sm mt-1'>
+        <p className='mt-1 text-sm text-gray-500'>
           Bạn vẫn có thể tiếp tục chỉnh sửa miễn là chưa hết thời gian.
         </p>
       </Modal>

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import TiptapEditor from 'components/TiptapEditor'
+import { competitionKeys } from 'constants/queryKeys'
 import React from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -13,7 +14,7 @@ function CompetitionInfosPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
     onError: (error) => {

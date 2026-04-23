@@ -14,6 +14,7 @@ import TiptapEditor from '../../TiptapEditor'
 import TextMessage from '../../TextMessage'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../constants/commonConstant'
 import '../../StartManageClass/CreateTest/style.scss'
+import { postKeys } from 'constants/queryKeys.js'
 
 const EditTest = () => {
   const navigate = useNavigate()
@@ -31,7 +32,7 @@ const EditTest = () => {
     mode: 'onTouched',
   })
   const { data: test, isLoading: isPageLoading } = useQuery({
-    queryKey: ['test', testId],
+    queryKey: postKeys.detail(testId),
     queryFn: async () => {
       if (!testId) return null
       const response = await getPostById(testId)
@@ -43,28 +44,24 @@ const EditTest = () => {
     },
   })
 
-  // This effect populates the form once the data is fetched
   useEffect(() => {
     if (test) {
       reset({
         title: test.title || '',
-        // Convert API datetime strings to dayjs objects
         deadline: test.deadline ? dayjs(test.deadline) : null,
-        // Parse the JSON string from the API for the Tiptap editor
         content: safeParse(test.content),
       })
     }
   }, [test, reset])
 
-  // --- REFACTORED: useMutation for handling the update ---
   const updateTestMutation = useMutation({
     mutationFn: (payload) => updatePost(testId, payload),
     onMutate: () => toast.loading('Đang cập nhật bài kiểm tra...'),
     onSuccess: (updatedData, variables, context) => {
       toast.success('Cập nhật thành công!', { id: context })
       // Invalidate queries to trigger automatic refetches
-      queryClient.invalidateQueries({ queryKey: ['test', testId] })
-      queryClient.invalidateQueries({ queryKey: ['tests', classId] })
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(testId) })
+      queryClient.invalidateQueries({ queryKey: postKeys.byClassroom(classId) })
       navigate(`/manage/classes/${classId}/tests`)
     },
     onError: (error, variables, context) => {

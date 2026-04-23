@@ -7,6 +7,7 @@ import { getLessonById } from '../../../../apis/lesson.api'
 import TextMessage from '../../../TextMessage'
 import EditorPlaceholder from '../../../EditorPlaceHolder'
 import { safeParse } from '../../../../utils/formatters'
+import { lessonKeys } from 'constants/queryKeys'
 
 import './style.scss'
 
@@ -21,7 +22,7 @@ const Lesson = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['lesson', lessonId],
+    queryKey: lessonKeys.detail(lessonId), 
     queryFn: () => getLessonById(lessonId).then((res) => res.data),
     enabled: !!lessonId,
     onError: (error) => {

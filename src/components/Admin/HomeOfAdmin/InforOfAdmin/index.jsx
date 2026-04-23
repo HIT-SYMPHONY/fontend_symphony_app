@@ -12,6 +12,8 @@ import { formatDate, translateGender, translateStatus } from '../../../../utils/
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../../../constants/commonConstant'
 import TextMessage from '../../../TextMessage'
 import './style.scss'
+import { useQueryClient } from '@tanstack/react-query'
+import { userKeys } from 'constants/queryKeys.js'
 
 const InforOfAdmin = () => {
   const navigate = useNavigate()
@@ -21,11 +23,11 @@ const InforOfAdmin = () => {
   const [userClasses, setUserClasses] = useState([])
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
-
+  const queryClient = useQueryClient() 
   const {
     register,
     handleSubmit,
-    control, // <-- Need 'control' for Controller
+    control, 
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = useForm({
@@ -73,7 +75,6 @@ const InforOfAdmin = () => {
       ...data,
       dateBirth: data.dateBirth ? data.dateBirth.format(API_DATE_FORMAT) : null,
     }
-    console.log(payload)
 
     const formData = new FormData()
     formData.append('data', new Blob([JSON.stringify(payload)], { type: 'application/json' }))
@@ -98,6 +99,8 @@ const InforOfAdmin = () => {
 
       setIsEditing(false)
       toast.success('Cập nhật thành công!', { id: updateToast })
+      queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) })
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() })
     } catch (error) {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'
       toast.error(message, { id: updateToast })
@@ -130,7 +133,6 @@ const InforOfAdmin = () => {
     const resetToast = toast.loading('Đang reset mật khẩu...')
     try {
       const response = await resetPassword(userId)
-      console.log(response)
       const newPassword = response.data.newPassword
       toast.success(`Reset mật khẩu thành công! Mật khẩu mới là ${newPassword}`, {
         id: resetToast,

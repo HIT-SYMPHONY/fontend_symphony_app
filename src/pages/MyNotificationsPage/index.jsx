@@ -4,47 +4,52 @@ import { useSearchParams } from 'react-router-dom'
 import NotificationsSwiper from 'components/StartHomePage/NotificationsSwiper'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getMyNotifications } from 'apis/notification.api'
-import { getMyClasses } from 'apis/user.api'
+import { getMyClasses, getMyCompetitions } from 'apis/user.api'
 import { Table, Tooltip } from 'antd'
-import { getMyCompetitions } from 'apis/user.api'
 import { formatDate } from 'utils/formatters'
 import { Client } from '@stomp/stompjs'
 import { LocalStorage } from 'constants/localStorage.constant'
+import { notificationKeys, userKeys } from 'constants/queryKeys'
 
 function MyNotificationsPage() {
   const [searchParams] = useSearchParams()
   const globalSearch = searchParams.get('q') || ''
-
+  const swiperParams = { view: 'swiper' }
   // Swiper Data (Latest)
-  const { data: notificationsSwiper, isLoading: isLoadingNotifications } = useQuery({
-    queryKey: ['notifications', 'swiper'],
-    queryFn: async () => {
-      try {
-        // Fetch latest notifications for swiper
-        const response = await getMyNotifications({ pageNum: 1, pageSize: 10 })
-        return response.data?.items || []
-      } catch (error) {
-        console.error('Error fetching notifications:', error)
-        return []
-      }
-    },
-  })
+  const { data: notificationsSwiper, isLoading: isLoadingNotifications } =
+    useQuery({
+      queryKey: notificationKeys.myNotifications(swiperParams),
+      queryFn: async () => {
+        try {
+          const response = await getMyNotifications({
+            pageNum: 1,
+            pageSize: 10,
+          })
+          return response.data?.items || []
+        } catch (error) {
+          console.error('Error fetching notifications:', error)
+          return []
+        }
+      },
+    })
 
   // Table Data (All with pagination & filter)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [classRoomId, setClassRoomId] = useState(null)
   const [competitionId, setCompetitionId] = useState(null)
+  const tableParams = {
+    pageNum: page,
+    pageSize: pageSize,
+    classRoomId: classRoomId || undefined,
+    competitionId: competitionId || undefined,
+    keyword: globalSearch,
+  }
 
   const { data: notificationsTable, isLoading: isLoadingTable } = useQuery({
-    queryKey: ['notifications', 'table', page, pageSize, classRoomId, competitionId],
+    queryKey: notificationKeys.myNotifications(tableParams),
     queryFn: async () => {
-      const response = await getMyNotifications({
-        pageNum: page,
-        pageSize: pageSize,
-        classRoomId: classRoomId || undefined,
-        competitionId: competitionId || undefined,
-      })
+      const response = await getMyNotifications(tableParams)
       return response.data
     },
     placeholderData: (prev) => prev,
@@ -52,14 +57,14 @@ function MyNotificationsPage() {
 
   // Classrooms for Filter
   const { data: classrooms } = useQuery({
-    queryKey: ['my-classes', ''],
+    queryKey: userKeys.myClasses(),
     queryFn: () => getMyClasses(),
     select: (data) => data.data || [],
   })
 
   // Competitions for Filter
   const { data: competitions } = useQuery({
-    queryKey: ['my-competitions'],
+    queryKey: userKeys.myCompetitions(),
     queryFn: () => getMyCompetitions({}),
     select: (data) => data.data || [],
   })
@@ -76,7 +81,9 @@ function MyNotificationsPage() {
   ]
 
   const handleTableChange = (pagination, filters) => {
-    const newFilterValue = filters.classRoomName ? filters.classRoomName[0] : null
+    const newFilterValue = filters.classRoomName
+      ? filters.classRoomName[0]
+      : null
 
     let newClassRoomId = null
     let newCompetitionId = null
@@ -121,10 +128,12 @@ function MyNotificationsPage() {
       filteredValue: classRoomId
         ? [`class_${classRoomId}`]
         : competitionId
-        ? [`competition_${competitionId}`]
-        : null,
+          ? [`competition_${competitionId}`]
+          : null,
       render: (text, record) => (
-        <span className='font-medium'>{text || record.competitionName || 'N/A'}</span>
+        <span className='font-medium'>
+          {text || record.competitionName || 'N/A'}
+        </span>
       ),
     },
     {
@@ -132,7 +141,9 @@ function MyNotificationsPage() {
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
-      render: (text) => <div className='font-bold whitespace-normal break-words'>{text}</div>,
+      render: (text) => (
+        <div className='whitespace-normal break-words font-bold'>{text}</div>
+      ),
     },
     {
       title: 'Ngày tạo',
@@ -166,13 +177,16 @@ function MyNotificationsPage() {
     const handleMessage = (message) => {
       const notification = JSON.parse(message.body)
       // Update swiper cache
-      queryClient.setQueryData(['notifications', 'swiper'], (oldData) => {
-        const data = oldData || []
-        const newData = [notification, ...data]
-        return newData.slice(0, 10)
-      })
+      queryClient.setQueryData(
+        notificationKeys.myNotifications(swiperParams),
+        (oldData) => {
+          const data = oldData || []
+          const newData = [notification, ...data]
+          return newData.slice(0, 10)
+        },
+      )
       // Invalidate and refetch table data
-      queryClient.invalidateQueries({ queryKey: ['notifications', 'table'] })
+      queryClient.invalidateQueries({ queryKey: notificationKeys.all })
     }
 
     const client = new Client({
@@ -182,10 +196,16 @@ function MyNotificationsPage() {
       },
       onConnect: () => {
         classrooms.forEach((classroom) => {
-          client.subscribe(`/topic/classrooms/${classroom.id}/notifications`, handleMessage)
+          client.subscribe(
+            `/topic/classrooms/${classroom.id}/notifications`,
+            handleMessage,
+          )
         })
         competitions.forEach((competition) => {
-          client.subscribe(`/topic/competitions/${competition.id}/notifications`, handleMessage)
+          client.subscribe(
+            `/topic/competitions/${competition.id}/notifications`,
+            handleMessage,
+          )
         })
       },
       onStompError: (frame) => {
@@ -203,17 +223,27 @@ function MyNotificationsPage() {
 
   return (
     <div>
-      <div className='flex items-center gap-2.5 mb-2'>
-        <Icon icon='mingcute:notification-newdot-line' width='36' height='36' color='#f27b36' />
-        <span className='font-semibold text-2xl'>Thông báo mới nhất</span>
+      <div className='mb-2 flex items-center gap-2.5'>
+        <Icon
+          icon='mingcute:notification-newdot-line'
+          width='36'
+          height='36'
+          color='#f27b36'
+        />
+        <span className='text-2xl font-semibold'>Thông báo mới nhất</span>
       </div>
       <NotificationsSwiper
         notifications={notificationsSwiper}
         isLoading={isLoadingNotifications}></NotificationsSwiper>
       <div className='mt-4'>
-        <div className='flex items-center gap-2.5 mb-2'>
-          <Icon icon='mingcute:notification-newdot-line' width='36' height='36' color='#f27b36' />
-          <span className='font-semibold text-2xl'>Tất cả thông báo</span>
+        <div className='mb-2 flex items-center gap-2.5'>
+          <Icon
+            icon='mingcute:notification-newdot-line'
+            width='36'
+            height='36'
+            color='#f27b36'
+          />
+          <span className='text-2xl font-semibold'>Tất cả thông báo</span>
         </div>
         <Table
           columns={columns}
@@ -232,7 +262,7 @@ function MyNotificationsPage() {
               record.content ? (
                 <Icon
                   icon='mingcute:down-line'
-                  className={`text-primary-medium cursor-pointer transition-transform duration-300 ${
+                  className={`cursor-pointer text-primary-medium transition-transform duration-300 ${
                     expanded ? 'rotate-[-180deg]' : ''
                   }`}
                   width='24'
@@ -241,8 +271,8 @@ function MyNotificationsPage() {
                 />
               ) : null,
             expandedRowRender: (record) => (
-              <div className='p-4 bg-orange-50 rounded-lg'>
-                <p className='font-semibold mb-2'>Nội dung chi tiết:</p>
+              <div className='rounded-lg bg-orange-50 p-4'>
+                <p className='mb-2 font-semibold'>Nội dung chi tiết:</p>
                 <p className='max-w-[70vw]'>{record.content}</p>
               </div>
             ),

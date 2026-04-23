@@ -13,6 +13,9 @@ import { getDisplayName } from '../../../../utils/formatters.js'
 import TiptapEditor from '../../../TiptapEditor'
 import { DISPLAY_DATETIME_FORMAT, API_DATETIME_FORMAT } from '../../../../constants/commonConstant.js'
 import './style.scss'
+import { competitionKeys } from 'constants/queryKeys.js'
+import { useQueryClient } from '@tanstack/react-query'
+
 
 
 const CreateOfCompetAdmin = () => {
@@ -26,7 +29,7 @@ const CreateOfCompetAdmin = () => {
     resolver: yupResolver(competitionCreationSchema),
     mode: 'onTouched',
   })
-
+  const queryClient = useQueryClient()
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
@@ -88,6 +91,7 @@ const CreateOfCompetAdmin = () => {
     try {
       await createCompetition(submissionData)
       toast.success('Tạo cuộc thi thành công!', { id: creationToast })
+      queryClient.invalidateQueries({ queryKey: competitionKeys.lists() })
       navigate('/admin/competitions')
     } catch (error) {
       const message = error.response?.data?.message || 'Có lỗi xảy ra khi tạo cuộc thi.'

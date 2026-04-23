@@ -15,11 +15,13 @@ import TextMessage from '../../../TextMessage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../../../constants/commonConstant.js'
 import './style.scss'
 import TiptapEditor from '../../../TiptapEditor/index.jsx'
+import { useQueryClient } from '@tanstack/react-query'
 
 const CheckOfClassAdmin = () => {
   const navigate = useNavigate()
   const { classId } = useParams()
 
+  const queryClient = useQueryClient()
   const [information, setInformation] = useState(null)
   const [leaders, setLeaders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -127,6 +129,9 @@ const CheckOfClassAdmin = () => {
       await updateClassroom(classId, formData)
       toast.success('Cập nhật thành công!', { id: saveToast })
       setIsEditing(false)
+      queryClient.invalidateQueries({ queryKey: classroomKeys.detail(classId) })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: classroomKeys.summaries() });
       await fetchData()
     } catch (err) {
       const message = err.response?.data?.message || 'Cập nhật thất bại.'

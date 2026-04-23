@@ -13,6 +13,7 @@ import {
   getDisplayName,
 } from 'utils/formatters'
 import { Skeleton } from 'antd'
+import { competitionUserKeys } from 'constants/queryKeys'
 
 function LeaderCompetitionParticipantsPage() {
   const navigate = useNavigate()
@@ -35,11 +36,8 @@ function LeaderCompetitionParticipantsPage() {
     isError,
     refetch,
   } = useInfiniteQuery({
-    queryKey: [
-      'competition-users',
-      competitionId,
-      listParams,
-    ],
+    queryKey: competitionUserKeys.members(competitionId, listParams),
+
     queryFn: async ({ pageParam = 1 }) => {
       const response = await getMembers(competitionId, {
         ...listParams,

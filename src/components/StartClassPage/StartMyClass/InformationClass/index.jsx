@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from 'antd'
-
+import { classroomKeys, lessonKeys, postKeys } from 'constants/queryKeys' 
 import { getClassroomById } from '../../../../apis/classroom.api'
 import { getLessonsByClassroomId } from '../../../../apis/lesson.api.js'
 import { getPostsByClassroomId } from '../../../../apis/post.api.js'
@@ -34,7 +34,7 @@ const HomeInformation = () => {
     isLoading: isLoadingClassroom,
     isError: isErrorClassroom,
   } = useQuery({
-    queryKey: ['classroom', classId],
+    queryKey: classroomKeys.detail(classId), 
     queryFn: () => getClassroomById(classId).then((res) => res.data),
     enabled: !!classId,
     onError: (error) => {
@@ -44,13 +44,13 @@ const HomeInformation = () => {
   })
 
   const { data: lessons = [], isLoading: isLoadingLessons } = useQuery({
-    queryKey: ['lessons', classId],
+    queryKey: lessonKeys.byClassroom(classId), 
     queryFn: () => getLessonsByClassroomId(classId).then((res) => res.data || []),
     enabled: !!classId,
   })
 
   const { data: posts = [], isLoading: isLoadingPosts } = useQuery({
-    queryKey: ['posts', classId],
+    queryKey: postKeys.byClassroom(classId, { pageNum: 1, pageSize: 100 }), 
     queryFn: () =>
       getPostsByClassroomId(classId, { pageNum: 1, pageSize: 100 }).then((res) => res.data || []),
     enabled: !!classId,

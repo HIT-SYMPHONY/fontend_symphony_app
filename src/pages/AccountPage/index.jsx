@@ -15,6 +15,8 @@ import ReplaceOfAdmin from '../../components/Admin/NotiOfAdmin/ReplaceOfNoti/ind
 import placeholderImage from '../../assets/img/Ellipse.png'
 import TextMessage from '../../components/TextMessage'
 import './style.scss'
+import { useQueryClient } from '@tanstack/react-query'
+import { userKeys } from 'constants/queryKeys.js'
 
 const AccountPage = () => {
   const { user, saveUser } = useAuth()
@@ -26,6 +28,8 @@ const AccountPage = () => {
   const [imageFile, setImageFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const fileInputRef = useRef(null)
+  const formRef = useRef(null)
+  const imageUploadRef = useRef(null)
 
   const {
     register,
@@ -143,6 +147,7 @@ const AccountPage = () => {
       saveUser({ ...user, fullName: updatedUserData.fullName, imageUrl: updatedUserData.imageUrl })
       setIsEditingPersonal(false)
       setImageFile(null)
+      queryClient.invalidateQueries({ queryKey: userKeys.currentUser() })
       toast.success('Cập nhật thành công!', { id: updateToast })
     } catch (error) {
       const message = error.response?.data?.message || 'Lỗi khi cập nhật.'

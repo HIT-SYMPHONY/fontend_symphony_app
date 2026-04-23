@@ -1,174 +1,158 @@
 import React, { useState } from 'react'
 import { Icon } from '@iconify/react'
-import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { Skeleton } from 'antd'
+
+import { getMyCompetitions } from 'apis/user.api'
+import { userKeys } from 'constants/queryKeys'
+import TextMessage from 'components/TextMessage'
+import ApiErrorDisplay from 'components/ApiErrorDisplay'
+import { translateStatus } from 'utils/formatters'
 import './style.scss'
+import CompetitionCommentAccordion from 'components/ComeptitionCommentAccordion/ComeptitionCommentAccordion'
 
 const TableCompetition = ({ onSetSub }) => {
-  const navigate = useNavigate()
-  // Dữ liệu mẫu
-  const list = [1, 2, 3, 4, 5, 6, 7]
-  const lop = [
-    {
-      name: 'Tuần 1',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 1,
-    },
-    {
-      name: 'Tuần 2',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
-    {
-      name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
-    {
-      name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
-    {
-      name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
-    {
-      name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
+  const [expandedItems, setExpandedItems] = useState({})
 
-    {
-      name: 'Tuần 3',
-      nguoinop: 'Người nộp: Nguyễn Thị M',
-      timenop: 'Ngày kiểm tra: 30/06/2025',
-      nguoigiao: 'Người giao: Nguyễn Thị N',
-      timegiao: 'Thời gian làm bài: 01 : 30 : 00',
-      diem: '80',
-      style: 2,
-    },
-  ]
+  const {
+    data: competitions,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: userKeys.myCompetitions(),
+    queryFn: getMyCompetitions,
+    select: (response) => response?.data || [],
+  })
 
-  // Khởi tạo trạng thái add cho từng mục trong list
-  const [addStates, setAddStates] = useState(list.map(() => false))
+  const toggleAccordion = (competitionId) => {
+    setExpandedItems((prev) => ({
+      ...prev,
+      [competitionId]: !prev[competitionId],
+    }))
+  }
 
-  // Hàm toggle trạng thái add cho một mục cụ thể
-  const toggleAdd = (index) => {
-    setAddStates((prev) => prev.map((state, i) => (i === index ? !state : state)))
+  const header = (
+    <div className='table-result__head'>
+      <div className='table-result__head__icon'>
+        <Icon
+          icon='fluent:clipboard-text-32-filled'
+          width='30'
+          height='30'
+          className='table-result__head__icon__fill'
+        />
+        <h2>Bảng kết quả</h2>
+      </div>
+      <div className='table-result__head__toggle'>
+        <p className='cursor-pointer' onClick={() => onSetSub(true)}>
+          Học tập
+        </p>
+        <p className='toggle cursor-pointer' onClick={() => onSetSub(false)}>
+          Cuộc thi
+        </p>
+      </div>
+    </div>
+  )
+
+  if (isLoading) {
+    return (
+      <div className='table-result'>
+        {header}
+        <div className='p-4'>
+          <Skeleton
+            active
+            avatar={{ size: 80, shape: 'square' }}
+            paragraph={{ rows: 2 }}
+          />
+          <Skeleton
+            active
+            avatar={{ size: 80, shape: 'square' }}
+            paragraph={{ rows: 2 }}
+            className='mt-4'
+          />
+          <Skeleton
+            active
+            avatar={{ size: 80, shape: 'square' }}
+            paragraph={{ rows: 2 }}
+            className='mt-4'
+          />
+          <Skeleton
+            active
+            avatar={{ size: 80, shape: 'square' }}
+            paragraph={{ rows: 2 }}
+            className='mt-4'
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <ApiErrorDisplay
+        title='Lỗi tải danh sách cuộc thi'
+        refetchQueries={[refetch]}
+      />
+    )
   }
 
   return (
     <div className='table-result'>
-      <div className='table-result__head'>
-        <div className='table-result__head__icon'>
-          <Icon
-            icon='fluent:clipboard-text-32-filled'
-            width='30'
-            height='30'
-            className='table-result__head__icon__fill'
-          />
-          <h2>Bảng kết quả</h2>
-        </div>
-        <div className='table-result__head__toggle'>
-          <p onClick={() => onSetSub(true)}>Học tập</p>
-          <p className='toggle' onClick={() => onSetSub(false)}>
-            Cuộc thi
-          </p>
-        </div>
-      </div>
-
+      {header}
       <div className='table-result__body'>
-        {list.map((item, index) => (
-          <div className='body' key={index}>
-            <div className='body__img'>
-              <div className='body__img__hi'></div>
-              <div className='body__img__tieumuc'>
-                <h5>HIT Contest Series 2025</h5>
-                <div className='body__img__tieumuc__space'>
-                  <span>Đang diễn ra</span>
-                  <div className='space'>
-                    <i className='fa-solid fa-star space__mau'></i>
-                    <span>Giải Nhất</span>
-                    <i className='fa-solid fa-star space__mau'></i>
-                    <span>3 giai đoạn</span>
-                    <Icon
-                      icon={addStates[index] ? 'mingcute:up-fill' : 'mingcute:down-fill'}
-                      width='24'
-                      height='24'
-                      className='space__mau'
-                      onClick={() => toggleAdd(index)}
-                    />
-                  </div>
-                </div>
-                <p>Phần thi: Photoshop</p>
-              </div>
-            </div>
-            {addStates[index] && (
-              <div className='body__thongtin'>
-                <hr />
-                <div className='body__thongtin__title'>
-                  <span>Tên bài</span>
-                  <span>Điểm</span>
-                  <span>Thông tin chi tiết</span>
-                </div>
-                <div className='body__thongtin__table'>
-                  {lop.map((item, index) => (
-                    <div className='list-table' key={index}>
-                      <div className='list-table__title'>
-                        <Icon
-                          icon='streamline-ultimate:ranking-stars-ribbon-bold'
-                          className='list-table__title__icon'
-                        />
-                        <h5>{item.name}</h5>
-                      </div>
-                      <h3 className='list-table__h3'>{item.diem}</h3>
-                      <div className='list-table__thongtin'>
-                        <p>{item.nguoigiao}</p>
-                        <p>{item.timegiao}</p>
-                      </div>
-                      <div className='list-table__thongtin'>
-                        <p>{item.nguoinop}</p>
-                        <p>{item.timenop}</p>
-                      </div>
+        {competitions.length === 0 ? (
+          <TextMessage text='Bạn chưa tham gia cuộc thi nào.' />
+        ) : (
+          competitions.map((competition) => {
+            const isExpanded = !!expandedItems[competition.id]
+
+            return (
+              <div className='body' key={competition.id}>
+                <div
+                  className='body__img cursor-pointer'
+                  onClick={() => toggleAccordion(competition.id)}>
+                  <div className='body__img__hinhanh flex items-center justify-center overflow-hidden'>
+                    {competition.image ? (
+                      <img
+                        src={competition.image}
+                        alt='competition cover'
+                        className='h-full w-full object-cover'
+                      />
+                    ) : (
                       <Icon
-                        icon='duo-icons:message-3'
-                        width='40'
-                        height='40'
-                        className='list-table__icon'
-                        onClick={() => navigate('comment')}
+                        icon='streamline-ultimate:ranking-stars-ribbon-bold'
+                        className='text-3xl text-gray-400'
+                      />
+                    )}
+                  </div>
+
+                  <div className='flex flex-1 items-center gap-1 pr-5'>
+                    <div className='flex-1'>
+                      <h3>{competition.name || 'Chưa cập nhật'}</h3>
+                      <span className='rounded-[4px] bg-neutral-light p-1 text-primary'>
+                        {translateStatus(competition.status)}
+                      </span>
+                    </div>
+                    <div>
+                      <Icon
+                        icon={
+                          isExpanded ? 'mingcute:up-fill' : 'mingcute:down-fill'
+                        }
+                        width='24'
+                        height='24'
+                        className='space__mau text-primary'
                       />
                     </div>
-                  ))}
+                  </div>
                 </div>
+
+                {isExpanded && (
+                  <CompetitionCommentAccordion competition={competition} />
+                )}
               </div>
-            )}
-          </div>
-        ))}
+            )
+          })
+        )}
       </div>
     </div>
   )

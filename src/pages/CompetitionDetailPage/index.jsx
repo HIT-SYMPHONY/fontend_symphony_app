@@ -6,6 +6,7 @@ import { getCompetitionById } from 'apis/competition.api'
 import toast from 'react-hot-toast'
 import { Skeleton } from 'antd'
 import SeparateDiv from 'components/SeparateDiv'
+import { competitionKeys } from 'constants/queryKeys'
 
 function CompetitionDetailPage() {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ function CompetitionDetailPage() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
     onError: (error) => {

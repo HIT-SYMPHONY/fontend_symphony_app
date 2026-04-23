@@ -15,6 +15,7 @@ import NavigationDropdown from '../../NavigationDropdown'
 import ApiErrorDisplay from 'components/ApiErrorDisplay'
 import useDebounce from 'hooks/useDebounce'
 import './style.scss'
+import { classroomKeys } from 'constants/queryKeys'
 
 const InformationManage = () => {
   const { classId } = useParams()
@@ -47,7 +48,7 @@ const InformationManage = () => {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['classroom', classId],
+    queryKey: classroomKeys.detail(classId),
     queryFn: async () => {
       if (!classId) return null
       const response = await getClassroomById(classId)

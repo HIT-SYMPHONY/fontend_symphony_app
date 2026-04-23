@@ -7,6 +7,7 @@ import ApiErrorDisplay from 'components/ApiErrorDisplay'
 import useAuth from 'hooks/useAuth'
 import { formatDate, safeParse } from 'utils/formatters'
 import TiptapEditor from 'components/TiptapEditor'
+import { competitionKeys } from 'constants/queryKeys'
 
 function LeaderCompetitionInfosPage() {
   const { competitionId } = useParams()
@@ -21,7 +22,7 @@ function LeaderCompetitionInfosPage() {
     isError,
     refetch,
   } = useQuery({
-    queryKey: ['competition', competitionId],
+    queryKey: competitionKeys.detail(competitionId),
     queryFn: () => getCompetitionById(competitionId).then((res) => res.data),
     enabled: !!competitionId,
   })
